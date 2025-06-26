@@ -43,11 +43,11 @@
 #endif
 
 // We don't want quasselcore to depend on KDE
-#if defined HAVE_KF5 && defined BUILD_CORE
-#    undef HAVE_KF5
+#if defined HAVE_${KF_FULL} && defined BUILD_CORE
+#    undef HAVE_${KF_FULL}
 #endif
 
-#if defined HAVE_KF5
+#if defined HAVE_${KF_FULL}
 #    include <KCoreAddons/KAboutData>
 #    include <KCoreAddons/Kdelibs4ConfigMigrator>
 #endif
@@ -71,8 +71,8 @@ int main(int argc, char** argv)
     QCoreApplication::setOrganizationName(Quassel::buildInfo().organizationName);
     QCoreApplication::setOrganizationDomain(Quassel::buildInfo().organizationDomain);
 
-    // Migrate settings from KDE4 to KF5 if appropriate
-#ifdef HAVE_KF5
+    // Migrate settings from KDE to KF if appropriate
+#ifdef HAVE_${KF_FULL}
     Kdelibs4ConfigMigrator migrator(QCoreApplication::applicationName());
     migrator.setConfigFiles(QStringList() << "quasselrc"
                                           << "quassel.notifyrc");
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
     try {
         Quassel::instance()->init(runMode);
 
-#ifdef HAVE_KF5
+#ifdef HAVE_${KF_FULL}
         AboutData aboutData;
         AboutData::setQuasselPersons(&aboutData);
         KAboutData::setApplicationData(aboutData.kAboutData());

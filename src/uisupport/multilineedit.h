@@ -25,7 +25,7 @@
 #include <QHash>
 #include <QKeyEvent>
 
-#if defined HAVE_KF5
+#if defined HAVE_${KF_FULL}
 #    include <KTextWidgets/KTextEdit>
 #    define MultiLineEditParent KTextEdit
 #else

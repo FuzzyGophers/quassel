@@ -26,7 +26,7 @@
 #include <QLocale>
 #include <QString>
 
-#ifdef HAVE_KF5
+#ifdef HAVE_${KF_FULL}
 #    include <KCoreAddons/KAboutData>
 #endif
 
@@ -171,7 +171,7 @@ public:
      */
     QList<AboutPerson> credits() const;
 
-#ifdef HAVE_KF5
+#ifdef HAVE_${KF_FULL}
     /**
      * Creates a KAboutData instance based on the contents of this AboutData instance.
      *

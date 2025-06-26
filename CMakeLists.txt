@@ -6,7 +6,7 @@
 # General setup
 #####################################################################
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 
 # Tell CMake about or own modules
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -33,7 +33,19 @@ if (USE_CCACHE)
 endif()
 
 # Set up project
-project(Quassel CXX)
+project(Quassel LANGUAGES CXX)
+
+# Global cache variables for Qt and KF to ease maintenance
+set(QT_PREFIX "Qt" CACHE STRING "Qt prefix")
+set(QT_VERSION "6" CACHE STRING "Qt version")
+set(QT_FULL "${QT_PREFIX}${QT_VERSION}" CACHE STRING "Qt full version")
+
+set(KF_PREFIX "KF" CACHE STRING "KF prefix")
+set(KF_VERSION "6" CACHE STRING "KF version")
+set(KF_FULL "${KF_PREFIX}${KF_VERSION}" CACHE STRING "KF full version")
+
+# Global cache variables for MacOS
+set(MACOS_VERSION "14.0" CACHE STRING "MacOS Version")
 
 # Let CMake handle file generation for Qt
 set(CMAKE_AUTOMOC ON)
@@ -55,6 +67,10 @@ include(FeatureSummary)
 include(QuasselCompileSettings)
 include(QuasselMacros)
 
+# Set C++17 standard for Qt6
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Options and variables that can be set on the command line
 #####################################################################
 
@@ -62,6 +78,7 @@ include(QuasselMacros)
 option(WANT_CORE     "Build the core (server) binary"           ON)
 option(WANT_QTCLIENT "Build the client-only binary"             ON)
 option(WANT_MONO     "Build the monolithic (all-in-one) binary" ON)
+
 add_feature_info(WANT_CORE WANT_CORE "Build the core (server) binary")
 add_feature_info(WANT_QTCLIENT WANT_QTCLIENT "Build the client-only binary (requires a core to connect to)")
 add_feature_info(WANT_MONO WANT_MONO "Build the monolithic (all-in-one) binary")
@@ -137,7 +154,7 @@ set(BUILD_SHARED_LIBS TRUE CACHE BOOL "" FORCE)
 if (APPLE)
     set(CMAKE_DISABLE_FIND_PACKAGE_X11 true)
     set(CMAKE_DISABLE_FIND_PACKAGE_XCB true)
-    set(CMAKE_DISABLE_FIND_PACKAGE_Qt5X11Extras true)
+    set(CMAKE_DISABLE_FIND_PACKAGE_${QT_FULL}X11Extras true)
 endif()
 
 # Simplify later checks
@@ -153,13 +170,7 @@ endif()
 # Set up Qt
 #####################################################################
 
-set(QT_MIN_VERSION "5.5.0")
-
-# Enable Qt deprecation warnings for Qt < 5.13 (on by default in newer versions)
-add_definitions(-DQT_DEPRECATED_WARNINGS)
-
-# Disable all Qt APIs that were deprecated in 5.5 and before
-add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050500)
+set(QT_MIN_VERSION "6.8")
 
 # Find package dependencies
 #
@@ -176,12 +187,14 @@ if (BUILD_CORE)
     list(APPEND qt_components Sql)
 endif()
 
-find_package(Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS ${qt_components})
-set_package_properties(Qt5 PROPERTIES TYPE REQUIRED
+find_package(${QT_FULL} ${QT_MIN_VERSION} REQUIRED COMPONENTS ${qt_components})
+set_package_properties(${QT_FULL} PROPERTIES TYPE REQUIRED
     URL "https://www.qt.io/"
     DESCRIPTION "the Qt libraries"
 )
-message(STATUS "Found Qt ${Qt5Core_VERSION}")
+message(STATUS "Found Qt ${Qt6Core_VERSION}")
+
+set(CMAKE_OSX_DEPLOYMENT_TARGET "${MACOS_VERSION}" CACHE STRING "Minimum macOS version")
 
 # Determine minimum deployment target for macOS supported by Qt
 if(APPLE)
@@ -193,7 +206,7 @@ if(APPLE)
         set(qmakeEmptyProjectFile "${CMAKE_BINARY_DIR}/empty.pro")
         set(qmakeStashFile "${CMAKE_BINARY_DIR}/.qmake.stash")
         file(WRITE ${qmakeEmptyProjectFile} "")
-        get_target_property(QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
+        get_target_property(QMAKE_EXECUTABLE ${QT_FULL}::qmake IMPORTED_LOCATION)
         execute_process(
             COMMAND ${QMAKE_EXECUTABLE} -E ${qmakeEmptyProjectFile}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -212,8 +225,8 @@ endif()
 
 # Check for SSL support in Qt
 cmake_push_check_state(RESET)
-set(CMAKE_REQUIRED_LIBRARIES Qt5::Core Qt5::Network)
-set(CMAKE_REQUIRED_FLAGS -std=c++14)
+set(CMAKE_REQUIRED_LIBRARIES ${QT_FULL}::Core ${QT_FULL}::Network)
+
 check_cxx_source_compiles("
     #include <QSslSocket>
     int main() {
@@ -229,34 +242,34 @@ endif()
 
 # Optional Qt components
 
-find_package(Qt5LinguistTools QUIET)
-set_package_properties(Qt5LinguistTools PROPERTIES TYPE RECOMMENDED
+find_package(${QT_FULL}LinguistTools QUIET)
+set_package_properties(${QT_FULL}LinguistTools PROPERTIES TYPE RECOMMENDED
     DESCRIPTION "contains tools for handling translation files"
     PURPOSE "Required for having translations"
 )
 
 if (BUILD_GUI)
     if (NOT WIN32)
-        find_package(Qt5DBus QUIET)
-        set_package_properties(Qt5DBus PROPERTIES TYPE RECOMMENDED
+        find_package(${QT_FULL}DBus QUIET)
+        set_package_properties(${QT_FULL}Bus PROPERTIES TYPE RECOMMENDED
             URL "https://www.qt.io/"
-            DESCRIPTION "D-Bus support for Qt5"
+            DESCRIPTION "D-Bus support for Qt"
             PURPOSE     "Needed for supporting D-Bus-based notifications and tray icon, used by most modern desktop environments"
         )
-        if (Qt5DBus_FOUND)
-            find_package(dbusmenu-qt5 QUIET CONFIG)
-            set_package_properties(dbusmenu-qt5 PROPERTIES TYPE RECOMMENDED
-                URL "https://launchpad.net/libdbusmenu-qt"
-                DESCRIPTION "a library implementing the DBusMenu specification"
-                PURPOSE     "Required for having a context menu for the D-Bus-based tray icon"
-            )
-        endif()
+    if (${QT_FULL}DBus_FOUND)
+        find_package(dbusmenu-qt${QT_VERSION} QUIET CONFIG)
+        set_package_properties(dbusmenu-qt${QT_VERSION} PROPERTIES TYPE RECOMMENDED
+            URL "https://launchpad.net/libdbusmenu-qt"
+            DESCRIPTION "a library implementing the DBusMenu specification"
+            PURPOSE     "Required for having a context menu for the D-Bus-based tray icon"
+        )
     endif()
+endif()
 
-    find_package(Qt5Multimedia QUIET)
-    set_package_properties(Qt5Multimedia PROPERTIES TYPE RECOMMENDED
+    find_package(${QT_FULL}Multimedia QUIET)
+    set_package_properties(${QT_FULL}Multimedia PROPERTIES TYPE RECOMMENDED
         URL "https://www.qt.io/"
-        DESCRIPTION "Multimedia support for Qt5"
+        DESCRIPTION "Multimedia support for Qt"
         PURPOSE     "Required for audio notifications"
     )
 
@@ -280,15 +293,15 @@ if (BUILD_GUI)
     endif()
 
     if (WITH_WEBENGINE)
-        find_package(Qt5WebEngine QUIET)
-        set_package_properties(Qt5WebEngine PROPERTIES TYPE RECOMMENDED
+        find_package(${QT_FULL}WebEngine QUIET)
+        set_package_properties(${QT_FULL}WebEngine PROPERTIES TYPE RECOMMENDED
             URL "https://www.qt.io/"
             DESCRIPTION "a WebEngine implementation for Qt"
             PURPOSE     "Needed for displaying previews for URLs in chat"
         )
-        if (Qt5WebEngine_FOUND)
-            find_package(Qt5WebEngineWidgets QUIET)
-            set_package_properties(Qt5WebEngineWidgets PROPERTIES TYPE RECOMMENDED
+        if (${QT_FULL}WebEngine_FOUND)
+            find_package(${QT_FULL}WebEngineWidgets QUIET)
+            set_package_properties(${QT_FULL}WebEngineWidgets PROPERTIES TYPE RECOMMENDED
                 URL "https://www.qt.io/"
                 DESCRIPTION "widgets for Qt's WebEngine implementation"
                 PURPOSE     "Needed for displaying previews for URLs in chat"
@@ -296,22 +309,22 @@ if (BUILD_GUI)
         endif()
     endif()
 
-    if (WITH_WEBENGINE AND Qt5WebEngineWidgets_FOUND)
+    if (WITH_WEBENGINE AND ${QT_FULL}WebEngineWidgets_FOUND)
         set(HAVE_WEBENGINE true)
     endif()
     add_feature_info("WITH_WEBENGINE, QtWebEngine and QtWebEngineWidgets modules" HAVE_WEBENGINE "Support showing previews for URLs in chat")
 
     if (NOT HAVE_WEBENGINE)
         if (WITH_WEBKIT)
-            find_package(Qt5WebKit QUIET)
-            set_package_properties(Qt5WebKit PROPERTIES TYPE OPTIONAL
+            find_package(${QT_FULL}WebKit QUIET)
+            set_package_properties(${QT_FULL}WebKit PROPERTIES TYPE OPTIONAL
                 URL "https://www.qt.io/"
                 DESCRIPTION "a WebKit implementation for Qt"
                 PURPOSE     "Needed for displaying previews for URLs in chat"
                 )
-            if (Qt5WebKit_FOUND)
-                find_package(Qt5WebKitWidgets QUIET)
-                set_package_properties(Qt5WebKitWidgets PROPERTIES TYPE OPTIONAL
+            if (${QT_FULL}WebKit_FOUND)
+                find_package(${QT_FULL}WebKitWidgets QUIET)
+                set_package_properties(${QT_FULL}WebKitWidgets PROPERTIES TYPE OPTIONAL
                     URL "https://www.qt.io/"
                     DESCRIPTION "widgets for Qt's WebKit implementation"
                     PURPOSE     "Needed for displaying previews for URLs in chat"
@@ -319,7 +332,7 @@ if (BUILD_GUI)
             endif()
         endif()
 
-        if (WITH_WEBKIT AND Qt5WebKitWidgets_FOUND)
+        if (WITH_WEBKIT AND ${QT_FULL}WebKitWidgets_FOUND)
             set(HAVE_WEBKIT true)
         endif()
         add_feature_info("WITH_WEBKIT, QtWebKit and QtWebKitWidgets modules" HAVE_WEBKIT "Support showing previews for URLs in chat (legacy)")
@@ -347,18 +360,18 @@ if (BUILD_GUI)
     if (ECM_FOUND)
         list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
         if (WITH_KDE)
-            find_package(KF5 REQUIRED COMPONENTS ConfigWidgets CoreAddons Notifications NotifyConfig Sonnet TextWidgets WidgetsAddons XmlGui)
-            set_package_properties(KF5 PROPERTIES TYPE REQUIRED
+            find_package(${KF_FULL} REQUIRED COMPONENTS ConfigWidgets CoreAddons Notifications NotifyConfig Sonnet TextWidgets WidgetsAddons XmlGui)
+            set_package_properties(${KF_FULL} PROPERTIES TYPE REQUIRED
                 URL "http://www.kde.org"
                 DESCRIPTION "KDE Frameworks"
                 PURPOSE     "Required for integration into the Plasma desktop"
             )
-            message(STATUS "Found KDE Frameworks ${KF5_VERSION}")
+            message(STATUS "Found KDE Frameworks ${KF_VERSION}")
         endif()
 
-        # Optional KF5 tier1 components
-        find_package(KF5Sonnet QUIET)
-        set_package_properties(KF5Sonnet PROPERTIES TYPE RECOMMENDED
+        # Optional KF tier1 components
+        find_package(${KF_FULL}Sonnet QUIET)
+        set_package_properties(${KF_FULL}Sonnet PROPERTIES TYPE RECOMMENDED
             URL "http://api.kde.org/frameworks-api/frameworks5-apidocs/sonnet/html"
             DESCRIPTION "framework for providing spell-checking capabilities"
             PURPOSE "Enables spell-checking support in input widgets"
@@ -367,8 +380,8 @@ if (BUILD_GUI)
 endif()
 
 if (BUILD_CORE)
-    find_package(Qca-qt5 2.0 QUIET)
-    set_package_properties(Qca-qt5 PROPERTIES TYPE RECOMMENDED
+    find_package(Qca-qt6 2.0 QUIET)
+    set_package_properties(Qca-qt6 PROPERTIES TYPE RECOMMENDED
         URL "https://projects.kde.org/projects/kdesupport/qca"
         DESCRIPTION "Qt Cryptographic Architecture"
         PURPOSE "Required for encryption support"
@@ -387,7 +400,7 @@ endif()
 # Non-Qt-based packages
 #####################################################################
 
-find_package(Boost 1.54 REQUIRED)
+find_package(Boost 1.85 REQUIRED)
 set_package_properties(Boost PROPERTIES TYPE REQUIRED
     URL "https://www.boost.org/"
     DESCRIPTION "Boost libraries for C++"
@@ -436,9 +449,9 @@ if (BUILD_TESTING)
         PURPOSE "Required for building unit tests"
     )
 
-    find_package(Qt5Test QUIET)
-    set_package_properties(Qt5Test PROPERTIES TYPE REQUIRED
-        DESCRIPTION "unit testing library for the Qt5 framework"
+    find_package(${QT_FULL}Test QUIET)
+    set_package_properties(${QT_FULL}Test PROPERTIES TYPE REQUIRED
+        DESCRIPTION "unit testing library for the Qt framework"
         PURPOSE "Required for building unit tests"
     )
     enable_testing()
@@ -451,10 +464,10 @@ endif()
 #####################################################################
 
 if (WITH_KDE)
-    add_definitions(-DHAVE_KDE -DHAVE_KF5)
-    set(WITH_KF5 TRUE)
+    add_definitions(-DHAVE_KDE -DHAVE_${KF_FULL})
+    set(WITH_${KF_VERSION} TRUE)
 
-    # If KDE Frameworks are present, they're most probably providing Qt5 integration including icon loading
+    # If KDE Frameworks are present, they're most probably providing Qt integration including icon loading
     set(EMBED_DATA OFF)
 
     include(KDEInstallDirs)
@@ -536,7 +549,7 @@ feature_summary(WHAT ALL
 
 # Finally, compile the sources
 # We want this after displaying the feature summary to avoid ugly
-# CMake backtraces in case a required Qt5 module is missing
+# CMake backtraces in case a required Qt module is missing
 #####################################################################
 
 add_subdirectory(src)

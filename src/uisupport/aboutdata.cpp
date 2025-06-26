@@ -110,7 +110,7 @@ AboutData& AboutData::addCredits(std::initializer_list<AboutPerson> credits)
     return *this;
 }
 
-#ifdef HAVE_KF5
+#ifdef HAVE_${KF_FULL}
 
 KAboutData AboutData::kAboutData() const
 {

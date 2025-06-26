@@ -28,7 +28,7 @@
 #include <QTableView>
 #include <QToolBar>
 
-#ifdef HAVE_KF5
+#ifdef HAVE_${KF_FULL}
 #    include <kconfigwidgets_version.h>
 
 #    include <KConfigWidgets/KStandardAction>
