@@ -88,10 +88,10 @@ private:
     QMutex _mutex;
 
     QDir _configDir;
+    QRegularExpression _quasselStanzaRx;
     QString _configFileName;
     QString _configPath;
     QString _configTag;
-    QRegExp _quasselStanzaRx;
     QString _quasselStanzaTemplate;
 };
 

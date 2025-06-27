@@ -87,7 +87,7 @@ void AppearanceSettingsPage::initLanguageComboBox()
 {
     QDir i18nDir(Quassel::translationDirPath(), "*.qm");
 
-    QRegExp rx("(qt_)?([a-zA-Z_]+)\\.qm");
+    QRegularExpression rx("(qt_)?([a-zA-Z_]+)\\.qm");
     foreach (QString translationFile, i18nDir.entryList()) {
         if (!rx.exactMatch(translationFile))
             continue;
