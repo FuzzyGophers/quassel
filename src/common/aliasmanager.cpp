@@ -21,6 +21,7 @@
 #include "aliasmanager.h"
 
 #include <QDebug>
+#include <QRegularExpression>
 #include <QStringList>
 
 #include "network.h"
