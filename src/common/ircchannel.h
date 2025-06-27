@@ -25,6 +25,7 @@
 #include <QHash>
 #include <QSet>
 #include <QString>
+#include <QStringConverter>
 #include <QStringList>
 #include <QVariantMap>
 
@@ -65,12 +66,12 @@ public:
     QStringList modeValueList(const QChar& mode) const;
     QString channelModeString() const;
 
-    inline QTextCodec* codecForEncoding() const { return _codecForEncoding; }
-    inline QTextCodec* codecForDecoding() const { return _codecForDecoding; }
+    inline const QStringEncoder& codecForEncoding() const { return _encoder; }
+    inline const QStringDecoder& codecForDecoding() const { return _decoder; }
     void setCodecForEncoding(const QString& codecName);
-    void setCodecForEncoding(QTextCodec* codec);
+    void setCodecForEncoding(QStringConverter::Encoding encoding);
     void setCodecForDecoding(const QString& codecName);
-    void setCodecForDecoding(QTextCodec* codec);
+    void setCodecForDecoding(QStringConverter::Encoding encoding);
 
     QString decodeString(const QByteArray& text) const;
     QByteArray encodeString(const QString& string) const;
@@ -142,8 +143,8 @@ private:
 
     Network* _network;
 
-    QTextCodec* _codecForEncoding;
-    QTextCodec* _codecForDecoding;
+    QStringEncoder _encoder;
+    QStringDecoder _decoder;
 
     QHash<QChar, QStringList> _A_channelModes;
     QHash<QChar, QString> _B_channelModes;

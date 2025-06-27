@@ -24,7 +24,7 @@
 
 #include <QHeaderView>
 #include <QMessageBox>
-#include <QTextCodec>
+#include <QStringConverter>
 
 #include "client.h"
 #include "icon.h"
@@ -72,11 +72,24 @@ NetworksSettingsPage::NetworksSettingsPage(QWidget* parent)
     unavailableIcon = icon::get({"emblem-unavailable", "dialog-warning"});
     questionIcon = icon::get({"emblem-question", "dialog-question", "dialog-information"});
 
-    foreach (int mib, QTextCodec::availableMibs()) {
-        QByteArray codec = QTextCodec::codecForMib(mib)->name();
-        ui.sendEncoding->addItem(codec);
-        ui.recvEncoding->addItem(codec);
-        ui.serverEncoding->addItem(codec);
+	// List of supported encodings
+	static const QMap<QStringConverter::Encoding, QString> encodingNames = {
+        {QStringConverter::Utf8, "UTF-8"},
+        {QStringConverter::Latin1, "Latin1 (ISO-8859-1)"},
+        {QStringConverter::Utf16, "UTF-16"},
+        {QStringConverter::Utf16LE, "UTF-16LE"},
+        {QStringConverter::Utf16BE, "UTF-16BE"},
+        {QStringConverter::Utf32, "UTF-32"},
+        {QStringConverter::Utf32LE, "UTF-32LE"},
+        {QStringConverter::Utf32BE, "UTF-32BE"},
+        {QStringConverter::System, "System"}
+    };
+	
+    for (const auto& pair : encodingNames) {
+        QString codecName = pair.second;
+        ui.sendEncoding->addItem(codecName);
+        ui.recvEncoding->addItem(codecName);
+        ui.serverEncoding->addItem(codecName);
     }
     ui.sendEncoding->model()->sort(0);
     ui.recvEncoding->model()->sort(0);

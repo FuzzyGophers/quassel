@@ -25,6 +25,7 @@
 #include <QList>
 #include <QSet>
 #include <QString>
+#include <QStringConverter>
 #include <QVariant>
 
 COMMON_EXPORT QString nickFromMask(const QString& mask);
@@ -47,7 +48,7 @@ COMMON_EXPORT QString secondsToString(int timeInSeconds);
  *  \param codec The text codec we use if the input is not utf8
  *  \return The decoded string.
  */
-COMMON_EXPORT QString decodeString(const QByteArray& input, QTextCodec* codec = nullptr);
+COMMON_EXPORT QString decodeString(const QByteArray& input, std::optional<QStringDecoder> decoder = std::nullopt);
 
 COMMON_EXPORT uint editingDistance(const QString& s1, const QString& s2);
 

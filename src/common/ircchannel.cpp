@@ -23,7 +23,7 @@
 #include <QDebug>
 #include <QHashIterator>
 #include <QMapIterator>
-#include <QTextCodec>
+#include <QStringConverter>
 
 #include "ircuser.h"
 #include "network.h"
@@ -83,37 +83,48 @@ QString IrcChannel::userModes(const QString& nick) const
     return userModes(network()->ircUser(nick));
 }
 
-void IrcChannel::setCodecForEncoding(const QString& name)
+void IrcChannel::setCodecForEncoding(const QString& codecName)
 {
-    setCodecForEncoding(QTextCodec::codecForName(name.toLatin1()));
+    QStringConverter::Encoding encoding = QStringConverter::encodingForName(codecName.toUtf8().constData()).value_or(QStringConverter::Utf8);
+	setCodecForEncoding(encoding);
 }
 
-void IrcChannel::setCodecForEncoding(QTextCodec* codec)
+void IrcChannel::setCodecForEncoding(QStringConverter::Encoding encoding)
 {
-    _codecForEncoding = codec;
+    _encoder = QStringEncoder(encoding);
+    if (!_encoder.isValid()) {
+        qWarning() << "Invalid encoding for" << codecName << ", falling back to UTF-8";
+        _encoder = QStringEncoder(QStringConverter::Utf8);
+    }
 }
 
-void IrcChannel::setCodecForDecoding(const QString& name)
+void IrcChannel::setCodecForDecoding(const QString& codecName)
 {
-    setCodecForDecoding(QTextCodec::codecForName(name.toLatin1()));
+    QStringConverter::Encoding encoding = QStringConverter::encodingForName(codecName.toUtf8().constData()).value_or(QStringConverter::Utf8);
+    setCodecForDecoding(encoding);
 }
 
-void IrcChannel::setCodecForDecoding(QTextCodec* codec)
+void IrcChannel::setCodecForDecoding(QStringConverter::Encoding encoding)
 {
-    _codecForDecoding = codec;
+    _decoder = QStringDecoder(encoding);
+    if (!_decoder.isValid()) {
+        qWarning() << "Invalid decoding for" << codecName << ", falling back to UTF-8";
+        _decoder = QStringDecoder(QStringConverter::Utf8);
+    }
 }
 
 QString IrcChannel::decodeString(const QByteArray& text) const
 {
-    if (!codecForDecoding())
+    if (!_decoder.isValid()) {
         return network()->decodeString(text);
-    return ::decodeString(text, _codecForDecoding);
+    }
+    return ::decodeString(text, _decoder);
 }
 
 QByteArray IrcChannel::encodeString(const QString& string) const
 {
-    if (codecForEncoding()) {
-        return _codecForEncoding->fromUnicode(string);
+    if (_encoder.isValid()) {
+        return _encoder(string);
     }
     return network()->encodeString(string);
 }

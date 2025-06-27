@@ -28,7 +28,6 @@
 #include <QDateTime>
 #include <QTimeZone>
 #include <QDebug>
-#include <QTextCodec>
 #include <QVector>
 
 #include "quassel.h"
@@ -91,20 +90,29 @@ QString stripAcceleratorMarkers(const QString& label_)
     return label;
 }
 
-QString decodeString(const QByteArray& input, QTextCodec* codec)
-{
-    if (codec && utf8DetectionBlacklist.contains(codec->mibEnum()))
-        return codec->toUnicode(input);
+// Blacklist for encodings where UTF-8 detection should be skipped
+static const QSet<QStringConverter::Encoding> utf8DetectionBlacklist = {
+    QStringConverter::Latin1,
+    // Add other encodings if needed (e.g., QStringConverter::System)
+};
 
-    // First, we check if it's utf8. It is very improbable to encounter a string that looks like
-    // valid utf8, but in fact is not. This means that if the input string passes as valid utf8, it
-    // is safe to assume that it is.
-    // Q_ASSERT(sizeof(const char) == sizeof(quint8));  // In God we trust...
+COMMON_EXPORT QString decodeString(const QByteArray& input, std::optional<QStringDecoder> decoder)
+{
+    // Skip UTF-8 detection if the decoder is valid and blacklisted
+    if (decoder && utf8DetectionBlacklist.contains(decoder->encoding())) {
+        QString result = decoder->operator()(input);
+        if (decoder->hasError()) {
+            qWarning() << "Decoding error with provided decoder for input:" << input;
+        }
+        return result;
+    }
+
+    // Manual UTF-8 validation
     bool isUtf8 = true;
     int cnt = 0;
     for (uchar c : input) {
         if (cnt) {
-            // We check a part of a multibyte char. These need to be of the form 10yyyyyy.
+            // Check multibyte char continuation (10yyyyyy)
             if ((c & 0xc0) != 0x80) {
                 isUtf8 = false;
                 break;
@@ -113,31 +121,36 @@ QString decodeString(const QByteArray& input, QTextCodec* codec)
             continue;
         }
         if ((c & 0x80) == 0x00)
-            continue;  // 7 bit is always ok
+            continue; // 7-bit ASCII
         if ((c & 0xf8) == 0xf0) {
-            cnt = 3;
+            cnt = 3; // 4-byte char
             continue;
-        }  // 4-byte char 11110xxx 10yyyyyy 10zzzzzz 10vvvvvv
+        }
         if ((c & 0xf0) == 0xe0) {
-            cnt = 2;
+            cnt = 2; // 3-byte char
             continue;
-        }  // 3-byte char 1110xxxx 10yyyyyy 10zzzzzz
+        }
         if ((c & 0xe0) == 0xc0) {
-            cnt = 1;
+            cnt = 1; // 2-byte char
             continue;
-        }  // 2-byte char 110xxxxx 10yyyyyy
+        }
         isUtf8 = false;
-        break;  // 8 bit char, but not utf8!
+        break; // Invalid UTF-8
     }
+
     if (isUtf8 && cnt == 0) {
         QString s = QString::fromUtf8(input);
         // qDebug() << "Detected utf8:" << s;
         return s;
     }
-    // QTextCodec *codec = QTextCodec::codecForName(encoding.toLatin1());
-    if (!codec)
-        return QString::fromLatin1(input);
-    return codec->toUnicode(input);
+
+    // Use provided decoder or fall back to Latin1
+    QStringDecoder defaultDecoder = decoder.value_or(QStringDecoder(QStringConverter::Latin1));
+    QString result = defaultDecoder(input);
+    if (defaultDecoder.hasError()) {
+        qWarning() << "Decoding error with" << (decoder ? "provided decoder" : "Latin1") << "for input:" << input;
+    }
+    return result;
 }
 
 uint editingDistance(const QString& s1, const QString& s2)

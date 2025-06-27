@@ -32,7 +32,11 @@
 #include <QPointer>
 #include <QString>
 #include <QStringList>
+#include <QStringConverter>
 #include <QVariantMap>
+
+// IRCv3 capabilities
+#include "irccap.h"
 
 #include "ircchannel.h"
 #include "ircuser.h"
@@ -40,9 +44,6 @@
 #include "syncableobject.h"
 #include "types.h"
 #include "util.h"
-
-// IRCv3 capabilities
-#include "irccap.h"
 
 // defined below!
 struct NetworkInfo;
@@ -60,12 +61,11 @@ class COMMON_EXPORT Network : public SyncableObject
     Q_PROPERTY(QString currentServer READ currentServer WRITE setCurrentServer)
     Q_PROPERTY(QString myNick READ myNick WRITE setMyNick)
     Q_PROPERTY(int latency READ latency WRITE setLatency)
-    Q_PROPERTY(QByteArray codecForServer READ codecForServer WRITE setCodecForServer)
-    Q_PROPERTY(QByteArray codecForEncoding READ codecForEncoding WRITE setCodecForEncoding)
-    Q_PROPERTY(QByteArray codecForDecoding READ codecForDecoding WRITE setCodecForDecoding)
+    Q_PROPERTY(QString codecForServer READ codecForServer WRITE setCodecForServer)
+    Q_PROPERTY(QString codecForEncoding READ codecForEncoding WRITE setCodecForEncoding)
+    Q_PROPERTY(QString codecForDecoding READ codecForDecoding WRITE setCodecForDecoding)
     Q_PROPERTY(IdentityId identityId READ identity WRITE setIdentity)
     Q_PROPERTY(bool isConnected READ isConnected WRITE setConnected)
-    // Q_PROPERTY(Network::ConnectionState connectionState READ connectionState WRITE setConnectionState)
     Q_PROPERTY(int connectionState READ connectionState WRITE setConnectionState)
     Q_PROPERTY(bool useRandomServer READ useRandomServer WRITE setUseRandomServer)
     Q_PROPERTY(QStringList perform READ perform WRITE setPerform)
@@ -98,9 +98,6 @@ public:
         Disconnecting
     };
 
-    // see:
-    //  http://www.irc.org/tech_docs/005.html
-    //  http://www.irc.org/tech_docs/draft-brocklesby-irc-isupport-03.txt
     enum ChannelModeType
     {
         NOT_A_CHANMODE = 0x00,
@@ -110,9 +107,6 @@ public:
         D_CHANMODE = 0x08
     };
 
-    // Default port assignments according to what many IRC networks have settled on.
-    // Technically not a standard, but it's fairly widespread.
-    // See https://freenode.net/news/port-6697-irc-via-tlsssl
     enum PortDefaults
     {
         PORT_PLAINTEXT = 6667,  /// Default port for unencrypted connections
@@ -135,8 +129,6 @@ public:
         QString proxyUser;
         QString proxyPass;
 
-        // sslVerify only applies when useSsl is true.  sslVerify should be enabled by default,
-        // so enabling useSsl offers a more secure default.
         Server()
             : proxyHost("localhost")
         {}
@@ -183,7 +175,6 @@ public:
     bool isStatusMsg(const QString& target) const;
 
     inline bool isConnected() const { return _connected; }
-    // Network::ConnectionState connectionState() const;
     inline int connectionState() const { return _connectionState; }
 
     /**@{*/
@@ -406,24 +397,27 @@ public:
     inline QList<IrcChannel*> ircChannels() const { return _ircChannels.values(); }
     inline quint32 ircChannelCount() const { return _ircChannels.count(); }
 
-    QByteArray codecForServer() const;
-    QByteArray codecForEncoding() const;
-    QByteArray codecForDecoding() const;
-    void setCodecForServer(QTextCodec* codec);
-    void setCodecForEncoding(QTextCodec* codec);
-    void setCodecForDecoding(QTextCodec* codec);
+    QString codecForServer() const;
+    QString codecForEncoding() const;
+    QString codecForDecoding() const;
+    void setCodecForServer(const QString& codecName);
+    void setCodecForEncoding(const QString& codecName);
+    void setCodecForDecoding(const QString& codecName);
+    void setCodecForServer(QStringConverter::Encoding encoding);
+    void setCodecForEncoding(QStringConverter::Encoding encoding);
+    void setCodecForDecoding(QStringConverter::Encoding encoding);
 
     QString decodeString(const QByteArray& text) const;
     QByteArray encodeString(const QString& string) const;
     QString decodeServerString(const QByteArray& text) const;
     QByteArray encodeServerString(const QString& string) const;
 
-    static QByteArray defaultCodecForServer();
-    static QByteArray defaultCodecForEncoding();
-    static QByteArray defaultCodecForDecoding();
-    static void setDefaultCodecForServer(const QByteArray& name);
-    static void setDefaultCodecForEncoding(const QByteArray& name);
-    static void setDefaultCodecForDecoding(const QByteArray& name);
+    static QString defaultCodecForServer();
+    static QString defaultCodecForEncoding();
+    static QString defaultCodecForDecoding();
+    static void setDefaultCodecForServer(const QString& name);
+    static void setDefaultCodecForEncoding(const QString& name);
+    static void setDefaultCodecForDecoding(const QString& name);
 
     inline bool autoAwayActive() const { return _autoAwayActive; }
     inline void setAutoAwayActive(bool active) { _autoAwayActive = active; }
@@ -499,10 +493,6 @@ public slots:
      * @param[in] unlimitedRate If true, disable rate limiting, otherwise apply configured limits.
      */
     void setUnlimitedMessageRate(bool unlimitedRate);
-
-    void setCodecForServer(const QByteArray& codecName);
-    void setCodecForEncoding(const QByteArray& codecName);
-    void setCodecForDecoding(const QByteArray& codecName);
 
     void addSupport(const QString& param, const QString& value = QString());
     void removeSupport(const QString& param);
@@ -676,8 +666,8 @@ signals:
     //   void codecForEncodingSet(const QByteArray &codecName);
     //   void codecForDecodingSet(const QByteArray &codecName);
 
-    //   void supportAdded(const QString &param, const QString &value);
-    //   void supportRemoved(const QString &param);
+    //   void supportAdded(const QString ¶m, const QString &value);
+    //   void supportRemoved(const QString ¶m);
 
     // IRCv3 capability negotiation (can drive other slots)
     /**
@@ -747,7 +737,6 @@ private:
     QStringList _capsEnabled;  /// Enabled capabilities that received 'CAP ACK'
     // _capsEnabled uses the same values from the <name>=<value> pairs stored in _caps
 
-
     ServerList _serverList;
     bool _useRandomServer;
     QStringList _perform;
@@ -773,13 +762,12 @@ private:
     quint32 _messageRateDelay;      /// Delay in ms. for messages when max. burst messages sent
     bool _unlimitedMessageRate;     /// If true, disable rate limiting, otherwise apply limits
 
-    QTextCodec* _codecForServer;
-    QTextCodec* _codecForEncoding;
-    QTextCodec* _codecForDecoding;
+    QStringEncoder _serverEncoder;
+    QStringDecoder _serverDecoder;
+    QStringEncoder _encoder;
+    QStringDecoder _decoder;
 
-    static QTextCodec* _defaultCodecForServer;
-    static QTextCodec* _defaultCodecForEncoding;
-    static QTextCodec* _defaultCodecForDecoding;
+    static const QStringConverter::Encoding _defaultEncoding;
 
     bool _autoAwayActive;  // when this is active handle305 and handle306 don't trigger any output
 
@@ -802,9 +790,9 @@ struct COMMON_EXPORT NetworkInfo
     QString saslAccount;
     QString saslPassword;
 
-    QByteArray codecForServer;
-    QByteArray codecForEncoding;
-    QByteArray codecForDecoding;
+    QString codecForServer;
+    QString codecForEncoding;
+    QString codecForDecoding;
 
     NetworkId networkId{0};
     IdentityId identity{1};
