@@ -34,7 +34,7 @@ class UiStyle;
 #    include <windows.h>
 #endif
 #ifdef Q_OS_MAC
-#    include <Carbon/Carbon.h>
+#    include <Foundation/Foundation.h>
 #endif
 
 class UISUPPORT_EXPORT GraphicalUi : public AbstractUi, protected Singleton<GraphicalUi>

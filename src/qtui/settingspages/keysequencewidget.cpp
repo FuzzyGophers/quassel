@@ -34,7 +34,7 @@
 
 // This defines the unicode symbols for special keys (kCommandUnicode and friends)
 #ifdef Q_OS_MAC
-#    include <Carbon/Carbon.h>
+#    include <Foundation/Foundation.h>
 #endif
 
 #include "action.h"
