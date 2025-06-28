@@ -90,14 +90,14 @@ QVariantMap SyncableObject::toVariantMap()
         if (!methodname.startsWith("init") || methodname.startsWith("initSet") || methodname.startsWith("initDone"))
             continue;
 
-        QMetaType::Type variantType = QMetaType::fromName(method.typeName()).id();
-        if (variantType == QMetaType::UnknownType && !QByteArray(method.typeName()).isEmpty()) {
+        QMetaType metaType = QMetaType::fromName(method.typeName());
+        if (!metaType.isValid() && !QByteArray(method.typeName()).isEmpty()) {
             qWarning() << "SyncableObject::toVariantMap(): cannot fetch init data for:" << this << method.methodSignature()
                        << "- Returntype is unknown to Qt's MetaSystem:" << QByteArray(method.typeName());
             continue;
         }
 
-        QVariant value(QMetaType(variantType), nullptr);
+        QVariant value(metaType, nullptr);
         QGenericReturnArgument genericvalue = QGenericReturnArgument(method.typeName(), value.data());
         QMetaObject::invokeMethod(this, methodname.toLatin1(), genericvalue);
 
