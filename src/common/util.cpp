@@ -73,6 +73,7 @@ static const QSet<QStringConverter::Encoding> utf8DetectionBlacklist = {
 
 QString decodeString(const QByteArray& input, std::optional<std::pair<QStringDecoder, QStringConverter::Encoding>> decoder)
 {
+    // Skip UTF-8 detection if the decoder is valid and blacklisted
     if (decoder && utf8DetectionBlacklist.contains(decoder->second)) {
         QString result = decoder->first(input);
         if (decoder->first.hasError()) {
@@ -81,10 +82,12 @@ QString decodeString(const QByteArray& input, std::optional<std::pair<QStringDec
         return result;
     }
 
+    // Manual UTF-8 validation
     bool isUtf8 = true;
     int cnt = 0;
     for (uchar c : input) {
         if (cnt) {
+            // Check multibyte char continuation (10yyyyyy)
             if ((c & 0xc0) != 0x80) {
                 isUtf8 = false;
                 break;
@@ -93,21 +96,21 @@ QString decodeString(const QByteArray& input, std::optional<std::pair<QStringDec
             continue;
         }
         if ((c & 0x80) == 0x00)
-            continue;
+            continue; // 7-bit ASCII
         if ((c & 0xf8) == 0xf0) {
-            cnt = 3;
+            cnt = 3; // 4-byte char
             continue;
         }
         if ((c & 0xf0) == 0xe0) {
-            cnt = 2;
+            cnt = 2; // 3-byte char
             continue;
         }
         if ((c & 0xe0) == 0xc0) {
-            cnt = 1;
+            cnt = 1; // 2-byte char
             continue;
         }
         isUtf8 = false;
-        break;
+        break; // Invalid UTF-8
     }
 
     if (isUtf8 && cnt == 0) {
@@ -115,10 +118,11 @@ QString decodeString(const QByteArray& input, std::optional<std::pair<QStringDec
         return s;
     }
 
-    QStringDecoder defaultDecoder = decoder ? decoder->first : QStringDecoder(QStringConverter::Latin1);
+    // Use provided decoder or fall back to Latin1, avoiding copy
+    QStringDecoder defaultDecoder(decoder ? decoder->second : QStringConverter::Latin1);
     QString result = defaultDecoder(input);
     if (defaultDecoder.hasError()) {
-        qWarning() << "Decoding error with" << (decoder ? "provided decoder" : "Latin1") << "for input:" << input;
+        qWarning() << "Decoding error with" << (decoder ? QStringConverter::nameForEncoding(decoder->second) : "Latin1") << "for input:" << input;
     }
     return result;
 }
