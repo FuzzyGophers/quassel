@@ -20,6 +20,7 @@
 
 #include "dccconfig.h"
 
+#include <QDataStream>
 #include <QMetaProperty>
 
 #include "types.h"
@@ -28,13 +29,41 @@ DccConfig::DccConfig(QObject* parent)
     : SyncableObject("DccConfig", parent)
 {
     static auto regTypes = []() -> bool {
-        qRegisterMetaTypeStreamOperators<IpDetectionMode>("DccConfig::IpDetectionMode");
-        qRegisterMetaTypeStreamOperators<PortSelectionMode>("DccConfig::PortSelectionMode");
+        qRegisterMetaType<DccConfig::IpDetectionMode>("DccConfig::IpDetectionMode");
+        qRegisterMetaType<DccConfig::PortSelectionMode>("DccConfig::PortSelectionMode");
         return true;
     }();
     Q_UNUSED(regTypes);
 
     setAllowClientUpdates(true);
+}
+
+QDataStream& operator<<(QDataStream& out, const DccConfig::IpDetectionMode& mode)
+{
+    out << static_cast<quint8>(mode);
+    return out;
+}
+
+QDataStream& operator>>(QDataStream& in, DccConfig::IpDetectionMode& mode)
+{
+    quint8 value;
+    in >> value;
+    mode = static_cast<DccConfig::IpDetectionMode>(value);
+    return in;
+}
+
+QDataStream& operator<<(QDataStream& out, const DccConfig::PortSelectionMode& mode)
+{
+    out << static_cast<quint8>(mode);
+    return out;
+}
+
+QDataStream& operator>>(QDataStream& in, DccConfig::PortSelectionMode& mode)
+{
+    quint8 value;
+    in >> value;
+    mode = static_cast<DccConfig::PortSelectionMode>(value);
+    return in;
 }
 
 bool DccConfig::operator==(const DccConfig& other)

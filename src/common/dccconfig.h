@@ -140,3 +140,6 @@ private:
     bool _usePassiveDcc{false};
     bool _useFastSend{false};
 };
+
+Q_DECLARE_METATYPE(DccConfig::IpDetectionMode)
+Q_DECLARE_METATYPE(DccConfig::PortSelectionMode)
