@@ -74,15 +74,16 @@ QDataStream& operator<<(QDataStream& out, const Message& msg)
     out << msg.msgId();
 
     if (SignalProxy::current()->targetPeer()->hasFeature(Quassel::Feature::LongTime)) {
-        // toMSecs returns a qint64, signed rather than unsigned
-        out << (qint64) msg.timestamp().toMSecsSinceEpoch();
+        // toMSecsSinceEpoch returns a qint64
+        out << (qint64)msg.timestamp().toMSecsSinceEpoch();
     }
     else {
-        out << (quint32) msg.timestamp().toTime_t();
+        // toSecsSinceEpoch returns a qint64, but we cast to quint32 for backward compatibility
+        out << (quint32)msg.timestamp().toSecsSinceEpoch();
     }
 
-    out << (quint32) msg.type()
-        << (quint8) msg.flags()
+    out << (quint32)msg.type()
+        << (quint8)msg.flags()
         << msg.bufferInfo()
         << msg.sender().toUtf8();
 
@@ -106,7 +107,7 @@ QDataStream& operator>>(QDataStream& in, Message& msg)
     in >> msg._msgId;
 
     if (SignalProxy::current()->sourcePeer()->hasFeature(Quassel::Feature::LongTime)) {
-        // timestamp is a qint64, signed rather than unsigned
+        // timestamp is a qint64
         qint64 timeStamp;
         in >> timeStamp;
         msg._timestamp = QDateTime::fromMSecsSinceEpoch(timeStamp);
@@ -114,7 +115,7 @@ QDataStream& operator>>(QDataStream& in, Message& msg)
     else {
         quint32 timeStamp;
         in >> timeStamp;
-        msg._timestamp = QDateTime::fromTime_t(timeStamp);
+        msg._timestamp = QDateTime::fromSecsSinceEpoch(timeStamp);
     }
 
     quint32 type;

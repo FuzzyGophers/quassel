@@ -44,11 +44,12 @@ Event::Event(EventManager::EventType type, QVariantMap& map)
     setFlags(static_cast<EventManager::EventFlags>(map.take("flags").toInt()));  // TODO sanity check?
 
     if (SignalProxy::current()->sourcePeer()->hasFeature(Quassel::Feature::LongTime)) {
-        // timestamp is a qint64, signed rather than unsigned
+        // timestamp is a qint64
         setTimestamp(QDateTime::fromMSecsSinceEpoch(map.take("timestamp").toLongLong()));
     }
     else {
-        setTimestamp(QDateTime::fromTime_t(map.take("timestamp").toUInt()));
+        // timestamp is a quint32
+        setTimestamp(QDateTime::fromSecsSinceEpoch(map.take("timestamp").toUInt()));
     }
 }
 
@@ -60,11 +61,12 @@ void Event::toVariantMap(QVariantMap& map) const
     map["type"] = static_cast<int>(type());
     map["flags"] = static_cast<int>(flags());
     if (SignalProxy::current()->targetPeer()->hasFeature(Quassel::Feature::LongTime)) {
-        // toMSecs returns a qint64, signed rather than unsigned
+        // toMSecsSinceEpoch returns a qint64
         map["timestamp"] = timestamp().toMSecsSinceEpoch();
     }
     else {
-        map["timestamp"] = timestamp().toTime_t();
+        // toSecsSinceEpoch returns a qint64, cast to quint32 for compatibility
+        map["timestamp"] = static_cast<quint32>(timestamp().toSecsSinceEpoch());
     }
 }
 
