@@ -25,6 +25,7 @@
 #include <QHash>
 #include <QList>
 #include <QUuid>
+#include <QMetaType>
 
 #include "syncableobject.h"
 
@@ -54,12 +55,14 @@ protected:
     void removeTransfer(const QUuid& uuid);
 
 protected slots:
-    virtual void setTransferIds(const TransferIdList& transferIds){Q_UNUSED(transferIds)};
-    virtual void onCoreTransferAdded(const QUuid& transferId){Q_UNUSED(transferId)};
+    virtual void setTransferIds(const TransferIdList& transferIds) { Q_UNUSED(transferIds); }
+    virtual void onCoreTransferAdded(const QUuid& transferId) { Q_UNUSED(transferId); }
 
 private:
     QHash<QUuid, Transfer*> _transfers;
 };
 
 QDataStream& operator<<(QDataStream& out, const TransferManager::TransferIdList& transferIds);
-QDataStream& operator>>(QDataStream& in, TransferManager::TransferIdList& state);
+QDataStream& operator>>(QDataStream& in, TransferManager::TransferIdList& transferIds);
+
+Q_DECLARE_METATYPE(TransferManager::TransferIdList)
