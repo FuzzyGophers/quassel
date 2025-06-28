@@ -1,23 +1,3 @@
-/***************************************************************************
- *   Copyright (C) 2005-2022 by the Quassel Project                        *
- *   devel@quassel-irc.org                                                 *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) version 3.                                           *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
- ***************************************************************************/
-
 #include "util.h"
 
 #include <algorithm>
@@ -28,12 +8,8 @@
 #include <QDateTime>
 #include <QTimeZone>
 #include <QDebug>
+#include <QRegularExpression>
 #include <QVector>
-
-#include "quassel.h"
-
-// MIBenum values from http://www.iana.org/assignments/character-sets/character-sets.xml#table-character-sets-1
-static QList<int> utf8DetectionBlacklist = QList<int>() << 39 /* ISO-2022-JP */;
 
 QString nickFromMask(const QString& mask)
 {
@@ -63,7 +39,7 @@ bool isChannelName(const QString& str)
     if (str.isEmpty())
         return false;
     static constexpr std::array<quint8, 4> prefixes{{'#', '&', '!', '+'}};
-    return std::any_of(prefixes.cbegin(), prefixes.cend(), [&str](quint8 c) { return c == str[0]; });
+    return std::any_of(prefixes.cbegin(), prefixes.cend(), [&str](quint8 c) { return QChar(c) == str[0]; });
 }
 
 QString stripFormatCodes(QString message)
@@ -90,29 +66,25 @@ QString stripAcceleratorMarkers(const QString& label_)
     return label;
 }
 
-// Blacklist for encodings where UTF-8 detection should be skipped
 static const QSet<QStringConverter::Encoding> utf8DetectionBlacklist = {
     QStringConverter::Latin1,
     // Add other encodings if needed (e.g., QStringConverter::System)
 };
 
-COMMON_EXPORT QString decodeString(const QByteArray& input, std::optional<QStringDecoder> decoder)
+QString decodeString(const QByteArray& input, std::optional<std::pair<QStringDecoder, QStringConverter::Encoding>> decoder)
 {
-    // Skip UTF-8 detection if the decoder is valid and blacklisted
-    if (decoder && utf8DetectionBlacklist.contains(decoder->encoding())) {
-        QString result = decoder->operator()(input);
-        if (decoder->hasError()) {
+    if (decoder && utf8DetectionBlacklist.contains(decoder->second)) {
+        QString result = decoder->first(input);
+        if (decoder->first.hasError()) {
             qWarning() << "Decoding error with provided decoder for input:" << input;
         }
         return result;
     }
 
-    // Manual UTF-8 validation
     bool isUtf8 = true;
     int cnt = 0;
     for (uchar c : input) {
         if (cnt) {
-            // Check multibyte char continuation (10yyyyyy)
             if ((c & 0xc0) != 0x80) {
                 isUtf8 = false;
                 break;
@@ -121,31 +93,29 @@ COMMON_EXPORT QString decodeString(const QByteArray& input, std::optional<QStrin
             continue;
         }
         if ((c & 0x80) == 0x00)
-            continue; // 7-bit ASCII
+            continue;
         if ((c & 0xf8) == 0xf0) {
-            cnt = 3; // 4-byte char
+            cnt = 3;
             continue;
         }
         if ((c & 0xf0) == 0xe0) {
-            cnt = 2; // 3-byte char
+            cnt = 2;
             continue;
         }
         if ((c & 0xe0) == 0xc0) {
-            cnt = 1; // 2-byte char
+            cnt = 1;
             continue;
         }
         isUtf8 = false;
-        break; // Invalid UTF-8
+        break;
     }
 
     if (isUtf8 && cnt == 0) {
         QString s = QString::fromUtf8(input);
-        // qDebug() << "Detected utf8:" << s;
         return s;
     }
 
-    // Use provided decoder or fall back to Latin1
-    QStringDecoder defaultDecoder = decoder.value_or(QStringDecoder(QStringConverter::Latin1));
+    QStringDecoder defaultDecoder = decoder ? decoder->first : QStringDecoder(QStringConverter::Latin1);
     QString result = defaultDecoder(input);
     if (defaultDecoder.hasError()) {
         qWarning() << "Decoding error with" << (decoder ? "provided decoder" : "Latin1") << "for input:" << input;
@@ -217,9 +187,9 @@ QByteArray prettyDigest(const QByteArray& digest)
 {
     QByteArray hexDigest = digest.toHex().toUpper();
     QByteArray prettyDigest;
-    prettyDigest.fill(':', hexDigest.count() + (hexDigest.count() / 2) - 1);
+    prettyDigest.fill(':', hexDigest.size() + (hexDigest.size() / 2) - 1);
 
-    for (int i = 0; i * 2 < hexDigest.count(); i++) {
+    for (int i = 0; i * 2 < hexDigest.size(); i++) {
         prettyDigest.replace(i * 3, 2, hexDigest.mid(i * 2, 2));
     }
     return prettyDigest;
@@ -227,74 +197,34 @@ QByteArray prettyDigest(const QByteArray& digest)
 
 QString formatCurrentDateTimeInString(const QString& formatStr)
 {
-    // Work on a copy of the string to avoid modifying the input string
     QString formattedStr = QString(formatStr);
-
-    // Exit early if there's nothing to format
     if (formattedStr.isEmpty())
         return formattedStr;
 
-    // Find %%<text>%% in string. Replace inside text formatted to QDateTime with the current
-    // timestamp, using %%%% as an escape for multiple %% signs.
-    // For example:
-    // Simple:   "All Quassel clients vanished from the face of the earth... %%hh:mm:ss%%"
-    // > Result:  "All Quassel clients vanished from the face of the earth... 23:20:34"
-    // Complex:  "Away since %%hh:mm%% on %%dd.MM%% - %%%% not here %%%%"
-    // > Result:  "Away since 23:20 on 21.05 - %% not here %%"
-    //
-    // Match groups of double % signs - Some text %%inside here%%, and even %%%%:
-    //   %%(.*)%%
-    //   (...)    marks a capturing group
-    //   .*       matches zero or more characters, not including newlines
-    // Note that '\' must be escaped as '\\'
-    // Helpful interactive website for debugging and explaining:  https://regex101.com/
     QRegularExpression regExpMatchTime("%%(.*)%%");
+    regExpMatchTime.setPatternOptions(QRegularExpression::PatternOption::NoPatternOption);
 
-    // Preserve the smallest groups possible to allow for multiple %%blocks%%
-    regExpMatchTime.setMinimal(true);
-
-    // NOTE: Move regExpMatchTime to a static regular expression if used anywhere that performance
-    // matters.
-
-    // Don't allow a runaway regular expression to loop for too long.  This might not happen.. but
-    // when dealing with user input, better to be safe..?
     int numIterations = 0;
-
-    // Find each group of %%text here%% starting from the beginning
-    int index = regExpMatchTime.indexIn(formattedStr);
+    int index = regExpMatchTime.match(formattedStr).capturedStart();
     int matchLength;
     QString matchedFormat;
     while (index >= 0 && numIterations < 512) {
-        // Get the total length of the matched expression
-        matchLength = regExpMatchTime.cap(0).length();
-        // Get the format string, e.g. "this text here" from "%%this text here%%"
-        matchedFormat = regExpMatchTime.cap(1);
-        // Check that there's actual characters inside.  A quadruple % (%%%%) represents two %%
-        // signs.
+        matchLength = regExpMatchTime.match(formattedStr, index).capturedLength(0);
+        matchedFormat = regExpMatchTime.match(formattedStr, index).captured(1);
         if (matchedFormat.length() > 0) {
-            // Format the string according to the current date and time.  Invalid time format
-            // strings are ignored.
             formattedStr.replace(index, matchLength, QDateTime::currentDateTime().toString(matchedFormat));
-            // Subtract the length of the removed % signs
-            // E.g. "%%h:mm ap%%" turns into "h:mm ap", removing four % signs, thus -4.  This is
-            // used below to determine how far to advance when looking for the next formatting code.
             matchLength -= 4;
         }
         else if (matchLength == 4) {
-            // Remove two of the four percent signs, so '%%%%' escapes to '%%'
             formattedStr.remove(index, 2);
-            // Subtract the length of the removed % signs, this time removing two % signs, thus -2.
             matchLength -= 2;
         }
         else {
-            // If neither of these match, something went wrong.  Don't modify it to be safe.
             qDebug() << "Unexpected time format when parsing string, no matchedFormat, matchLength "
                         "should be 4, actually is"
                      << matchLength;
         }
-
-        // Find the next group of %%text here%% starting from where the last group ended
-        index = regExpMatchTime.indexIn(formattedStr, index + matchLength);
+        index = regExpMatchTime.match(formattedStr, index + matchLength).capturedStart();
         numIterations++;
     }
 
@@ -303,39 +233,20 @@ QString formatCurrentDateTimeInString(const QString& formatStr)
 
 QString tryFormatUnixEpoch(const QString& possibleEpochDate, Qt::DateFormat dateFormat, bool useUTC)
 {
-    // Does the string resemble a Unix epoch?  Parse as 64-bit time
     qint64 secsSinceEpoch = possibleEpochDate.toLongLong();
     if (secsSinceEpoch == 0) {
-        // Parsing either failed, or '0' was sent.  No need to distinguish; either way, it's not
-        // useful as epoch.
-        // See https://doc.qt.io/qt-5/qstring.html#toLongLong
         return possibleEpochDate;
     }
 
-    // Time checks out, parse it
     QDateTime date;
 #if QT_VERSION >= 0x050800
     date.setSecsSinceEpoch(secsSinceEpoch);
 #else
-    // toSecsSinceEpoch() was added in Qt 5.8.  Manually downconvert to seconds for now.
-    // See https://doc.qt.io/qt-5/qdatetime.html#toMSecsSinceEpoch
     date.setMSecsSinceEpoch(secsSinceEpoch * 1000);
 #endif
 
-    // Return the localized date/time
     if (useUTC) {
-        // Return UTC time
         if (dateFormat == Qt::DateFormat::ISODate) {
-            // Replace the "T" date/time separator with " " for readability.  This isn't quite the
-            // ISO 8601 spec (it specifies omitting the "T" entirely), but RFC 3339 allows this.
-            // Go with RFC 3339 for human readability that's still machine-parseable, too.
-            //
-            // Before: 2018-06-21T21:35:52Z
-            // After:  2018-06-21 21:35:52Z
-            //         ..........^ (10th character)
-            //
-            // See https://en.wikipedia.org/wiki/ISO_8601#cite_note-32
-            // And https://www.ietf.org/rfc/rfc3339.txt
             return date.toUTC().toString(dateFormat).replace(10, 1, " ");
         }
         else {
@@ -343,12 +254,9 @@ QString tryFormatUnixEpoch(const QString& possibleEpochDate, Qt::DateFormat date
         }
     }
     else if (dateFormat == Qt::DateFormat::ISODate) {
-        // Add in ISO local timezone information via special handling below
-        // formatDateTimeToOffsetISO() handles converting "T" to " "
         return formatDateTimeToOffsetISO(date);
     }
     else {
-        // Return local time
         return date.toString(dateFormat);
     }
 }
@@ -356,22 +264,7 @@ QString tryFormatUnixEpoch(const QString& possibleEpochDate, Qt::DateFormat date
 QString formatDateTimeToOffsetISO(const QDateTime& dateTime)
 {
     if (!dateTime.isValid()) {
-        // Don't try to do anything with invalid date/time
         return "formatDateTimeToISO() invalid date/time";
     }
-
-    // Replace the "T" date/time separator with " " for readability.  This isn't quite the ISO 8601
-    // spec (it specifies omitting the "T" entirely), but RFC 3339 allows this.  Go with RFC 3339
-    // for human readability that's still machine-parseable, too.
-    //
-    // Before: 2018-08-22T18:43:10-05:00
-    // After:  2018-08-22 18:43:10-05:00
-    //         ..........^ (10th character)
-    //
-    // See https://en.wikipedia.org/wiki/ISO_8601#cite_note-32
-    // And https://www.ietf.org/rfc/rfc3339.txt
-
-    // The expected way to get a UTC offset on ISO 8601 dates
-    // Remove the "T" date/time separator
     return dateTime.toOffsetFromUtc(dateTime.offsetFromUtc()).toString(Qt::ISODate).replace(10, 1, " ");
 }
