@@ -140,4 +140,4 @@ struct SelectOverloadHelper
  * @tparam Args Argument types of the desired signature
  */
 template<typename... Args>
-constexpr Q_DECL_UNUSED detail::SelectOverloadHelper<Args...> selectOverload = {};
+constexpr detail::SelectOverloadHelper<Args...> selectOverload = {};

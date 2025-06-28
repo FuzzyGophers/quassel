@@ -148,19 +148,22 @@ void AliasManager::expand(const QString& alias, const BufferInfo& bufferInfo, co
 
         // replace ranges like $1..3
         if (!params.isEmpty()) {
-            int pos;
-            while ((pos = paramRangeR.indexIn(command)) != -1) {
-                int start = paramRangeR.cap(1).toInt();
+            QRegularExpressionMatch match;
+            int pos = 0;
+            while ((match = paramRangeR.match(command, pos)).hasMatch()) {
+                pos = match.capturedStart();
+                int start = match.captured(1).toInt();
                 bool ok;
-                int end = paramRangeR.cap(2).toInt(&ok);
+                int end = match.captured(2).toInt(&ok);
                 if (!ok) {
                     end = params.count();
                 }
                 if (end < start)
-                    command = command.replace(pos, paramRangeR.matchedLength(), QString());
+                    command = command.replace(pos, match.capturedLength(), QString());
                 else {
-                    command = command.replace(pos, paramRangeR.matchedLength(), QStringList(params.mid(start - 1, end - start + 1)).join(" "));
+                    command = command.replace(pos, match.capturedLength(), QStringList(params.mid(start - 1, end - start + 1)).join(" "));
                 }
+                pos += match.capturedLength();
             }
         }
 
@@ -179,13 +182,6 @@ void AliasManager::expand(const QString& alias, const BufferInfo& bufferInfo, co
 
             // Identd
             // Ident if verified, or "*" if blank/unknown/unverified (prefixed with "~")
-            //
-            // Most IRC daemons have the option to prefix an ident with "~" if it could not be
-            // verified via an identity daemon such as oidentd.  In these cases, it can be handy to
-            // have a way to ban via ident if verified, or all idents if not verified.  If the
-            // server does not verify idents, it usually won't add "~".
-            //
-            // Identd must be replaced before ident to avoid being treated as "$i:ident" + "d"
             command = command.replace(QString("$%1:identd").arg(j),
                                       (ircUser && !ircUser->user().isEmpty() && !ircUser->user().startsWith("~")) ? ircUser->user()
                                                                                                                   : QString("*"));

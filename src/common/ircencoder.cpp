@@ -40,7 +40,8 @@ void IrcEncoder::writeTagValue(QByteArray& msg, const QString& value)
              .replace(";", R"(\:)")
              .replace(" ", R"(\s)")
              .replace("\r", R"(\r)")
-             .replace("\n", R"(\n)");
+             .replace("\n", R"(\n)")
+             .toUtf8();
 }
 
 void IrcEncoder::writeTags(QByteArray& msg, const QHash<IrcTagKey, QString>& tags)
@@ -57,10 +58,10 @@ void IrcEncoder::writeTags(QByteArray& msg, const QHash<IrcTagKey, QString>& tag
                 msg += "+";
             }
             if (!key.vendor.isEmpty()) {
-                msg += key.vendor;
+                msg += key.vendor.toUtf8();
                 msg += "/";
             }
-            msg += key.key;
+            msg += key.key.toUtf8();
             if (!tags[key].isEmpty()) {
                 msg += "=";
                 writeTagValue(msg, tags[key]);
@@ -81,7 +82,7 @@ void IrcEncoder::writePrefix(QByteArray& msg, const QByteArray& prefix)
 
 void IrcEncoder::writeCommand(QByteArray& msg, const QString& cmd)
 {
-    msg += cmd.toUpper().toLatin1();
+    msg += cmd.toUpper().toUtf8();
 }
 
 void IrcEncoder::writeParams(QByteArray& msg, const QList<QByteArray>& params)
