@@ -86,7 +86,7 @@ void BasicHandler::handle(const QString& member,
         }
         else {
             void* param[] = {nullptr,
-                             Q_ARG(QString, member).data(),
+                             QGenericArgument("QString", &member).data(),
                              val0.data(),
                              val1.data(),
                              val2.data(),
