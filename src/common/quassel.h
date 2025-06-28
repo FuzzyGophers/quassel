@@ -32,6 +32,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QMetaType>
 
 #include "abstractsignalwatcher.h"
 #include "singleton.h"

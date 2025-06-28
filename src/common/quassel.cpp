@@ -125,10 +125,6 @@ bool Quassel::reloadConfig()
     return result;
 }
 
-//! Register our custom types with Qt's Meta Object System.
-/**  This makes them available for QVariant and in signals/slots, among other things.
- *
- */
 void Quassel::registerMetaTypes()
 {
     // Complex types
@@ -138,12 +134,6 @@ void Quassel::registerMetaTypes()
     qRegisterMetaType<Network::Server>("Network::Server");
     qRegisterMetaType<Identity>("Identity");
 
-    qRegisterMetaTypeStreamOperators<Message>("Message");
-    qRegisterMetaTypeStreamOperators<BufferInfo>("BufferInfo");
-    qRegisterMetaTypeStreamOperators<NetworkInfo>("NetworkInfo");
-    qRegisterMetaTypeStreamOperators<Network::Server>("Network::Server");
-    qRegisterMetaTypeStreamOperators<Identity>("Identity");
-
     qRegisterMetaType<IdentityId>("IdentityId");
     qRegisterMetaType<BufferId>("BufferId");
     qRegisterMetaType<NetworkId>("NetworkId");
@@ -152,25 +142,14 @@ void Quassel::registerMetaTypes()
     qRegisterMetaType<MsgId>("MsgId");
 
     qRegisterMetaType<QHostAddress>("QHostAddress");
-    qRegisterMetaTypeStreamOperators<QHostAddress>("QHostAddress");
     qRegisterMetaType<QUuid>("QUuid");
-    qRegisterMetaTypeStreamOperators<QUuid>("QUuid");
-
-    qRegisterMetaTypeStreamOperators<IdentityId>("IdentityId");
-    qRegisterMetaTypeStreamOperators<BufferId>("BufferId");
-    qRegisterMetaTypeStreamOperators<NetworkId>("NetworkId");
-    qRegisterMetaTypeStreamOperators<UserId>("UserId");
-    qRegisterMetaTypeStreamOperators<AccountId>("AccountId");
-    qRegisterMetaTypeStreamOperators<MsgId>("MsgId");
 
     qRegisterMetaType<Protocol::SessionState>("Protocol::SessionState");
     qRegisterMetaType<PeerPtr>("PeerPtr");
-    qRegisterMetaTypeStreamOperators<PeerPtr>("PeerPtr");
 
     // Versions of Qt prior to 4.7 didn't define QVariant as a meta type
     if (!QMetaType::type("QVariant")) {
         qRegisterMetaType<QVariant>("QVariant");
-        qRegisterMetaTypeStreamOperators<QVariant>("QVariant");
     }
 }
 

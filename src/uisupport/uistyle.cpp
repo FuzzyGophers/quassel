@@ -78,7 +78,6 @@ UiStyle::UiStyle(QObject* parent)
 {
     static bool registered = []() {
         qRegisterMetaType<FormatList>();
-        qRegisterMetaTypeStreamOperators<FormatList>();
         return true;
     }();
     Q_UNUSED(registered)

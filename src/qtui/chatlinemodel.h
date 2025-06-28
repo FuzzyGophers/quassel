@@ -22,6 +22,7 @@
 #define CHATLINEMODEL_H_
 
 #include <QList>
+#include <QMetaType>
 
 #include "chatlinemodelitem.h"
 #include "messagemodel.h"
@@ -45,7 +46,7 @@ public:
     inline const MessageModelItem* messageItemAt(int i) const override { return &_messageList[i]; }
 
 protected:
-    //   virtual MessageModelItem *createMessageModelItem(const Message &);
+    // virtual MessageModelItem *createMessageModelItem(const Message &);
 
     inline int messageCount() const override { return _messageList.count(); }
     inline bool messagesIsEmpty() const override { return _messageList.isEmpty(); }
