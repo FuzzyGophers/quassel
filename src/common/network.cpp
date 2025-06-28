@@ -1098,7 +1098,7 @@ QString NetworkInfo::skipCapsToString() const
 
 void NetworkInfo::skipCapsFromString(const QString& flattenedSkipCaps)
 {
-    skipCaps = flattenedSkipCaps.toLower().split(" ", QString::SplitBehavior::SkipEmptyParts);
+    skipCaps = flattenedSkipCaps.toLower().split(" ", Qt::SkipEmptyParts);
 }
 
 bool NetworkInfo::operator==(const NetworkInfo& other) const
