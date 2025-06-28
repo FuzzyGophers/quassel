@@ -1825,7 +1825,7 @@ std::vector<Message> PostgreSqlStorage::requestMsgs(UserId user, BufferId buffer
         // PostgreSQL returns date/time in ISO 8601 format, no 64-bit handling needed
         // See https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-DATETIME-OUTPUT
         timestamp = query.value(1).toDateTime();
-        timestamp.setTimeSpec(Qt::UTC);
+        timestamp.setTimeZone(QTimeZone::UTC);
         Message msg(timestamp,
                     bufferInfo,
                     (Message::Type)query.value(2).toInt(),
@@ -1893,7 +1893,7 @@ std::vector<Message> PostgreSqlStorage::requestMsgsFiltered(
         // PostgreSQL returns date/time in ISO 8601 format, no 64-bit handling needed
         // See https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-DATETIME-OUTPUT
         timestamp = query.value(1).toDateTime();
-        timestamp.setTimeSpec(Qt::UTC);
+        timestamp.setTimeZone(QTimeZone::UTC);
         Message msg(timestamp,
                     bufferInfo,
                     (Message::Type)query.value(2).toInt(),
@@ -1969,7 +1969,7 @@ std::vector<Message> PostgreSqlStorage::requestMsgsForward(
         // PostgreSQL returns date/time in ISO 8601 format, no 64-bit handling needed
         // See https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-DATETIME-OUTPUT
         timestamp = query.value(1).toDateTime();
-        timestamp.setTimeSpec(Qt::UTC);
+        timestamp.setTimeZone(QTimeZone::UTC);
         Message msg(timestamp,
                     bufferInfo,
                     (Message::Type)query.value(2).toInt(),
@@ -2025,7 +2025,7 @@ std::vector<Message> PostgreSqlStorage::requestAllMsgs(UserId user, MsgId first,
         // PostgreSQL returns date/time in ISO 8601 format, no 64-bit handling needed
         // See https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-DATETIME-OUTPUT
         timestamp = query.value(2).toDateTime();
-        timestamp.setTimeSpec(Qt::UTC);
+        timestamp.setTimeZone(QTimeZone::UTC);
         Message msg(timestamp,
                     bufferInfoHash[query.value(1).toInt()],
                     (Message::Type)query.value(3).toInt(),
@@ -2089,7 +2089,7 @@ std::vector<Message> PostgreSqlStorage::requestAllMsgsFiltered(
         // PostgreSQL returns date/time in ISO 8601 format, no 64-bit handling needed
         // See https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-DATETIME-OUTPUT
         timestamp = query.value(2).toDateTime();
-        timestamp.setTimeSpec(Qt::UTC);
+        timestamp.setTimeZone(QTimeZone::UTC);
         Message msg(timestamp,
                     bufferInfoHash[query.value(1).toInt()],
                     (Message::Type)query.value(3).toInt(),

@@ -963,7 +963,6 @@ void Network::initSetIrcUsersAndChannels(const QVariantMap& usersAndChannels)
 
         if (!proxy()->sourcePeer()->hasFeature(Quassel::Feature::LongTime)) {
             QDateTime lastAwayMessageTime = QDateTime();
-            lastAwayMessageTime.setTimeSpec(Qt::UTC);
 #if QT_VERSION >= 0x050800
             lastAwayMessageTime.fromSecsSinceEpoch(map.take("lastAwayMessage").toInt());
 #else

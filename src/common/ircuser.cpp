@@ -38,10 +38,8 @@ IrcUser::IrcUser(const QString& hostmask, Network* network)
     , _awayMessage()
     , _away(false)
     , _server()
-    ,
-    // _idleTime(QDateTime::currentDateTime()),
-    _ircOperator()
-    , _lastAwayMessageTime()
+    , _ircOperator()
+    , _lastAwayMessageTime(QDateTime::fromMSecsSinceEpoch(0, Qt::UTC))
     , _whoisServiceReply()
     , _encrypted(false)
     , _network(network)
@@ -49,13 +47,7 @@ IrcUser::IrcUser(const QString& hostmask, Network* network)
     , _codecForDecoding(nullptr)
 {
     updateObjectName();
-    _lastAwayMessageTime.setTimeSpec(Qt::UTC);
-    _lastAwayMessageTime.setMSecsSinceEpoch(0);
 }
-
-// ====================
-//  PUBLIC:
-// ====================
 
 QString IrcUser::hostmask() const
 {
@@ -128,9 +120,6 @@ QByteArray IrcUser::encodeString(const QString& string) const
     return network()->encodeString(string);
 }
 
-// ====================
-//  PUBLIC SLOTS:
-// ====================
 void IrcUser::setUser(const QString& user)
 {
     if (!user.isEmpty() && _user != user) {
@@ -207,25 +196,21 @@ void IrcUser::setIrcOperator(const QString& ircOperator)
     }
 }
 
-// This function is only ever called by SYNC calls from legacy cores (pre-0.13).
-// Therefore, no SYNC call is needed here.
 void IrcUser::setLastAwayMessage(int lastAwayMessage)
 {
 #if QT_VERSION >= 0x050800
-    QDateTime lastAwayMessageTime = QDateTime::fromSecsSinceEpoch(lastAwayMessage);
+    QDateTime lastAwayMessageTime = QDateTime::fromSecsSinceEpoch(lastAwayMessage, Qt::UTC);
 #else
-    // toSecsSinceEpoch() was added in Qt 5.8.  Manually downconvert to seconds for now.
-    // See https://doc.qt.io/qt-5/qdatetime.html#toMSecsSinceEpoch
-    QDateTime lastAwayMessageTime = QDateTime::fromMSecsSinceEpoch(lastAwayMessage * 1000);
+    // toSecsSinceEpoch() was added in Qt 5.8. Manually downconvert to seconds for now.
+    QDateTime lastAwayMessageTime = QDateTime::fromMSecsSinceEpoch(lastAwayMessage * 1000, Qt::UTC);
 #endif
-    lastAwayMessageTime.setTimeSpec(Qt::UTC);
     setLastAwayMessageTime(lastAwayMessageTime);
 }
 
 void IrcUser::setLastAwayMessageTime(const QDateTime& lastAwayMessageTime)
 {
-    if (lastAwayMessageTime > _lastAwayMessageTime) {
-        _lastAwayMessageTime = lastAwayMessageTime;
+    if (lastAwayMessageTime.toUTC() > _lastAwayMessageTime) {
+        _lastAwayMessageTime = lastAwayMessageTime.toUTC();
         SYNC(ARG(lastAwayMessageTime))
     }
 }
@@ -374,7 +359,6 @@ void IrcUser::addUserModes(const QString& modes)
     if (modes.isEmpty())
         return;
 
-    // Don't needlessly sync when no changes are made
     bool changesMade = false;
     for (int i = 0; i < modes.count(); i++) {
         if (!_userModes.contains(modes[i])) {
