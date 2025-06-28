@@ -39,7 +39,7 @@ IrcUser::IrcUser(const QString& hostmask, Network* network)
     , _away(false)
     , _server()
     , _ircOperator()
-    , _lastAwayMessageTime(QDateTime::fromMSecsSinceEpoch(0, Qt::UTC))
+    , _lastAwayMessageTime(QDateTime::fromMSecsSinceEpoch(0, QTimeZone::UTC))
     , _whoisServiceReply()
     , _encrypted(false)
     , _network(network)
@@ -199,10 +199,10 @@ void IrcUser::setIrcOperator(const QString& ircOperator)
 void IrcUser::setLastAwayMessage(int lastAwayMessage)
 {
 #if QT_VERSION >= 0x050800
-    QDateTime lastAwayMessageTime = QDateTime::fromSecsSinceEpoch(lastAwayMessage, Qt::UTC);
+    QDateTime lastAwayMessageTime = QDateTime::fromSecsSinceEpoch(lastAwayMessage, QTimeZone::UTC);
 #else
     // toSecsSinceEpoch() was added in Qt 5.8. Manually downconvert to seconds for now.
-    QDateTime lastAwayMessageTime = QDateTime::fromMSecsSinceEpoch(lastAwayMessage * 1000, Qt::UTC);
+    QDateTime lastAwayMessageTime = QDateTime::fromMSecsSinceEpoch(lastAwayMessage * 1000, QTimeZone::UTC);
 #endif
     setLastAwayMessageTime(lastAwayMessageTime);
 }

@@ -44,7 +44,7 @@ MessageModel::MessageModel(QObject* parent)
     : QAbstractItemModel(parent)
 {
     QDateTime now = QDateTime::currentDateTimeUtc();
-    _nextDayChange = QDateTime(QDateTime::currentDateTimeUtc().date().addDays(1), QTime(0, 0, 0), Qt::UTC);
+    _nextDayChange = QDateTime(QDateTime::currentDateTimeUtc().date().addDays(1), QTime(0, 0, 0), QTimeZone::UTC);
     _dayChangeTimer.setInterval(now.msecsTo(_nextDayChange));
     _dayChangeTimer.start();
     connect(&_dayChangeTimer, &QTimer::timeout, this, &MessageModel::changeOfDay);
