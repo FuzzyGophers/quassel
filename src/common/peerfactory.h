@@ -37,7 +37,7 @@ class COMMON_EXPORT PeerFactory
 {
 public:
     // second value is the protocol-specific features
-    using ProtoDescriptor = QPair<Protocol::Type, quint16>;
+    using ProtoDescriptor = QPair<QuasselProtocol::Type, quint16>;
     using ProtoList = QVector<ProtoDescriptor>;
 
     static ProtoList supportedProtocols();

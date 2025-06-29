@@ -158,9 +158,9 @@ void ClientAuthHandler::onSocketConnected()
         QDataStream stream(socket());  // stream handles the endianness for us
         stream.setVersion(QDataStream::Qt_4_2);
 
-        quint32 magic = Protocol::magic;
-        magic |= Protocol::Encryption;
-        magic |= Protocol::Compression;
+        quint32 magic = QuasselProtocol::magic;
+        magic |= QuasselProtocol::Encryption;
+        magic |= QuasselProtocol::Compression;
 
         stream << magic;
 
@@ -182,7 +182,7 @@ void ClientAuthHandler::onSocketConnected()
 
     qDebug() << "Legacy core detected, switching to compatibility mode";
 
-    auto* peer = PeerFactory::createPeer(PeerFactory::ProtoDescriptor(Protocol::LegacyProtocol, 0),
+    auto* peer = PeerFactory::createPeer(PeerFactory::ProtoDescriptor(QuasselProtocol::LegacyProtocol, 0),
                                          this,
                                          socket(),
                                          Compressor::NoCompression,
@@ -208,12 +208,12 @@ void ClientAuthHandler::onReadyRead()
     socket()->read((char*)&reply, 4);
     reply = qFromBigEndian<quint32>(reply);
 
-    auto type = static_cast<Protocol::Type>(reply & 0xff);
+    auto type = static_cast<QuasselProtocol::Type>(reply & 0xff);
     auto protoFeatures = static_cast<quint16>(reply >> 8 & 0xffff);
     _connectionFeatures = static_cast<quint8>(reply >> 24);
 
     Compressor::CompressionLevel level;
-    if (_connectionFeatures & Protocol::Compression)
+    if (_connectionFeatures & QuasselProtocol::Compression)
         level = Compressor::BestCompression;
     else
         level = Compressor::NoCompression;
@@ -228,7 +228,7 @@ void ClientAuthHandler::onReadyRead()
         return;
     }
 
-    if (peer->protocol() == Protocol::LegacyProtocol) {
+    if (peer->protocol() == QuasselProtocol::LegacyProtocol) {
         connect(peer, &RemotePeer::protocolVersionMismatch, this, &ClientAuthHandler::onProtocolVersionMismatch);
         _legacy = true;
     }
@@ -256,23 +256,23 @@ void ClientAuthHandler::setPeer(RemotePeer* peer)
         startRegistration();
     // otherwise, do it now
     else
-        checkAndEnableSsl(_connectionFeatures & Protocol::Encryption);
+        checkAndEnableSsl(_connectionFeatures & QuasselProtocol::Encryption);
 }
 
 void ClientAuthHandler::startRegistration()
 {
     emit statusMessage(tr("Synchronizing to core..."));
 
-    _peer->dispatch(Protocol::RegisterClient(Quassel::Features{}, Quassel::buildInfo().fancyVersionString, Quassel::buildInfo().commitDate));
+    _peer->dispatch(QuasselProtocol::RegisterClient(Quassel::Features{}, Quassel::buildInfo().fancyVersionString, Quassel::buildInfo().commitDate));
 }
 
-void ClientAuthHandler::handle(const Protocol::ClientDenied& msg)
+void ClientAuthHandler::handle(const QuasselProtocol::ClientDenied& msg)
 {
     emit errorPopup(msg.errorString);
     requestDisconnect(tr("The core refused connection from this client"));
 }
 
-void ClientAuthHandler::handle(const Protocol::ClientRegistered& msg)
+void ClientAuthHandler::handle(const QuasselProtocol::ClientRegistered& msg)
 {
     _coreConfigured = msg.coreConfigured;
     _backendInfo = msg.backendInfo;
@@ -309,17 +309,17 @@ void ClientAuthHandler::onConnectionReady()
         login();
 }
 
-void ClientAuthHandler::setupCore(const Protocol::SetupData& setupData)
+void ClientAuthHandler::setupCore(const QuasselProtocol::SetupData& setupData)
 {
     _peer->dispatch(setupData);
 }
 
-void ClientAuthHandler::handle(const Protocol::SetupFailed& msg)
+void ClientAuthHandler::handle(const QuasselProtocol::SetupFailed& msg)
 {
     emit coreSetupFailed(msg.errorString);
 }
 
-void ClientAuthHandler::handle(const Protocol::SetupDone& msg)
+void ClientAuthHandler::handle(const QuasselProtocol::SetupDone& msg)
 {
     Q_UNUSED(msg)
 
@@ -346,22 +346,22 @@ void ClientAuthHandler::login(const QString& previousError)
         }
     }
 
-    _peer->dispatch(Protocol::Login(_account.user(), _account.password()));
+    _peer->dispatch(QuasselProtocol::Login(_account.user(), _account.password()));
 }
 
-void ClientAuthHandler::handle(const Protocol::LoginFailed& msg)
+void ClientAuthHandler::handle(const QuasselProtocol::LoginFailed& msg)
 {
     login(msg.errorString);
 }
 
-void ClientAuthHandler::handle(const Protocol::LoginSuccess& msg)
+void ClientAuthHandler::handle(const QuasselProtocol::LoginSuccess& msg)
 {
     Q_UNUSED(msg)
 
     emit loginSuccessful(_account);
 }
 
-void ClientAuthHandler::handle(const Protocol::SessionState& msg)
+void ClientAuthHandler::handle(const QuasselProtocol::SessionState& msg)
 {
     disconnect(socket(), nullptr, this, nullptr);  // this is the last message we shall ever get
 

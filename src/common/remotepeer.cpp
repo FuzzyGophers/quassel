@@ -30,7 +30,7 @@
 #include "remotepeer.h"
 #include "util.h"
 
-using namespace Protocol;
+using namespace QuasselProtocol;
 
 const quint32 maxMessageSize = 64 * 1024
                                * 1024;  // This is uncompressed size. 64 MB should be enough for any sort of initData or backlog chunk

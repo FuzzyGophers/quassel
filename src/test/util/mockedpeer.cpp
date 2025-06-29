@@ -32,10 +32,10 @@ struct ProtocolMessage
 {
     // Supported protocol message types. If extended, the various visitors in this file need to be extended too.
     boost::variant<
-        Protocol::SyncMessage,
-        Protocol::RpcCall,
-        Protocol::InitRequest,
-        Protocol::InitData
+        QuasselProtocol::SyncMessage,
+        QuasselProtocol::RpcCall,
+        QuasselProtocol::InitRequest,
+        QuasselProtocol::InitData
     > message;
 };
 
@@ -47,7 +47,7 @@ void PrintTo(const ProtocolMessage& msg, std::ostream* os)
             : _os{os}
         {}
 
-        void operator()(const Protocol::SyncMessage& syncMessage) const
+        void operator()(const QuasselProtocol::SyncMessage& syncMessage) const
         {
             *_os << "SyncMessage{className = " << PrintToString(syncMessage.className)
                  << ", objectName = " << PrintToString(syncMessage.objectName)
@@ -56,21 +56,21 @@ void PrintTo(const ProtocolMessage& msg, std::ostream* os)
                  << "}";
         }
 
-        void operator()(const Protocol::RpcCall& rpcCall) const
+        void operator()(const QuasselProtocol::RpcCall& rpcCall) const
         {
             *_os << "RpcCall{signalName = " << PrintToString(rpcCall.signalName)
                  << ", params = " << PrintToString(rpcCall.params)
                  << "}";
         }
 
-        void operator()(const Protocol::InitRequest& initRequest) const
+        void operator()(const QuasselProtocol::InitRequest& initRequest) const
         {
             *_os << "InitRequest{className = " << PrintToString(initRequest.className)
                  << ", objectName = " << PrintToString(initRequest.objectName)
                  << "}";
         }
 
-        void operator()(const Protocol::InitData& initData) const
+        void operator()(const QuasselProtocol::InitData& initData) const
         {
             *_os << "InitData{className = " << PrintToString(initData.className)
                  << ", objectName = " << PrintToString(initData.objectName)
@@ -96,22 +96,22 @@ MockedPeer::MockedPeer(QObject* parent)
 
 MockedPeer::~MockedPeer() = default;
 
-void MockedPeer::dispatch(const Protocol::SyncMessage& msg)
+void MockedPeer::dispatch(const QuasselProtocol::SyncMessage& msg)
 {
     Dispatches({msg});
 }
 
-void MockedPeer::dispatch(const Protocol::RpcCall& msg)
+void MockedPeer::dispatch(const QuasselProtocol::RpcCall& msg)
 {
     Dispatches({msg});
 }
 
-void MockedPeer::dispatch(const Protocol::InitRequest& msg)
+void MockedPeer::dispatch(const QuasselProtocol::InitRequest& msg)
 {
     Dispatches({msg});
 }
 
-void MockedPeer::dispatch(const Protocol::InitData& msg)
+void MockedPeer::dispatch(const QuasselProtocol::InitData& msg)
 {
     Dispatches({msg});
 }
@@ -200,7 +200,7 @@ public:
             : _expectation{expectation}
         {}
 
-        bool operator()(const Protocol::SyncMessage& syncMessage) const
+        bool operator()(const QuasselProtocol::SyncMessage& syncMessage) const
         {
             auto e = boost::any_cast<SyncMessageExpectation>(&_expectation);
             if (!e) {
@@ -214,7 +214,7 @@ public:
             return true;
         }
 
-        bool operator()(const Protocol::RpcCall& rpcCall) const
+        bool operator()(const QuasselProtocol::RpcCall& rpcCall) const
         {
             auto e = boost::any_cast<RpcCallExpectation>(&_expectation);
             if (!e) {
@@ -226,7 +226,7 @@ public:
             return true;
         }
 
-        bool operator()(const Protocol::InitRequest& initRequest) const
+        bool operator()(const QuasselProtocol::InitRequest& initRequest) const
         {
             auto e = boost::any_cast<InitRequestExpectation>(&_expectation);
             if (!e) {
@@ -238,7 +238,7 @@ public:
             return true;
         }
 
-        bool operator()(const Protocol::InitData& initData) const
+        bool operator()(const QuasselProtocol::InitData& initData) const
         {
             auto e = boost::any_cast<InitDataExpectation>(&_expectation);
             if (!e) {

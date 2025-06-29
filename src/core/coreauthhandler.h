@@ -43,9 +43,9 @@ signals:
 private:
     using AuthHandler::handle;
 
-    void handle(const Protocol::RegisterClient& msg) override;
-    void handle(const Protocol::SetupData& msg) override;
-    void handle(const Protocol::Login& msg) override;
+    void handle(const QuasselProtocol::RegisterClient& msg) override;
+    void handle(const QuasselProtocol::SetupData& msg) override;
+    void handle(const QuasselProtocol::Login& msg) override;
 
     void setPeer(RemotePeer* peer);
     void startSsl();

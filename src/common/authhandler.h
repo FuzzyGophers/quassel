@@ -39,16 +39,16 @@ public:
 
     virtual bool isLocal() const;
 
-    virtual void handle(const Protocol::RegisterClient&) { invalidMessage(); }
-    virtual void handle(const Protocol::ClientDenied&) { invalidMessage(); }
-    virtual void handle(const Protocol::ClientRegistered&) { invalidMessage(); }
-    virtual void handle(const Protocol::SetupData&) { invalidMessage(); }
-    virtual void handle(const Protocol::SetupFailed&) { invalidMessage(); }
-    virtual void handle(const Protocol::SetupDone&) { invalidMessage(); }
-    virtual void handle(const Protocol::Login&) { invalidMessage(); }
-    virtual void handle(const Protocol::LoginFailed&) { invalidMessage(); }
-    virtual void handle(const Protocol::LoginSuccess&) { invalidMessage(); }
-    virtual void handle(const Protocol::SessionState&) { invalidMessage(); }
+    virtual void handle(const QuasselProtocol::RegisterClient&) { invalidMessage(); }
+    virtual void handle(const QuasselProtocol::ClientDenied&) { invalidMessage(); }
+    virtual void handle(const QuasselProtocol::ClientRegistered&) { invalidMessage(); }
+    virtual void handle(const QuasselProtocol::SetupData&) { invalidMessage(); }
+    virtual void handle(const QuasselProtocol::SetupFailed&) { invalidMessage(); }
+    virtual void handle(const QuasselProtocol::SetupDone&) { invalidMessage(); }
+    virtual void handle(const QuasselProtocol::Login&) { invalidMessage(); }
+    virtual void handle(const QuasselProtocol::LoginFailed&) { invalidMessage(); }
+    virtual void handle(const QuasselProtocol::LoginSuccess&) { invalidMessage(); }
+    virtual void handle(const QuasselProtocol::SessionState&) { invalidMessage(); }
 
     // fallback for unknown types, will trigger an error
     template<class T>

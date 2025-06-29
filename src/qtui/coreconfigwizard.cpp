@@ -189,10 +189,10 @@ void CoreConfigWizard::prepareCoreSetup(const QString& backend,
     // So if the core doesn't support that feature, don't pass those parameters.
     if (!Client::isCoreFeatureEnabled(Quassel::Feature::Authenticators)) {
         coreConnection()->setupCore(
-            Protocol::SetupData(field("adminUser.user").toString(), field("adminUser.password").toString(), backend, properties));
+            QuasselProtocol::SetupData(field("adminUser.user").toString(), field("adminUser.password").toString(), backend, properties));
     }
     else {
-        coreConnection()->setupCore(Protocol::SetupData(field("adminUser.user").toString(),
+        coreConnection()->setupCore(QuasselProtocol::SetupData(field("adminUser.user").toString(),
                                                         field("adminUser.password").toString(),
                                                         backend,
                                                         properties,

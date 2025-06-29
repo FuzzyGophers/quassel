@@ -517,7 +517,7 @@ QString CoreSession::avatarUrl(const QString& sender, NetworkId networkId) const
     return "";
 }
 
-Protocol::SessionState CoreSession::sessionState() const
+QuasselProtocol::SessionState CoreSession::sessionState() const
 {
     QVariantList bufferInfos;
     QVariantList networkIds;
@@ -533,7 +533,7 @@ Protocol::SessionState CoreSession::sessionState() const
         identities << QVariant::fromValue(*i);
     }
 
-    return Protocol::SessionState(identities, bufferInfos, networkIds);
+    return QuasselProtocol::SessionState(identities, bufferInfos, networkIds);
 }
 
 /*** Identity Handling ***/

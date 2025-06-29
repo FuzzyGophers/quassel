@@ -686,7 +686,7 @@ signals:
     void bufferInfoUpdated(UserId user, const BufferInfo& info);
 
     //! Relay from CoreSession::sessionState(). Used for internal connection only
-    void sessionStateReceived(const Protocol::SessionState& sessionState);
+    void sessionStateReceived(const QuasselProtocol::SessionState& sessionState);
 
     //! Emitted when database schema upgrade starts or ends
     void dbUpgradeInProgress(bool inProgress);

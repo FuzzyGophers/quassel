@@ -35,7 +35,7 @@
 #include "types.h"
 #include "util.h"
 
-using namespace Protocol;
+using namespace QuasselProtocol;
 
 class RemovePeerEvent : public QEvent
 {

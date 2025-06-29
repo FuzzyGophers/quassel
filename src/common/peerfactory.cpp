@@ -26,8 +26,8 @@
 PeerFactory::ProtoList PeerFactory::supportedProtocols()
 {
     ProtoList result;
-    result.append(ProtoDescriptor(Protocol::DataStreamProtocol, DataStreamPeer::supportedFeatures()));
-    result.append(ProtoDescriptor(Protocol::LegacyProtocol, 0));
+    result.append(ProtoDescriptor(QuasselProtocol::DataStreamProtocol, DataStreamPeer::supportedFeatures()));
+    result.append(ProtoDescriptor(QuasselProtocol::LegacyProtocol, 0));
     return result;
 }
 
@@ -41,12 +41,12 @@ RemotePeer* PeerFactory::createPeer(
     const ProtoList& protocols, AuthHandler* authHandler, QTcpSocket* socket, Compressor::CompressionLevel level, QObject* parent)
 {
     foreach (const ProtoDescriptor& protodesc, protocols) {
-        Protocol::Type proto = protodesc.first;
+        QuasselProtocol::Type proto = protodesc.first;
         quint16 features = protodesc.second;
         switch (proto) {
-        case Protocol::LegacyProtocol:
+        case QuasselProtocol::LegacyProtocol:
             return new LegacyPeer(authHandler, socket, level, parent);
-        case Protocol::DataStreamProtocol:
+        case QuasselProtocol::DataStreamProtocol:
             if (DataStreamPeer::acceptsFeatures(features))
                 return new DataStreamPeer(authHandler, socket, features, level, parent);
             break;

@@ -83,7 +83,7 @@ public:
 
     inline CoreNetworkConfig* networkConfig() const { return _networkConfig; }
 
-    Protocol::SessionState sessionState() const;
+    QuasselProtocol::SessionState sessionState() const;
 
     inline SignalProxy* signalProxy() const { return _signalProxy; }
 
@@ -166,7 +166,7 @@ public slots:
 
 signals:
     void initialized();
-    void sessionStateReceived(const Protocol::SessionState& sessionState);
+    void sessionStateReceived(const QuasselProtocol::SessionState& sessionState);
 
     // void msgFromGui(uint netid, QString buf, QString message);
     void displayMsg(Message message);

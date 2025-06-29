@@ -55,7 +55,7 @@ void CoreAuthHandler::onReadyRead()
         socket()->peek((char*) &magic, 4);
         magic = qFromBigEndian<quint32>(magic);
 
-        if (magic == Protocol::proxyMagic) {
+        if (magic == QuasselProtocol::proxyMagic) {
             if (!socket()->canReadLine()) {
                 return;
             }
@@ -82,11 +82,11 @@ void CoreAuthHandler::onReadyRead()
         socket()->peek((char*)&magic, 4);
         magic = qFromBigEndian<quint32>(magic);
 
-        if ((magic & 0xffffff00) != Protocol::magic) {
+        if ((magic & 0xffffff00) != QuasselProtocol::magic) {
             // no magic, assume legacy protocol
             qDebug() << "Legacy client detected, switching to compatibility mode";
             _legacy = true;
-            RemotePeer* peer = PeerFactory::createPeer(PeerFactory::ProtoDescriptor(Protocol::LegacyProtocol, 0),
+            RemotePeer* peer = PeerFactory::createPeer(PeerFactory::ProtoDescriptor(QuasselProtocol::LegacyProtocol, 0),
                                                        this,
                                                        socket(),
                                                        Compressor::NoCompression,
@@ -99,10 +99,10 @@ void CoreAuthHandler::onReadyRead()
         _magicReceived = true;
         quint8 features = magic & 0xff;
         // figure out which connection features we'll use based on the client's support
-        if (Core::sslSupported() && (features & Protocol::Encryption))
-            _connectionFeatures |= Protocol::Encryption;
-        if (features & Protocol::Compression)
-            _connectionFeatures |= Protocol::Compression;
+        if (Core::sslSupported() && (features & QuasselProtocol::Encryption))
+            _connectionFeatures |= QuasselProtocol::Encryption;
+        if (features & QuasselProtocol::Compression)
+            _connectionFeatures |= QuasselProtocol::Compression;
 
         socket()->read((char*)&magic, 4);  // read the 4 bytes we've just peeked at
     }
@@ -113,13 +113,13 @@ void CoreAuthHandler::onReadyRead()
         socket()->read((char*)&data, 4);
         data = qFromBigEndian<quint32>(data);
 
-        auto type = static_cast<Protocol::Type>(data & 0xff);
+        auto type = static_cast<QuasselProtocol::Type>(data & 0xff);
         auto protoFeatures = static_cast<quint16>(data >> 8 & 0xffff);
         _supportedProtos.append(PeerFactory::ProtoDescriptor(type, protoFeatures));
 
         if (data >= 0x80000000) {  // last protocol
             Compressor::CompressionLevel level;
-            if (_connectionFeatures & Protocol::Compression)
+            if (_connectionFeatures & QuasselProtocol::Compression)
                 level = Compressor::BestCompression;
             else
                 level = Compressor::NoCompression;
@@ -131,7 +131,7 @@ void CoreAuthHandler::onReadyRead()
                 return;
             }
 
-            if (peer->protocol() == Protocol::LegacyProtocol) {
+            if (peer->protocol() == QuasselProtocol::LegacyProtocol) {
                 _legacy = true;
                 connect(peer, &RemotePeer::protocolVersionMismatch, this, &CoreAuthHandler::onProtocolVersionMismatch);
             }
@@ -143,7 +143,7 @@ void CoreAuthHandler::onReadyRead()
             socket()->write((char*)&reply, 4);
             socket()->flush();
 
-            if (!_legacy && (_connectionFeatures & Protocol::Encryption))
+            if (!_legacy && (_connectionFeatures & QuasselProtocol::Encryption))
                 startSsl();  // legacy peer enables it later
             return;
         }
@@ -169,7 +169,7 @@ void CoreAuthHandler::onProtocolVersionMismatch(int actual, int expected)
                              "This core needs at least client/core protocol version %1 (got: %2).<br>"
                              "Please consider upgrading your client.")
                               .arg(expected, actual);
-    _peer->dispatch(Protocol::ClientDenied(errorString));
+    _peer->dispatch(QuasselProtocol::ClientDenied(errorString));
     _peer->close();
 }
 
@@ -179,24 +179,24 @@ bool CoreAuthHandler::checkClientRegistered()
         qWarning() << qPrintable(tr("Client")) << qPrintable(hostAddress().toString())
                    << qPrintable(tr("did not send a registration message before trying to login, rejecting."));
         _peer->dispatch(
-            Protocol::ClientDenied(tr("<b>Client not initialized!</b><br>You need to send a registration message before trying to login.")));
+            QuasselProtocol::ClientDenied(tr("<b>Client not initialized!</b><br>You need to send a registration message before trying to login.")));
         _peer->close();
         return false;
     }
     return true;
 }
 
-void CoreAuthHandler::handle(const Protocol::RegisterClient& msg)
+void CoreAuthHandler::handle(const QuasselProtocol::RegisterClient& msg)
 {
     bool useSsl;
     if (_legacy)
         useSsl = Core::sslSupported() && msg.sslSupported;
     else
-        useSsl = _connectionFeatures & Protocol::Encryption;
+        useSsl = _connectionFeatures & QuasselProtocol::Encryption;
 
     if (Quassel::isOptionSet("require-ssl") && !useSsl && !_peer->isLocal()) {
         qInfo() << qPrintable(tr("SSL required but non-SSL connection attempt from %1").arg(hostAddress().toString()));
-        _peer->dispatch(Protocol::ClientDenied(tr("<b>SSL is required!</b><br>You need to use SSL in order to connect to this core.")));
+        _peer->dispatch(QuasselProtocol::ClientDenied(tr("<b>SSL is required!</b><br>You need to use SSL in order to connect to this core.")));
         _peer->close();
         return;
     }
@@ -215,7 +215,7 @@ void CoreAuthHandler::handle(const Protocol::RegisterClient& msg)
         }
     }
 
-    _peer->dispatch(Protocol::ClientRegistered(Quassel::Features{}, configured, backends, authenticators, useSsl));
+    _peer->dispatch(QuasselProtocol::ClientRegistered(Quassel::Features{}, configured, backends, authenticators, useSsl));
 
     // useSsl is only used for the legacy protocol
     if (_legacy && useSsl)
@@ -224,7 +224,7 @@ void CoreAuthHandler::handle(const Protocol::RegisterClient& msg)
     _clientRegistered = true;
 }
 
-void CoreAuthHandler::handle(const Protocol::SetupData& msg)
+void CoreAuthHandler::handle(const QuasselProtocol::SetupData& msg)
 {
     if (!checkClientRegistered())
         return;
@@ -239,12 +239,12 @@ void CoreAuthHandler::handle(const Protocol::SetupData& msg)
 
     QString result = Core::setup(msg.adminUser, msg.adminPassword, msg.backend, msg.setupData, authenticator, msg.authSetupData);
     if (!result.isEmpty())
-        _peer->dispatch(Protocol::SetupFailed(result));
+        _peer->dispatch(QuasselProtocol::SetupFailed(result));
     else
-        _peer->dispatch(Protocol::SetupDone());
+        _peer->dispatch(QuasselProtocol::SetupDone());
 }
 
-void CoreAuthHandler::handle(const Protocol::Login& msg)
+void CoreAuthHandler::handle(const QuasselProtocol::Login& msg)
 {
     if (!checkClientRegistered())
         return;
@@ -252,7 +252,7 @@ void CoreAuthHandler::handle(const Protocol::Login& msg)
     if (!Core::isConfigured()) {
         qWarning() << qPrintable(tr("Client")) << qPrintable(hostAddress().toString())
                    << qPrintable(tr("attempted to login before the core was configured, rejecting."));
-        _peer->dispatch(Protocol::ClientDenied(
+        _peer->dispatch(QuasselProtocol::ClientDenied(
             tr("<b>Attempted to login before core was configured!</b><br>The core must be configured before attempting to login.")));
         return;
     }
@@ -276,14 +276,14 @@ void CoreAuthHandler::handle(const Protocol::Login& msg)
 
     if (uid == 0) {
         qInfo() << qPrintable(tr("Invalid login attempt from %1 as \"%2\"").arg(hostAddress().toString(), msg.user));
-        _peer->dispatch(Protocol::LoginFailed(tr(
+        _peer->dispatch(QuasselProtocol::LoginFailed(tr(
             "<b>Invalid username or password!</b><br>The username/password combination you supplied could not be found in the database.")));
         if (_metricsServer) {
             _metricsServer->addLoginAttempt(msg.user, false);
         }
         return;
     }
-    _peer->dispatch(Protocol::LoginSuccess());
+    _peer->dispatch(QuasselProtocol::LoginSuccess());
     if (_metricsServer) {
         _metricsServer->addLoginAttempt(uid, true);
     }

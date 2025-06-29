@@ -37,7 +37,7 @@ public:
     InternalPeer(QObject* parent = nullptr);
     ~InternalPeer() override;
 
-    Protocol::Type protocol() const override { return Protocol::InternalProtocol; }
+    QuasselProtocol::Type protocol() const override { return QuasselProtocol::InternalProtocol; }
     QString description() const override;
 
     QString address() const override;
@@ -55,39 +55,39 @@ public:
 
     int lag() const override;
 
-    void dispatch(const Protocol::SyncMessage& msg) override;
-    void dispatch(const Protocol::RpcCall& msg) override;
-    void dispatch(const Protocol::InitRequest& msg) override;
-    void dispatch(const Protocol::InitData& msg) override;
+    void dispatch(const QuasselProtocol::SyncMessage& msg) override;
+    void dispatch(const QuasselProtocol::RpcCall& msg) override;
+    void dispatch(const QuasselProtocol::InitRequest& msg) override;
+    void dispatch(const QuasselProtocol::InitData& msg) override;
 
     /* These are not needed for InternalPeer */
-    void dispatch(const Protocol::RegisterClient&) override {}
-    void dispatch(const Protocol::ClientDenied&) override {}
-    void dispatch(const Protocol::ClientRegistered&) override {}
-    void dispatch(const Protocol::SetupData&) override {}
-    void dispatch(const Protocol::SetupFailed&) override {}
-    void dispatch(const Protocol::SetupDone&) override {}
-    void dispatch(const Protocol::Login&) override {}
-    void dispatch(const Protocol::LoginFailed&) override {}
-    void dispatch(const Protocol::LoginSuccess&) override {}
-    void dispatch(const Protocol::SessionState&) override {}
+    void dispatch(const QuasselProtocol::RegisterClient&) override {}
+    void dispatch(const QuasselProtocol::ClientDenied&) override {}
+    void dispatch(const QuasselProtocol::ClientRegistered&) override {}
+    void dispatch(const QuasselProtocol::SetupData&) override {}
+    void dispatch(const QuasselProtocol::SetupFailed&) override {}
+    void dispatch(const QuasselProtocol::SetupDone&) override {}
+    void dispatch(const QuasselProtocol::Login&) override {}
+    void dispatch(const QuasselProtocol::LoginFailed&) override {}
+    void dispatch(const QuasselProtocol::LoginSuccess&) override {}
+    void dispatch(const QuasselProtocol::SessionState&) override {}
 
 public slots:
     void close(const QString& reason = QString()) override;
 
 signals:
-    void dispatchMessage(const Protocol::SyncMessage& msg);
-    void dispatchMessage(const Protocol::RpcCall& msg);
-    void dispatchMessage(const Protocol::InitRequest& msg);
-    void dispatchMessage(const Protocol::InitData& msg);
+    void dispatchMessage(const QuasselProtocol::SyncMessage& msg);
+    void dispatchMessage(const QuasselProtocol::RpcCall& msg);
+    void dispatchMessage(const QuasselProtocol::InitRequest& msg);
+    void dispatchMessage(const QuasselProtocol::InitData& msg);
 
 private slots:
     void peerDisconnected();
 
-    void handleMessage(const Protocol::SyncMessage& msg);
-    void handleMessage(const Protocol::RpcCall& msg);
-    void handleMessage(const Protocol::InitRequest& msg);
-    void handleMessage(const Protocol::InitData& msg);
+    void handleMessage(const QuasselProtocol::SyncMessage& msg);
+    void handleMessage(const QuasselProtocol::RpcCall& msg);
+    void handleMessage(const QuasselProtocol::InitRequest& msg);
+    void handleMessage(const QuasselProtocol::InitData& msg);
 
 private:
     template<typename T>

@@ -33,7 +33,7 @@ const uint protocolVersion = 10;
 const uint coreNeedsProtocol = protocolVersion;
 const uint clientNeedsProtocol = protocolVersion;
 
-using namespace Protocol;
+using namespace QuasselProtocol;
 
 LegacyPeer::LegacyPeer(::AuthHandler* authHandler, QTcpSocket* socket, Compressor::CompressionLevel level, QObject* parent)
     : RemotePeer(authHandler, socket, level, parent)
@@ -386,7 +386,7 @@ void LegacyPeer::handlePackedFunc(const QVariant& packedFunc)
         QByteArray className = params.takeFirst().toByteArray();
         QString objectName = params.takeFirst().toString();
         QByteArray slotName = params.takeFirst().toByteArray();
-        handle(Protocol::SyncMessage(className, objectName, slotName, params));
+        handle(QuasselProtocol::SyncMessage(className, objectName, slotName, params));
         break;
     }
     case RpcCall: {
@@ -395,7 +395,7 @@ void LegacyPeer::handlePackedFunc(const QVariant& packedFunc)
             return;
         }
         QByteArray signalName = params.takeFirst().toByteArray();
-        handle(Protocol::RpcCall(signalName, params));
+        handle(QuasselProtocol::RpcCall(signalName, params));
         break;
     }
     case InitRequest: {
@@ -405,7 +405,7 @@ void LegacyPeer::handlePackedFunc(const QVariant& packedFunc)
         }
         QByteArray className = params[0].toByteArray();
         QString objectName = params[1].toString();
-        handle(Protocol::InitRequest(className, objectName));
+        handle(QuasselProtocol::InitRequest(className, objectName));
         break;
     }
     case InitData: {
@@ -420,7 +420,7 @@ void LegacyPeer::handlePackedFunc(const QVariant& packedFunc)
         // we need to special-case IrcUsersAndChannels here, since the format changed
         if (className == "Network")
             fromLegacyIrcUsersAndChannels(initData);
-        handle(Protocol::InitData(className, objectName, initData));
+        handle(QuasselProtocol::InitData(className, objectName, initData));
         break;
     }
     case HeartBeat: {
@@ -432,7 +432,7 @@ void LegacyPeer::handlePackedFunc(const QVariant& packedFunc)
         // so we assume it's sent today, which works in exactly the same cases as it did in the old implementation
         QDateTime dateTime = QDateTime::currentDateTime().toUTC();
         dateTime.setTime(params[0].toTime());
-        handle(Protocol::HeartBeat(dateTime));
+        handle(QuasselProtocol::HeartBeat(dateTime));
         break;
     }
     case HeartBeatReply: {
@@ -444,28 +444,28 @@ void LegacyPeer::handlePackedFunc(const QVariant& packedFunc)
         // so we assume it's sent today, which works in exactly the same cases as it did in the old implementation
         QDateTime dateTime = QDateTime::currentDateTime().toUTC();
         dateTime.setTime(params[0].toTime());
-        handle(Protocol::HeartBeatReply(dateTime));
+        handle(QuasselProtocol::HeartBeatReply(dateTime));
         break;
     }
     }
 }
 
-void LegacyPeer::dispatch(const Protocol::SyncMessage& msg)
+void LegacyPeer::dispatch(const QuasselProtocol::SyncMessage& msg)
 {
     dispatchPackedFunc(QVariantList() << (qint16)Sync << msg.className << msg.objectName << msg.slotName << msg.params);
 }
 
-void LegacyPeer::dispatch(const Protocol::RpcCall& msg)
+void LegacyPeer::dispatch(const QuasselProtocol::RpcCall& msg)
 {
     dispatchPackedFunc(QVariantList() << (qint16)RpcCall << msg.signalName << msg.params);
 }
 
-void LegacyPeer::dispatch(const Protocol::InitRequest& msg)
+void LegacyPeer::dispatch(const QuasselProtocol::InitRequest& msg)
 {
     dispatchPackedFunc(QVariantList() << (qint16)InitRequest << msg.className << msg.objectName);
 }
 
-void LegacyPeer::dispatch(const Protocol::InitData& msg)
+void LegacyPeer::dispatch(const QuasselProtocol::InitData& msg)
 {
     // We need to special-case IrcUsersAndChannels, as the format changed
     if (msg.className == "Network") {
@@ -477,12 +477,12 @@ void LegacyPeer::dispatch(const Protocol::InitData& msg)
         dispatchPackedFunc(QVariantList() << (qint16)InitData << msg.className << msg.objectName << msg.initData);
 }
 
-void LegacyPeer::dispatch(const Protocol::HeartBeat& msg)
+void LegacyPeer::dispatch(const QuasselProtocol::HeartBeat& msg)
 {
     dispatchPackedFunc(QVariantList() << (qint16)HeartBeat << msg.timestamp.time());
 }
 
-void LegacyPeer::dispatch(const Protocol::HeartBeatReply& msg)
+void LegacyPeer::dispatch(const QuasselProtocol::HeartBeatReply& msg)
 {
     dispatchPackedFunc(QVariantList() << (qint16)HeartBeatReply << msg.timestamp.time());
 }

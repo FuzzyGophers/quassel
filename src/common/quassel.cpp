@@ -145,7 +145,7 @@ void Quassel::registerMetaTypes()
     qRegisterMetaType<QHostAddress>("QHostAddress");
     qRegisterMetaType<QUuid>("QUuid");
 
-    qRegisterMetaType<Protocol::SessionState>("Protocol::SessionState");
+    qRegisterMetaType<QuasselProtocol::SessionState>("QuasselProtocol::SessionState");
     qRegisterMetaType<PeerPtr>("PeerPtr");
 
     // Versions of Qt prior to 4.7 didn't define QVariant as a meta type

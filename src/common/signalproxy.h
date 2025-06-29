@@ -260,10 +260,10 @@ private:
     template<class T>
     void dispatch(Peer* peer, const T& protoMessage);
 
-    void handle(Peer* peer, const Protocol::SyncMessage& syncMessage);
-    void handle(Peer* peer, const Protocol::RpcCall& rpcCall);
-    void handle(Peer* peer, const Protocol::InitRequest& initRequest);
-    void handle(Peer* peer, const Protocol::InitData& initData);
+    void handle(Peer* peer, const QuasselProtocol::SyncMessage& syncMessage);
+    void handle(Peer* peer, const QuasselProtocol::RpcCall& rpcCall);
+    void handle(Peer* peer, const QuasselProtocol::InitRequest& initRequest);
+    void handle(Peer* peer, const QuasselProtocol::InitData& initData);
 
     template<class T>
     void handle(Peer*, T)

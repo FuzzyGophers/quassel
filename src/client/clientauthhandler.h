@@ -49,7 +49,7 @@ public slots:
 
     void login(const QString& previousError = QString());
     void login(const QString& user, const QString& password, bool remember);
-    void setupCore(const Protocol::SetupData& setupData);
+    void setupCore(const QuasselProtocol::SetupData& setupData);
 
 signals:
     void statusMessage(const QString& message);
@@ -61,7 +61,7 @@ signals:
 
     void connectionReady();
     void loginSuccessful(const CoreAccount& account);
-    void handshakeComplete(RemotePeer* peer, const Protocol::SessionState& sessionState);
+    void handshakeComplete(RemotePeer* peer, const QuasselProtocol::SessionState& sessionState);
 
     // These signals MUST be handled synchronously!
     void userAuthenticationRequired(CoreAccount* account, bool* valid, const QString& errorMessage = QString());
@@ -77,13 +77,13 @@ signals:
 private:
     using AuthHandler::handle;
 
-    void handle(const Protocol::ClientDenied& msg) override;
-    void handle(const Protocol::ClientRegistered& msg) override;
-    void handle(const Protocol::SetupFailed& msg) override;
-    void handle(const Protocol::SetupDone& msg) override;
-    void handle(const Protocol::LoginFailed& msg) override;
-    void handle(const Protocol::LoginSuccess& msg) override;
-    void handle(const Protocol::SessionState& msg) override;
+    void handle(const QuasselProtocol::ClientDenied& msg) override;
+    void handle(const QuasselProtocol::ClientRegistered& msg) override;
+    void handle(const QuasselProtocol::SetupFailed& msg) override;
+    void handle(const QuasselProtocol::SetupDone& msg) override;
+    void handle(const QuasselProtocol::LoginFailed& msg) override;
+    void handle(const QuasselProtocol::LoginSuccess& msg) override;
+    void handle(const QuasselProtocol::SessionState& msg) override;
 
     void setPeer(RemotePeer* peer);
     void checkAndEnableSsl(bool coreSupportsSsl);

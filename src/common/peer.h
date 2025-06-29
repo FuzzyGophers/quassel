@@ -38,7 +38,7 @@ class COMMON_EXPORT Peer : public QObject
 public:
     explicit Peer(AuthHandler* authHandler, QObject* parent = nullptr);
 
-    virtual Protocol::Type protocol() const = 0;
+    virtual QuasselProtocol::Type protocol() const = 0;
     virtual QString description() const = 0;
 
     virtual SignalProxy* signalProxy() const = 0;
@@ -73,22 +73,22 @@ public:
 
 public slots:
     /* Handshake messages */
-    virtual void dispatch(const Protocol::RegisterClient&) = 0;
-    virtual void dispatch(const Protocol::ClientDenied&) = 0;
-    virtual void dispatch(const Protocol::ClientRegistered&) = 0;
-    virtual void dispatch(const Protocol::SetupData&) = 0;
-    virtual void dispatch(const Protocol::SetupFailed&) = 0;
-    virtual void dispatch(const Protocol::SetupDone&) = 0;
-    virtual void dispatch(const Protocol::Login&) = 0;
-    virtual void dispatch(const Protocol::LoginFailed&) = 0;
-    virtual void dispatch(const Protocol::LoginSuccess&) = 0;
-    virtual void dispatch(const Protocol::SessionState&) = 0;
+    virtual void dispatch(const QuasselProtocol::RegisterClient&) = 0;
+    virtual void dispatch(const QuasselProtocol::ClientDenied&) = 0;
+    virtual void dispatch(const QuasselProtocol::ClientRegistered&) = 0;
+    virtual void dispatch(const QuasselProtocol::SetupData&) = 0;
+    virtual void dispatch(const QuasselProtocol::SetupFailed&) = 0;
+    virtual void dispatch(const QuasselProtocol::SetupDone&) = 0;
+    virtual void dispatch(const QuasselProtocol::Login&) = 0;
+    virtual void dispatch(const QuasselProtocol::LoginFailed&) = 0;
+    virtual void dispatch(const QuasselProtocol::LoginSuccess&) = 0;
+    virtual void dispatch(const QuasselProtocol::SessionState&) = 0;
 
     /* Sigproxy messages */
-    virtual void dispatch(const Protocol::SyncMessage&) = 0;
-    virtual void dispatch(const Protocol::RpcCall&) = 0;
-    virtual void dispatch(const Protocol::InitRequest&) = 0;
-    virtual void dispatch(const Protocol::InitData&) = 0;
+    virtual void dispatch(const QuasselProtocol::SyncMessage&) = 0;
+    virtual void dispatch(const QuasselProtocol::RpcCall&) = 0;
+    virtual void dispatch(const QuasselProtocol::InitRequest&) = 0;
+    virtual void dispatch(const QuasselProtocol::InitData&) = 0;
 
     virtual void close(const QString& reason = QString()) = 0;
 
@@ -125,7 +125,7 @@ template<typename T>
 inline void Peer::handle(const T& protoMessage)
 {
     switch (protoMessage.handler()) {
-    case Protocol::Handler::SignalProxy:
+    case QuasselProtocol::Handler::SignalProxy:
         if (!signalProxy()) {
             qWarning() << Q_FUNC_INFO << "Cannot handle message without a SignalProxy!";
             return;
@@ -133,7 +133,7 @@ inline void Peer::handle(const T& protoMessage)
         signalProxy()->handle(this, protoMessage);
         break;
 
-    case Protocol::Handler::AuthHandler:
+    case QuasselProtocol::Handler::AuthHandler:
         if (!authHandler()) {
             qWarning() << Q_FUNC_INFO << "Cannot handle auth messages without an active AuthHandler!";
             return;

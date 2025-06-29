@@ -28,7 +28,7 @@
 
 #include "quassel.h"
 
-namespace Protocol {
+namespace QuasselProtocol {
 
 const quint32 magic = 0x42b33f00;
 
@@ -266,7 +266,7 @@ struct HeartBeatReply
 }  // namespace Protocol
 
 // Required for InternalPeer
-Q_DECLARE_METATYPE(Protocol::SyncMessage)
-Q_DECLARE_METATYPE(Protocol::RpcCall)
-Q_DECLARE_METATYPE(Protocol::InitRequest)
-Q_DECLARE_METATYPE(Protocol::InitData)
+Q_DECLARE_METATYPE(QuasselProtocol::SyncMessage)
+Q_DECLARE_METATYPE(QuasselProtocol::RpcCall)
+Q_DECLARE_METATYPE(QuasselProtocol::InitRequest)
+Q_DECLARE_METATYPE(QuasselProtocol::InitData)

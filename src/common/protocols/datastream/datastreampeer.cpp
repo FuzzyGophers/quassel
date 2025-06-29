@@ -29,7 +29,7 @@
 
 #include "serializers/serializers.h"
 
-using namespace Protocol;
+using namespace QuasselProtocol;
 
 DataStreamPeer::DataStreamPeer(
     ::AuthHandler* authHandler, QTcpSocket* socket, quint16 features, Compressor::CompressionLevel level, QObject* parent)
@@ -320,7 +320,7 @@ void DataStreamPeer::handlePackedFunc(const QVariantList& packedFunc)
         QByteArray className = params.takeFirst().toByteArray();
         QString objectName = QString::fromUtf8(params.takeFirst().toByteArray());
         QByteArray slotName = params.takeFirst().toByteArray();
-        handle(Protocol::SyncMessage(className, objectName, slotName, params));
+        handle(QuasselProtocol::SyncMessage(className, objectName, slotName, params));
         break;
     }
     case RpcCall: {
@@ -329,7 +329,7 @@ void DataStreamPeer::handlePackedFunc(const QVariantList& packedFunc)
             return;
         }
         QByteArray signalName = params.takeFirst().toByteArray();
-        handle(Protocol::RpcCall(signalName, params));
+        handle(QuasselProtocol::RpcCall(signalName, params));
         break;
     }
     case InitRequest: {
@@ -339,7 +339,7 @@ void DataStreamPeer::handlePackedFunc(const QVariantList& packedFunc)
         }
         QByteArray className = params[0].toByteArray();
         QString objectName = QString::fromUtf8(params[1].toByteArray());
-        handle(Protocol::InitRequest(className, objectName));
+        handle(QuasselProtocol::InitRequest(className, objectName));
         break;
     }
     case InitData: {
@@ -352,7 +352,7 @@ void DataStreamPeer::handlePackedFunc(const QVariantList& packedFunc)
         QVariantMap initData;
         for (int i = 0; i < params.count() / 2; ++i)
             initData[QString::fromUtf8(params[2 * i].toByteArray())] = params[2 * i + 1];
-        handle(Protocol::InitData(className, objectName, initData));
+        handle(QuasselProtocol::InitData(className, objectName, initData));
         break;
     }
     case HeartBeat: {
@@ -361,7 +361,7 @@ void DataStreamPeer::handlePackedFunc(const QVariantList& packedFunc)
             return;
         }
         // Note: QDateTime instead of QTime as in the legacy protocol!
-        handle(Protocol::HeartBeat(params[0].toDateTime()));
+        handle(QuasselProtocol::HeartBeat(params[0].toDateTime()));
         break;
     }
     case HeartBeatReply: {
@@ -370,28 +370,28 @@ void DataStreamPeer::handlePackedFunc(const QVariantList& packedFunc)
             return;
         }
         // Note: QDateTime instead of QTime as in the legacy protocol!
-        handle(Protocol::HeartBeatReply(params[0].toDateTime()));
+        handle(QuasselProtocol::HeartBeatReply(params[0].toDateTime()));
         break;
     }
     }
 }
 
-void DataStreamPeer::dispatch(const Protocol::SyncMessage& msg)
+void DataStreamPeer::dispatch(const QuasselProtocol::SyncMessage& msg)
 {
     dispatchPackedFunc(QVariantList() << (qint16)Sync << msg.className << msg.objectName.toUtf8() << msg.slotName << msg.params);
 }
 
-void DataStreamPeer::dispatch(const Protocol::RpcCall& msg)
+void DataStreamPeer::dispatch(const QuasselProtocol::RpcCall& msg)
 {
     dispatchPackedFunc(QVariantList() << (qint16)RpcCall << msg.signalName << msg.params);
 }
 
-void DataStreamPeer::dispatch(const Protocol::InitRequest& msg)
+void DataStreamPeer::dispatch(const QuasselProtocol::InitRequest& msg)
 {
     dispatchPackedFunc(QVariantList() << (qint16)InitRequest << msg.className << msg.objectName.toUtf8());
 }
 
-void DataStreamPeer::dispatch(const Protocol::InitData& msg)
+void DataStreamPeer::dispatch(const QuasselProtocol::InitData& msg)
 {
     QVariantList initData;
     QVariantMap::const_iterator it = msg.initData.begin();
@@ -402,12 +402,12 @@ void DataStreamPeer::dispatch(const Protocol::InitData& msg)
     dispatchPackedFunc(QVariantList() << (qint16)InitData << msg.className << msg.objectName.toUtf8() << initData);
 }
 
-void DataStreamPeer::dispatch(const Protocol::HeartBeat& msg)
+void DataStreamPeer::dispatch(const QuasselProtocol::HeartBeat& msg)
 {
     dispatchPackedFunc(QVariantList() << (qint16)HeartBeat << msg.timestamp);
 }
 
-void DataStreamPeer::dispatch(const Protocol::HeartBeatReply& msg)
+void DataStreamPeer::dispatch(const QuasselProtocol::HeartBeatReply& msg)
 {
     dispatchPackedFunc(QVariantList() << (qint16)HeartBeatReply << msg.timestamp);
 }

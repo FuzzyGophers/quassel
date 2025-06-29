@@ -86,10 +86,10 @@ protected:
     virtual void processMessage(const QByteArray& msg) = 0;
 
     // These protocol messages get handled internally and won't reach SignalProxy
-    void handle(const Protocol::HeartBeat& heartBeat);
-    void handle(const Protocol::HeartBeatReply& heartBeatReply);
-    virtual void dispatch(const Protocol::HeartBeat& msg) = 0;
-    virtual void dispatch(const Protocol::HeartBeatReply& msg) = 0;
+    void handle(const QuasselProtocol::HeartBeat& heartBeat);
+    void handle(const QuasselProtocol::HeartBeatReply& heartBeatReply);
+    virtual void dispatch(const QuasselProtocol::HeartBeat& msg) = 0;
+    virtual void dispatch(const QuasselProtocol::HeartBeatReply& msg) = 0;
 
 protected slots:
     virtual void onSocketStateChanged(QAbstractSocket::SocketState state);

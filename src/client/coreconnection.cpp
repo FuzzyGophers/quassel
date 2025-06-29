@@ -389,7 +389,7 @@ void CoreConnection::connectToCurrentAccount()
     _authHandler->connectToCore();
 }
 
-void CoreConnection::setupCore(const Protocol::SetupData& setupData)
+void CoreConnection::setupCore(const QuasselProtocol::SetupData& setupData)
 {
     _authHandler->setupCore(setupData);
 }
@@ -414,7 +414,7 @@ void CoreConnection::onLoginSuccessful(const CoreAccount& account)
     emit connectionMsg(tr("Synchronizing to %1...").arg(account.accountName()));
 }
 
-void CoreConnection::onHandshakeComplete(RemotePeer* peer, const Protocol::SessionState& sessionState)
+void CoreConnection::onHandshakeComplete(RemotePeer* peer, const QuasselProtocol::SessionState& sessionState)
 {
     updateProgress(100, 100);
 
@@ -432,14 +432,14 @@ void CoreConnection::onHandshakeComplete(RemotePeer* peer, const Protocol::Sessi
     syncToCore(sessionState);
 }
 
-void CoreConnection::internalSessionStateReceived(const Protocol::SessionState& sessionState)
+void CoreConnection::internalSessionStateReceived(const QuasselProtocol::SessionState& sessionState)
 {
     updateProgress(100, 100);
     setState(Synchronizing);
     syncToCore(sessionState);
 }
 
-void CoreConnection::syncToCore(const Protocol::SessionState& sessionState)
+void CoreConnection::syncToCore(const QuasselProtocol::SessionState& sessionState)
 {
     setProgressText(tr("Receiving network states"));
     updateProgress(0, 100);

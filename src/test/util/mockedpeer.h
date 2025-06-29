@@ -67,10 +67,10 @@ public:
     MOCK_METHOD1(Dispatches, void(const ProtocolMessage&));
 
     using InternalPeer::dispatch;
-    void dispatch(const Protocol::SyncMessage&) override;
-    void dispatch(const Protocol::RpcCall&) override;
-    void dispatch(const Protocol::InitRequest&) override;
-    void dispatch(const Protocol::InitData&) override;
+    void dispatch(const QuasselProtocol::SyncMessage&) override;
+    void dispatch(const QuasselProtocol::RpcCall&) override;
+    void dispatch(const QuasselProtocol::InitRequest&) override;
+    void dispatch(const QuasselProtocol::InitData&) override;
 
 private:
     void dispatchInternal(const ProtocolMessage&);

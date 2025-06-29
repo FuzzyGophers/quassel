@@ -77,9 +77,9 @@ public slots:
     bool connectToCore(AccountId = 0);
     void reconnectToCore();
     void disconnectFromCore();
-    void internalSessionStateReceived(const Protocol::SessionState& sessionState);
+    void internalSessionStateReceived(const QuasselProtocol::SessionState& sessionState);
 
-    void setupCore(const Protocol::SetupData& setupData);
+    void setupCore(const QuasselProtocol::SetupData& setupData);
 
 signals:
     void stateChanged(CoreConnection::ConnectionState);
@@ -120,13 +120,13 @@ private slots:
     void checkSyncState();
 
     void loginToCore(const QString& user, const QString& password, bool remember);  // for config wizard
-    void syncToCore(const Protocol::SessionState& sessionState);
+    void syncToCore(const QuasselProtocol::SessionState& sessionState);
 
     void resetConnection(bool wantReconnect = false);
 
     void onConnectionReady();
     void onLoginSuccessful(const CoreAccount& account);
-    void onHandshakeComplete(RemotePeer* peer, const Protocol::SessionState& sessionState);
+    void onHandshakeComplete(RemotePeer* peer, const QuasselProtocol::SessionState& sessionState);
 
     void updateProgress(int value, int maximum);
     void setProgressText(const QString& text);

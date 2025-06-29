@@ -1312,7 +1312,7 @@ ServerEditDlg::ServerEditDlg(const Network::Server& server, QWidget* parent)
     // if the Legacy protocol is in use.  If any other RemotePeer protocol
     // is in use, that means a newer protocol is in use and therefore the
     // core will use autonegotiation.
-    if (Client::coreConnection()->peer()->protocol() != Protocol::LegacyProtocol) {
+    if (Client::coreConnection()->peer()->protocol() != QuasselProtocol::LegacyProtocol) {
         ui.label_3->hide();
         ui.sslVersion->hide();
     }

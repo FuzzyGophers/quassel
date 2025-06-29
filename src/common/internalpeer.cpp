@@ -22,17 +22,17 @@
 
 #include "util.h"
 
-using namespace Protocol;
+using namespace QuasselProtocol;
 
 InternalPeer::InternalPeer(QObject* parent)
     : Peer(nullptr, parent)
 {
     static bool registered = []() {
         qRegisterMetaType<QPointer<InternalPeer>>();
-        qRegisterMetaType<Protocol::SyncMessage>();
-        qRegisterMetaType<Protocol::RpcCall>();
-        qRegisterMetaType<Protocol::InitRequest>();
-        qRegisterMetaType<Protocol::InitData>();
+        qRegisterMetaType<QuasselProtocol::SyncMessage>();
+        qRegisterMetaType<QuasselProtocol::RpcCall>();
+        qRegisterMetaType<QuasselProtocol::InitRequest>();
+        qRegisterMetaType<QuasselProtocol::InitData>();
         return true;
     }();
     Q_UNUSED(registered)
@@ -116,21 +116,21 @@ void InternalPeer::setSignalProxy(::SignalProxy* proxy)
 void InternalPeer::setPeer(InternalPeer* peer)
 {
     connect(peer,
-            selectOverload<const Protocol::SyncMessage&>(&InternalPeer::dispatchMessage),
+            selectOverload<const QuasselProtocol::SyncMessage&>(&InternalPeer::dispatchMessage),
             this,
-            selectOverload<const Protocol::SyncMessage&>(&InternalPeer::handleMessage));
+            selectOverload<const QuasselProtocol::SyncMessage&>(&InternalPeer::handleMessage));
     connect(peer,
-            selectOverload<const Protocol::RpcCall&>(&InternalPeer::dispatchMessage),
+            selectOverload<const QuasselProtocol::RpcCall&>(&InternalPeer::dispatchMessage),
             this,
-            selectOverload<const Protocol::RpcCall&>(&InternalPeer::handleMessage));
+            selectOverload<const QuasselProtocol::RpcCall&>(&InternalPeer::handleMessage));
     connect(peer,
-            selectOverload<const Protocol::InitRequest&>(&InternalPeer::dispatchMessage),
+            selectOverload<const QuasselProtocol::InitRequest&>(&InternalPeer::dispatchMessage),
             this,
-            selectOverload<const Protocol::InitRequest&>(&InternalPeer::handleMessage));
+            selectOverload<const QuasselProtocol::InitRequest&>(&InternalPeer::handleMessage));
     connect(peer,
-            selectOverload<const Protocol::InitData&>(&InternalPeer::dispatchMessage),
+            selectOverload<const QuasselProtocol::InitData&>(&InternalPeer::dispatchMessage),
             this,
-            selectOverload<const Protocol::InitData&>(&InternalPeer::handleMessage));
+            selectOverload<const QuasselProtocol::InitData&>(&InternalPeer::handleMessage));
 
     connect(peer, &Peer::disconnected, this, &InternalPeer::peerDisconnected);
 
@@ -166,22 +166,22 @@ void InternalPeer::dispatch(const InitData& msg)
     emit dispatchMessage(msg);
 }
 
-void InternalPeer::handleMessage(const Protocol::SyncMessage& msg)
+void InternalPeer::handleMessage(const QuasselProtocol::SyncMessage& msg)
 {
     handle(msg);
 }
 
-void InternalPeer::handleMessage(const Protocol::RpcCall& msg)
+void InternalPeer::handleMessage(const QuasselProtocol::RpcCall& msg)
 {
     handle(msg);
 }
 
-void InternalPeer::handleMessage(const Protocol::InitRequest& msg)
+void InternalPeer::handleMessage(const QuasselProtocol::InitRequest& msg)
 {
     handle(msg);
 }
 
-void InternalPeer::handleMessage(const Protocol::InitData& msg)
+void InternalPeer::handleMessage(const QuasselProtocol::InitData& msg)
 {
     handle(msg);
 }

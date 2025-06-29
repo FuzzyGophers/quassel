@@ -42,31 +42,31 @@ public:
 
     DataStreamPeer(AuthHandler* authHandler, QTcpSocket* socket, quint16 features, Compressor::CompressionLevel level, QObject* parent = nullptr);
 
-    Protocol::Type protocol() const override { return Protocol::DataStreamProtocol; }
+    QuasselProtocol::Type protocol() const override { return QuasselProtocol::DataStreamProtocol; }
     QString protocolName() const override { return "the DataStream protocol"; }
 
     static quint16 supportedFeatures();
     static bool acceptsFeatures(quint16 peerFeatures);
     quint16 enabledFeatures() const override;
 
-    void dispatch(const Protocol::RegisterClient& msg) override;
-    void dispatch(const Protocol::ClientDenied& msg) override;
-    void dispatch(const Protocol::ClientRegistered& msg) override;
-    void dispatch(const Protocol::SetupData& msg) override;
-    void dispatch(const Protocol::SetupFailed& msg) override;
-    void dispatch(const Protocol::SetupDone& msg) override;
-    void dispatch(const Protocol::Login& msg) override;
-    void dispatch(const Protocol::LoginFailed& msg) override;
-    void dispatch(const Protocol::LoginSuccess& msg) override;
-    void dispatch(const Protocol::SessionState& msg) override;
+    void dispatch(const QuasselProtocol::RegisterClient& msg) override;
+    void dispatch(const QuasselProtocol::ClientDenied& msg) override;
+    void dispatch(const QuasselProtocol::ClientRegistered& msg) override;
+    void dispatch(const QuasselProtocol::SetupData& msg) override;
+    void dispatch(const QuasselProtocol::SetupFailed& msg) override;
+    void dispatch(const QuasselProtocol::SetupDone& msg) override;
+    void dispatch(const QuasselProtocol::Login& msg) override;
+    void dispatch(const QuasselProtocol::LoginFailed& msg) override;
+    void dispatch(const QuasselProtocol::LoginSuccess& msg) override;
+    void dispatch(const QuasselProtocol::SessionState& msg) override;
 
-    void dispatch(const Protocol::SyncMessage& msg) override;
-    void dispatch(const Protocol::RpcCall& msg) override;
-    void dispatch(const Protocol::InitRequest& msg) override;
-    void dispatch(const Protocol::InitData& msg) override;
+    void dispatch(const QuasselProtocol::SyncMessage& msg) override;
+    void dispatch(const QuasselProtocol::RpcCall& msg) override;
+    void dispatch(const QuasselProtocol::InitRequest& msg) override;
+    void dispatch(const QuasselProtocol::InitData& msg) override;
 
-    void dispatch(const Protocol::HeartBeat& msg) override;
-    void dispatch(const Protocol::HeartBeatReply& msg) override;
+    void dispatch(const QuasselProtocol::HeartBeat& msg) override;
+    void dispatch(const QuasselProtocol::HeartBeatReply& msg) override;
 
 signals:
     void protocolError(const QString& errorString);
