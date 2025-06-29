@@ -28,6 +28,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QHostAddress>
+#include <QRandomGenerator>
 #include <QLibraryInfo>
 #include <QMetaEnum>
 #include <QSettings>
@@ -64,7 +65,7 @@ void Quassel::init(RunMode runMode)
 {
     _runMode = runMode;
 
-    qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+    QRandomGenerator::global()->seed(QTime(0, 0, 0).msecsTo(QTime::currentTime()));
 
     setupSignalHandling();
     setupEnvironment();
@@ -148,7 +149,7 @@ void Quassel::registerMetaTypes()
     qRegisterMetaType<PeerPtr>("PeerPtr");
 
     // Versions of Qt prior to 4.7 didn't define QVariant as a meta type
-    if (!QMetaType::type("QVariant")) {
+    if (!QMetaType::fromName("QVariant").isValid()) {
         qRegisterMetaType<QVariant>("QVariant");
     }
 }
@@ -228,13 +229,14 @@ void Quassel::setupBuildInfo()
     }
     else {
         // analyze what we got from git-describe
-        static const QRegularExpression rx{"(.*)-(\\d+)-g([0-9a-f]+)(-dirty)?$"};
-        if (rx.exactMatch(buildInfo.generatedVersion)) {
-            QString distance = rx.cap(2) == "0" ? QString{} : QString{"%1+%2 "}.arg(rx.cap(1), rx.cap(2));
-            buildInfo.plainVersionString = QString{"v%1 (%2git-%3%4)"}.arg(buildInfo.baseVersion, distance, rx.cap(3), rx.cap(4));
+        static const QRegularExpression rx{R"((.*)-(\d+)-g([0-9a-f]+)(-dirty)?$)"};
+        QRegularExpressionMatch match = rx.match(buildInfo.generatedVersion);
+        if (match.hasMatch()) {
+            QString distance = match.captured(2) == "0" ? QString{} : QString{"%1+%2 "}.arg(match.captured(1), match.captured(2));
+            buildInfo.plainVersionString = QString{"v%1 (%2git-%3%4)"}.arg(buildInfo.baseVersion, distance, match.captured(3), match.captured(4));
             if (!buildInfo.commitHash.isEmpty()) {
                 buildInfo.fancyVersionString = QString{"v%1 (%2git-<a href=\"https://github.com/quassel/quassel/commit/%5\">%3</a>%4)"}
-                                                   .arg(buildInfo.baseVersion, distance, rx.cap(3), rx.cap(4), buildInfo.commitHash);
+                                                   .arg(buildInfo.baseVersion, distance, match.captured(3), match.captured(4), buildInfo.commitHash);
             }
         }
         else {
@@ -524,7 +526,7 @@ QStringList Quassel::dataDirPaths()
 QString Quassel::findDataFilePath(const QString& fileName)
 {
     QStringList dataDirs = dataDirPaths();
-    foreach (QString dataDir, dataDirs) {
+    for (const QString& dataDir : dataDirs) {
         QString path = dataDir + fileName;
         if (QFile::exists(path))
             return path;
@@ -535,7 +537,7 @@ QString Quassel::findDataFilePath(const QString& fileName)
 QStringList Quassel::scriptDirPaths()
 {
     QStringList res(configDirPath() + "scripts/");
-    foreach (QString path, dataDirPaths())
+    for (const QString& path : dataDirPaths())
         res << path + "scripts/";
     return res;
 }
@@ -545,7 +547,7 @@ QString Quassel::translationDirPath()
     if (instance()->_translationDirPath.isEmpty()) {
         // We support only one translation dir; fallback mechanisms wouldn't work else.
         // This means that if we have a $data/translations dir, the internal :/i18n resource won't be considered.
-        foreach (const QString& dir, dataDirPaths()) {
+        for (const QString& dir : dataDirPaths()) {
             if (QFile::exists(dir + "translations/")) {
                 instance()->_translationDirPath = dir + "translations/";
                 break;
@@ -578,15 +580,23 @@ void Quassel::loadTranslation(const QLocale& locale)
     quasselTranslator->setObjectName("QuasselTr");
 
 #ifndef Q_OS_MAC
-    bool success = qtTranslator->load(locale, QString("qt_"), translationDirPath());
+    bool success = qtTranslator->load(locale, QString("qt_"), QLibraryInfo::path(QLibraryInfo::TranslationsPath));
     if (!success)
-        qtTranslator->load(locale, QString("qt_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    quasselTranslator->load(locale, QString(""), translationDirPath());
+        success = qtTranslator->load(locale, QString("qt_"), QLibraryInfo::path(QLibraryInfo::TranslationsPath));
+    if (!success)
+        qWarning() << "Failed to load Qt translations for locale" << locale.name();
+    success = quasselTranslator->load(locale, QString(""), translationDirPath());
+    if (!success)
+        qWarning() << "Failed to load Quassel translations for locale" << locale.name();
 #else
     bool success = qtTranslator->load(QString("qt_%1").arg(locale.name()), translationDirPath());
     if (!success)
-        qtTranslator->load(QString("qt_%1").arg(locale.name()), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    quasselTranslator->load(QString("%1").arg(locale.name()), translationDirPath());
+        success = qtTranslator->load(QString("qt_%1").arg(locale.name()), QLibraryInfo::path(QLibraryInfo::TranslationsPath));
+    if (!success)
+        qWarning() << "Failed to load Qt translations for locale" << locale.name();
+    success = quasselTranslator->load(QString("%1").arg(locale.name()), translationDirPath());
+    if (!success)
+        qWarning() << "Failed to load Quassel translations for locale" << locale.name();
 #endif
 
     qApp->installTranslator(quasselTranslator);
@@ -599,18 +609,16 @@ Quassel::Features::Features()
 {
     QStringList features;
 
-    // TODO Qt5: Use QMetaEnum::fromType()
-    auto featureEnum = Quassel::staticMetaObject.enumerator(Quassel::staticMetaObject.indexOfEnumerator("Feature"));
+    auto featureEnum = QMetaEnum::fromType<Quassel::Feature>();
     _features.resize(featureEnum.keyCount(), true);  // enable all known features to true
 }
 
-Quassel::Features::Features(const QStringList& features, LegacyFeatures legacyFeatures)
+Quassel::Features::Features(const QStringList& features, Quassel::LegacyFeatures legacyFeatures)
 {
-    // TODO Qt5: Use QMetaEnum::fromType()
-    auto featureEnum = Quassel::staticMetaObject.enumerator(Quassel::staticMetaObject.indexOfEnumerator("Feature"));
+    auto featureEnum = QMetaEnum::fromType<Quassel::Feature>();
     _features.resize(featureEnum.keyCount(), false);
 
-    for (auto&& feature : features) {
+    for (const auto& feature : features) {
         int i = featureEnum.keyToValue(qPrintable(feature));
         if (i >= 0) {
             _features[i] = true;
@@ -621,8 +629,7 @@ Quassel::Features::Features(const QStringList& features, LegacyFeatures legacyFe
     }
 
     if (legacyFeatures) {
-        // TODO Qt5: Use QMetaEnum::fromType()
-        auto legacyFeatureEnum = Quassel::staticMetaObject.enumerator(Quassel::staticMetaObject.indexOfEnumerator("LegacyFeature"));
+        auto legacyFeatureEnum = QMetaEnum::fromType<Quassel::LegacyFeature>();
         for (quint32 mask = 0x0001; mask <= 0x8000; mask <<= 1) {
             if (static_cast<quint32>(legacyFeatures) & mask) {
                 int i = featureEnum.keyToValue(legacyFeatureEnum.valueToKey(mask));
@@ -649,8 +656,7 @@ QStringList Quassel::Features::toStringList(bool enabled) const
 
     QStringList result;
 
-    // TODO Qt5: Use QMetaEnum::fromType()
-    auto featureEnum = Quassel::staticMetaObject.enumerator(Quassel::staticMetaObject.indexOfEnumerator("Feature"));
+    auto featureEnum = QMetaEnum::fromType<Quassel::Feature>();
     for (quint32 i = 0; i < _features.size(); ++i) {
         if (_features[i] == enabled) {
             result << featureEnum.key(i);
@@ -661,11 +667,9 @@ QStringList Quassel::Features::toStringList(bool enabled) const
 
 Quassel::LegacyFeatures Quassel::Features::toLegacyFeatures() const
 {
-    // TODO Qt5: Use LegacyFeatures (flag operators for enum classes not supported in Qt4)
     quint32 result{0};
-    // TODO Qt5: Use QMetaEnum::fromType()
-    auto featureEnum = Quassel::staticMetaObject.enumerator(Quassel::staticMetaObject.indexOfEnumerator("Feature"));
-    auto legacyFeatureEnum = Quassel::staticMetaObject.enumerator(Quassel::staticMetaObject.indexOfEnumerator("LegacyFeature"));
+    auto featureEnum = QMetaEnum::fromType<Quassel::Feature>();
+    auto legacyFeatureEnum = QMetaEnum::fromType<Quassel::LegacyFeature>();
 
     for (quint32 i = 0; i < _features.size(); ++i) {
         if (_features[i]) {
@@ -675,7 +679,7 @@ Quassel::LegacyFeatures Quassel::Features::toLegacyFeatures() const
             }
         }
     }
-    return static_cast<LegacyFeatures>(result);
+    return static_cast<Quassel::LegacyFeatures>(result);
 }
 
 QStringList Quassel::Features::unknownFeatures() const

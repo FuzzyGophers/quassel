@@ -43,7 +43,6 @@ class Logger;
 
 class COMMON_EXPORT Quassel : public QObject, public Singleton<Quassel>
 {
-    // TODO Qt5: Use Q_GADGET
     Q_OBJECT
 
 public:
@@ -105,7 +104,7 @@ public:
         RemoteDisconnect       = 0x4000,
         ExtendedFeatures       = 0x8000,
     };
-    Q_FLAGS(LegacyFeature)
+    Q_FLAG(LegacyFeature)
     Q_DECLARE_FLAGS(LegacyFeatures, LegacyFeature)
 
     /**
@@ -146,7 +145,7 @@ public:
         LoadBacklogForwards,  ///< Allow loading backlog in ascending order, old to new
         SkipIrcCaps,          ///< Control what IRCv3 capabilities are skipped during negotiation
     };
-    Q_ENUMS(Feature)
+    Q_ENUM(Feature)
 
     class Features;
 
