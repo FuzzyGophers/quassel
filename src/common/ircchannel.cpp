@@ -118,13 +118,13 @@ QString IrcChannel::decodeString(const QByteArray& text) const
     if (!_decoder.isValid()) {
         return network()->decodeString(text);
     }
-    return ::decodeString(text, std::make_optional(std::make_pair(_decoder, _decoder.encoding())));
+    return ::decodeString(text, &_decoder);
 }
 
 QByteArray IrcChannel::encodeString(const QString& string) const
 {
     if (_encoder.isValid()) {
-        return QStringEncoder(_encoder.encoding())(string);
+        return QStringEncoder(_encoder.name())(string);
     }
     return network()->encodeString(string);
 }

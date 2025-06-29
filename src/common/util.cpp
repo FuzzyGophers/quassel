@@ -71,12 +71,12 @@ static const QSet<QStringConverter::Encoding> utf8DetectionBlacklist = {
     // Add other encodings if needed (e.g., QStringConverter::System)
 };
 
-QString decodeString(const QByteArray& input, std::optional<std::pair<QStringDecoder, QStringConverter::Encoding>> decoder)
+QString decodeString(const QByteArray& input, const QStringDecoder* decoder)
 {
     // Skip UTF-8 detection if the decoder is valid and blacklisted
-    if (decoder && utf8DetectionBlacklist.contains(decoder->second)) {
-        QString result = decoder->first(input);
-        if (decoder->first.hasError()) {
+    if (decoder && utf8DetectionBlacklist.contains(QStringConverter::encodingForName(decoder->name()).value_or(QStringConverter::Utf8))) {
+        QString result = (*decoder)(input);
+        if (decoder->hasError()) {
             qWarning() << "Decoding error with provided decoder for input:" << input;
         }
         return result;
@@ -119,10 +119,10 @@ QString decodeString(const QByteArray& input, std::optional<std::pair<QStringDec
     }
 
     // Use provided decoder or fall back to Latin1, avoiding copy
-    QStringDecoder defaultDecoder(decoder ? decoder->second : QStringConverter::Latin1);
+    QStringDecoder defaultDecoder(decoder ? QStringConverter::encodingForName(decoder->name()).value_or(QStringConverter::Latin1) : QStringConverter::Latin1);
     QString result = defaultDecoder(input);
     if (defaultDecoder.hasError()) {
-        qWarning() << "Decoding error with" << (decoder ? QStringConverter::nameForEncoding(decoder->second) : "Latin1") << "for input:" << input;
+        qWarning() << "Decoding error with" << (decoder ? decoder->name() : "Latin1") << "for input:" << input;
     }
     return result;
 }

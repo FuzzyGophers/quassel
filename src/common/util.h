@@ -17,7 +17,7 @@ COMMON_EXPORT bool isChannelName(const QString& str);
 COMMON_EXPORT QString stripFormatCodes(QString);
 COMMON_EXPORT QString stripAcceleratorMarkers(const QString&);
 COMMON_EXPORT QString secondsToString(int timeInSeconds);
-COMMON_EXPORT QString decodeString(const QByteArray& input, std::optional<std::pair<QStringDecoder, QStringConverter::Encoding>> decoder = std::nullopt);
+COMMON_EXPORT QString decodeString(const QByteArray& input, const QStringDecoder* decoder = nullptr);
 COMMON_EXPORT uint editingDistance(const QString& s1, const QString& s2);
 
 template<typename T>
