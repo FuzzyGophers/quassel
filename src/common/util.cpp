@@ -1,3 +1,23 @@
+/***************************************************************************
+ *   Copyright (C) 2005-2022 by the Quassel Project                        *
+ *   devel@quassel-irc.org                                                 *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) version 3.                                           *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
+ ***************************************************************************/
+
 #include "util.h"
 
 #include <algorithm>
@@ -75,9 +95,10 @@ QString decodeString(const QByteArray& input, const QStringDecoder* decoder)
 {
     // Skip UTF-8 detection if the decoder is valid and blacklisted
     if (decoder && utf8DetectionBlacklist.contains(QStringConverter::encodingForName(decoder->name()).value_or(QStringConverter::Utf8))) {
-        QString result = (*decoder)(input);
-        if (decoder->hasError()) {
-            qWarning() << "Decoding error with provided decoder for input:" << input;
+        QStringDecoder decoderInstance(QStringConverter::encodingForName(decoder->name()).value_or(QStringConverter::Utf8));
+		QString result = decoderInstance(input);
+		if (decoderInstance.hasError()) {
+            qWarning() << "Decoding error with" << decoder->name() << "for input:" << input;
         }
         return result;
     }
@@ -118,7 +139,7 @@ QString decodeString(const QByteArray& input, const QStringDecoder* decoder)
         return s;
     }
 
-    // Use provided decoder or fall back to Latin1, avoiding copy
+    // Use provided decoder or fall back to Latin1
     QStringDecoder defaultDecoder(decoder ? QStringConverter::encodingForName(decoder->name()).value_or(QStringConverter::Latin1) : QStringConverter::Latin1);
     QString result = defaultDecoder(input);
     if (defaultDecoder.hasError()) {
@@ -243,11 +264,7 @@ QString tryFormatUnixEpoch(const QString& possibleEpochDate, Qt::DateFormat date
     }
 
     QDateTime date;
-#if QT_VERSION >= 0x050800
     date.setSecsSinceEpoch(secsSinceEpoch);
-#else
-    date.setMSecsSinceEpoch(secsSinceEpoch * 1000);
-#endif
 
     if (useUTC) {
         if (dateFormat == Qt::DateFormat::ISODate) {
