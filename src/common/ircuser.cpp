@@ -18,26 +18,6 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-/***************************************************************************
- *   Copyright (C) 2005-2022 by the Quassel Project                        *
- *   devel@quassel-irc.org                                                 *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) version 3.                                           *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
- ***************************************************************************/
-
 #include "ircuser.h"
 
 #include <QDebug>
@@ -60,7 +40,7 @@ IrcUser::IrcUser(const QString& hostmask, Network* network)
     , _away(false)
     , _server()
     , _ircOperator()
-    , _lastAwayMessageTime(QDateTime::fromMSecsSinceEpoch(0, Qt::UTC))
+    , _lastAwayMessageTime(QDateTime(QDate(1970, 1, 1), QTime(0, 0), QTimeZone::UTC))
     , _whoisServiceReply()
     , _encrypted(false)
     , _network(network)
@@ -219,11 +199,7 @@ void IrcUser::setIrcOperator(const QString& ircOperator)
 
 void IrcUser::setLastAwayMessage(int lastAwayMessage)
 {
-#if QT_VERSION >= 0x050800
-    QDateTime lastAwayMessageTime = QDateTime::fromSecsSinceEpoch(lastAwayMessage, Qt::UTC);
-#else
-    QDateTime lastAwayMessageTime = QDateTime::fromMSecsSinceEpoch(lastAwayMessage * 1000, Qt::UTC);
-#endif
+    QDateTime lastAwayMessageTime = QDateTime::fromSecsSinceEpoch(lastAwayMessage, QTimeZone::UTC);
     setLastAwayMessageTime(lastAwayMessageTime);
 }
 
