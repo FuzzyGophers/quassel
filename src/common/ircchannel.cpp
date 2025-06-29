@@ -36,8 +36,8 @@ IrcChannel::IrcChannel(const QString& channelname, Network* network)
     , _topic(QString())
     , _encrypted(false)
     , _network(network)
-    , _codecForEncoding(nullptr)
-    , _codecForDecoding(nullptr)
+    , _encoder(QStringConverter::Utf8)
+    , _decoder(QStringConverter::Utf8)
 {
     setObjectName(QString::number(network->networkId().toInt()) + "/" + channelname);
 }
@@ -86,14 +86,14 @@ QString IrcChannel::userModes(const QString& nick) const
 void IrcChannel::setCodecForEncoding(const QString& codecName)
 {
     QStringConverter::Encoding encoding = QStringConverter::encodingForName(codecName.toUtf8().constData()).value_or(QStringConverter::Utf8);
-	setCodecForEncoding(encoding);
+    setCodecForEncoding(encoding);
 }
 
 void IrcChannel::setCodecForEncoding(QStringConverter::Encoding encoding)
 {
     _encoder = QStringEncoder(encoding);
     if (!_encoder.isValid()) {
-        qWarning() << "Invalid encoding for" << codecName << ", falling back to UTF-8";
+        qWarning() << "Invalid encoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to UTF-8";
         _encoder = QStringEncoder(QStringConverter::Utf8);
     }
 }
@@ -108,7 +108,7 @@ void IrcChannel::setCodecForDecoding(QStringConverter::Encoding encoding)
 {
     _decoder = QStringDecoder(encoding);
     if (!_decoder.isValid()) {
-        qWarning() << "Invalid decoding for" << codecName << ", falling back to UTF-8";
+        qWarning() << "Invalid decoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to UTF-8";
         _decoder = QStringDecoder(QStringConverter::Utf8);
     }
 }
@@ -118,13 +118,13 @@ QString IrcChannel::decodeString(const QByteArray& text) const
     if (!_decoder.isValid()) {
         return network()->decodeString(text);
     }
-    return ::decodeString(text, _decoder);
+    return ::decodeString(text, std::make_optional(std::make_pair(_decoder, _decoder.encoding())));
 }
 
 QByteArray IrcChannel::encodeString(const QString& string) const
 {
     if (_encoder.isValid()) {
-        return _encoder(string);
+        return QStringEncoder(_encoder.encoding())(string);
     }
     return network()->encodeString(string);
 }

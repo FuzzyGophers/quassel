@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include <QDebug>
+#include <QTimeZone>
 #include <QStringConverter>
 
 #include "peer.h"
@@ -484,64 +485,10 @@ void Network::setCodecForDecoding(QStringConverter::Encoding encoding)
     emit configChanged();
 }
 
-// Assuming ::decodeString from prior migration
-static QString decodeString(const QByteArray& input, std::optional<QStringDecoder> decoder = std::nullopt)
-{
-    static const QSet<QStringConverter::Encoding> utf8DetectionBlacklist = {QStringConverter::Latin1};
-    if (decoder && utf8DetectionBlacklist.contains(decoder->encoding())) {
-        QString result = decoder->operator()(input);
-        if (decoder->hasError()) {
-            qWarning() << "Decoding error with provided decoder for input:" << input;
-        }
-        return result;
-    }
-
-    bool isUtf8 = true;
-    int cnt = 0;
-    for (uchar c : input) {
-        if (cnt) {
-            if ((c & 0xc0) != 0x80) {
-                isUtf8 = false;
-                break;
-            }
-            cnt--;
-            continue;
-        }
-        if ((c & 0x80) == 0x00)
-            continue;
-        if ((c & 0xf8) == 0xf0) {
-            cnt = 3;
-            continue;
-        }
-        if ((c & 0xf0) == 0xe0) {
-            cnt = 2;
-            continue;
-        }
-        if ((c & 0xe0) == 0xc0) {
-            cnt = 1;
-            continue;
-        }
-        isUtf8 = false;
-        break;
-    }
-
-    if (isUtf8 && cnt == 0) {
-        QString s = QString::fromUtf8(input);
-        return s;
-    }
-
-    QStringDecoder defaultDecoder = decoder.value_or(QStringDecoder(QStringConverter::Latin1));
-    QString result = defaultDecoder(input);
-    if (defaultDecoder.hasError()) {
-        qWarning() << "Decoding error with" << (decoder ? "provided decoder" : "Latin1") << "for input:" << input;
-    }
-    return result;
-}
-
 QString Network::decodeString(const QByteArray& text) const
 {
     if (_decoder.isValid()) {
-        return ::decodeString(text, _decoder);
+        return ::decodeString(text, std::make_optional(std::make_pair(_decoder, _decoder.encoding())));
     }
     return ::decodeString(text, std::nullopt); // Uses default (Latin1)
 }
@@ -549,7 +496,7 @@ QString Network::decodeString(const QByteArray& text) const
 QByteArray Network::encodeString(const QString& string) const
 {
     if (_encoder.isValid()) {
-        return _encoder(string);
+        return QStringEncoder(_encoder.encoding())(string);
     }
     return QStringEncoder(_defaultEncoding)(string);
 }
@@ -557,7 +504,7 @@ QByteArray Network::encodeString(const QString& string) const
 QString Network::decodeServerString(const QByteArray& text) const
 {
     if (_serverDecoder.isValid()) {
-        return ::decodeString(text, _serverDecoder);
+        return ::decodeString(text, std::make_optional(std::make_pair(_serverDecoder, _serverDecoder.encoding())));
     }
     return ::decodeString(text, std::nullopt); // Uses default (Latin1)
 }
@@ -565,7 +512,7 @@ QString Network::decodeServerString(const QByteArray& text) const
 QByteArray Network::encodeServerString(const QString& string) const
 {
     if (_serverEncoder.isValid()) {
-        return _serverEncoder(string);
+        return QStringEncoder(_serverEncoder.encoding())(string);
     }
     return QStringEncoder(_defaultEncoding)(string);
 }
@@ -964,9 +911,9 @@ void Network::initSetIrcUsersAndChannels(const QVariantMap& usersAndChannels)
         if (!proxy()->sourcePeer()->hasFeature(Quassel::Feature::LongTime)) {
             QDateTime lastAwayMessageTime = QDateTime();
 #if QT_VERSION >= 0x050800
-            lastAwayMessageTime.fromSecsSinceEpoch(map.take("lastAwayMessage").toInt());
+            lastAwayMessageTime = QDateTime::fromSecsSinceEpoch(map.take("lastAwayMessage").toInt(), Qt::UTC);
 #else
-            lastAwayMessageTime.fromMSecsSinceEpoch(map.take("lastAwayMessage").toInt() * 1000);
+            lastAwayMessageTime = QDateTime::fromMSecsSinceEpoch(map.take("lastAwayMessage").toInt() * 1000, Qt::UTC);
 #endif
             map["lastAwayMessageTime"] = lastAwayMessageTime;
         }

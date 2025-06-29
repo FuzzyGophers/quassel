@@ -18,10 +18,31 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+/***************************************************************************
+ *   Copyright (C) 2005-2022 by the Quassel Project                        *
+ *   devel@quassel-irc.org                                                 *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) version 3.                                           *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
+ ***************************************************************************/
+
 #include "ircuser.h"
 
 #include <QDebug>
 #include <QStringConverter>
+#include <QTimeZone>
 
 #include "ircchannel.h"
 #include "network.h"
@@ -39,12 +60,12 @@ IrcUser::IrcUser(const QString& hostmask, Network* network)
     , _away(false)
     , _server()
     , _ircOperator()
-    , _lastAwayMessageTime(QDateTime::fromMSecsSinceEpoch(0, QTimeZone::UTC))
+    , _lastAwayMessageTime(QDateTime::fromMSecsSinceEpoch(0, Qt::UTC))
     , _whoisServiceReply()
     , _encrypted(false)
     , _network(network)
-    , _codecForEncoding(nullptr)
-    , _codecForDecoding(nullptr)
+    , _encoder(QStringConverter::Utf8)
+    , _decoder(QStringConverter::Utf8)
 {
     updateObjectName();
 }
@@ -84,7 +105,7 @@ void IrcUser::setCodecForEncoding(QStringConverter::Encoding encoding)
 {
     _encoder = QStringEncoder(encoding);
     if (!_encoder.isValid()) {
-        qWarning() << "Invalid encoding for" << codecName << ", falling back to UTF-8";
+        qWarning() << "Invalid encoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to UTF-8";
         _encoder = QStringEncoder(QStringConverter::Utf8);
     }
 }
@@ -99,7 +120,7 @@ void IrcUser::setCodecForDecoding(QStringConverter::Encoding encoding)
 {
     _decoder = QStringDecoder(encoding);
     if (!_decoder.isValid()) {
-        qWarning() << "Invalid decoding for" << codecName << ", falling back to UTF-8";
+        qWarning() << "Invalid decoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to UTF-8";
         _decoder = QStringDecoder(QStringConverter::Utf8);
     }
 }
@@ -109,13 +130,13 @@ QString IrcUser::decodeString(const QByteArray& text) const
     if (!_decoder.isValid()) {
         return network()->decodeString(text);
     }
-    return ::decodeString(text, _decoder);
+    return ::decodeString(text, std::make_optional(std::make_pair(_decoder, _decoder.encoding())));
 }
 
 QByteArray IrcUser::encodeString(const QString& string) const
 {
     if (_encoder.isValid()) {
-        return _encoder(string);
+        return QStringEncoder(_encoder.encoding())(string);
     }
     return network()->encodeString(string);
 }
@@ -199,10 +220,9 @@ void IrcUser::setIrcOperator(const QString& ircOperator)
 void IrcUser::setLastAwayMessage(int lastAwayMessage)
 {
 #if QT_VERSION >= 0x050800
-    QDateTime lastAwayMessageTime = QDateTime::fromSecsSinceEpoch(lastAwayMessage, QTimeZone::UTC);
+    QDateTime lastAwayMessageTime = QDateTime::fromSecsSinceEpoch(lastAwayMessage, Qt::UTC);
 #else
-    // toSecsSinceEpoch() was added in Qt 5.8. Manually downconvert to seconds for now.
-    QDateTime lastAwayMessageTime = QDateTime::fromMSecsSinceEpoch(lastAwayMessage * 1000, QTimeZone::UTC);
+    QDateTime lastAwayMessageTime = QDateTime::fromMSecsSinceEpoch(lastAwayMessage * 1000, Qt::UTC);
 #endif
     setLastAwayMessageTime(lastAwayMessageTime);
 }
@@ -360,7 +380,7 @@ void IrcUser::addUserModes(const QString& modes)
         return;
 
     bool changesMade = false;
-    for (int i = 0; i < modes.count(); i++) {
+    for (int i = 0; i < modes.size(); i++) {
         if (!_userModes.contains(modes[i])) {
             _userModes += modes[i];
             changesMade = true;
@@ -378,7 +398,7 @@ void IrcUser::removeUserModes(const QString& modes)
     if (modes.isEmpty())
         return;
 
-    for (int i = 0; i < modes.count(); i++) {
+    for (int i = 0; i < modes.size(); i++) {
         _userModes.remove(modes[i]);
     }
     SYNC(ARG(modes))
