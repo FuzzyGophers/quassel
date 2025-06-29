@@ -175,10 +175,10 @@ void IrcChannel::joinIrcUsers(const QList<IrcUser*>& users, const QStringList& m
         if (!ircuser)
             continue;
         if (_userModes.contains(ircuser)) {
-            if (sortedModes[i].count() > 1) {
+            if (sortedModes[i].size() > 1) {
                 // Multiple modes received, do it one at a time
                 // TODO Better way of syncing this without breaking protocol?
-                for (int i_m = 0; i_m < sortedModes[i].count(); ++i_m) {
+                for (int i_m = 0; i_m < sortedModes[i].size(); ++i_m) {
                     addUserMode(ircuser, sortedModes[i][i_m]);
                 }
             }
@@ -401,7 +401,7 @@ void IrcChannel::initSetChanModes(const QVariantMap& channelModes)
     }
 
     QString D_modes = channelModes["D"].toString();
-    for (int i = 0; i < D_modes.count(); i++) {
+	for (int i = 0; i < D_modes.size(); i++) {
         _D_channelModes << D_modes[i];
     }
 }
