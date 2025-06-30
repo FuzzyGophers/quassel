@@ -1536,7 +1536,22 @@ void CoreSessionEventProcessor::processCtcpEvent(CtcpEvent* e)
     if (e->type() != EventManager::CtcpEvent || e->ctcpType() != CtcpEvent::Query)
         return;
 
-    handle(e->ctcpCmd(), Q_ARG(CtcpEvent*, e));
+    QString cmd = e->ctcpCmd().toUpper();
+	if (cmd == "ACTION") {
+        handleCtcpAction(e);
+    } else if (cmd == "CLIENTINFO") {
+        handleCtcpClientinfo(e);
+    } else if (cmd == "DCC") {
+        handleCtcpDcc(e);
+    } else if (cmd == "PING") {
+        handleCtcpPing(e);
+    } else if (cmd == "TIME") {
+        handleCtcpTime(e);
+    } else if (cmd == "VERSION") {
+        handleCtcpVersion(e);
+    } else {
+        defaultHandler(cmd, e);
+    }
 }
 
 void CoreSessionEventProcessor::defaultHandler(const QString& ctcpCmd, CtcpEvent* e)

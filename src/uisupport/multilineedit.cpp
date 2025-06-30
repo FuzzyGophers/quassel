@@ -189,10 +189,10 @@ void MultiLineEdit::updateSizeHint()
     opt.midLineWidth = midLineWidth();
     opt.state |= QStyle::State_Sunken;
     QWidget* widget = this;
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     widget = 0;
 #endif
-    QSize s = style()->sizeFromContents(QStyle::CT_LineEdit, &opt, QSize(100, h).expandedTo(QApplication::globalStrut()), widget);
+    QSize s = style()->sizeFromContents(QStyle::CT_LineEdit, &opt, QSize(100, h), widget);
     if (s != _sizeHint) {
         _sizeHint = s;
         updateGeometry();
@@ -599,31 +599,23 @@ bool MultiLineEdit::mircCodesChanged(QTextCursor& cursor, QTextCursor& peekcurso
 QString MultiLineEdit::convertMircCodesToHtml(const QString& text)
 {
     QStringList words;
-    QRegularExpression mircCode = QRegularExpression("(\x02|\x1d|\x1f|\x03|\x1E)", Qt::CaseSensitive);
+    QRegularExpression mircCode = QRegularExpression("(\x02|\x1d|\x1f|\x03|\x1E)");
 
     int posLeft = 0;
-    int posRight = 0;
+    QRegularExpressionMatchIterator it = mircCode.globalMatch(text);
 
-    for (;;) {
-        posRight = mircCode.indexIn(text, posLeft);
-
-        if (posRight < 0) {
-            words << text.mid(posLeft);
-            break;  // no more mirc color codes
-        }
-
+    while (it.hasNext()) {
+        QRegularExpressionMatch match = it.next();
+        int posRight = match.capturedStart();
         if (posLeft < posRight) {
             words << text.mid(posLeft, posRight - posLeft);
-            posLeft = posRight;
         }
+        words << match.captured(0);
+        posLeft = posRight + match.capturedLength(0);
+    }
 
-        posRight = text.indexOf(mircCode.cap(), posRight + 1);
-        if (posRight == -1) {
-            words << text.mid(posLeft);
-            break;  // unclosed color code; can't process
-        }
-        words << text.mid(posLeft, posRight + 1 - posLeft);
-        posLeft = posRight + 1;
+    if (posLeft < text.length()) {
+        words << text.mid(posLeft);
     }
 
     for (int i = 0; i < words.count(); i++) {

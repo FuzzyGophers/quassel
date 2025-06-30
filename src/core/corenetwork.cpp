@@ -24,6 +24,7 @@
 
 #include <QDebug>
 #include <QHostInfo>
+#include <QRandomGenerator>
 #include <QTextBoundaryFinder>
 
 #include "core.h"
@@ -83,7 +84,7 @@ CoreNetwork::CoreNetwork(const NetworkId& networkid, CoreSession* session)
     connect(&_tokenBucketTimer, &QTimer::timeout, this, &CoreNetwork::checkTokenBucket);
 
     connect(&socket, &QAbstractSocket::connected, this, &CoreNetwork::onSocketInitialized);
-    connect(&socket, selectOverload<QAbstractSocket::SocketError>(&QAbstractSocket::error), this, &CoreNetwork::onSocketError);
+    connect(&socket, &QAbstractSocket::errorOccurred, this, &CoreNetwork::onSocketError);
     connect(&socket, &QAbstractSocket::stateChanged, this, &CoreNetwork::onSocketStateChanged);
     connect(&socket, &QIODevice::readyRead, this, &CoreNetwork::onSocketHasData);
     connect(&socket, &QSslSocket::encrypted, this, &CoreNetwork::onSocketInitialized);
@@ -219,7 +220,7 @@ void CoreNetwork::connectToIrc(bool reconnecting)
 
     // use a random server?
     if (useRandomServer()) {
-        _lastUsedServerIndex = qrand() % serverList().size();
+        _lastUsedServerIndex = QRandomGenerator::global()->bounded(serverList().size());
     }
     else if (_previousConnectionAttemptFailed) {
         // cycle to next server if previous connection attempt failed

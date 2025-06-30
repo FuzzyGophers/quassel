@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include <QCoreApplication>
+#include <QRandomGenerator>
 #include <QtGlobal>
 
 #include "coreauthhandler.h"
@@ -395,11 +396,11 @@ QString Core::setupCoreForInternalUsage()
 {
     Q_ASSERT(!_registeredStorageBackends.empty());
 
-    qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());
     int pass = 0;
-    for (int i = 0; i < 10; i++) {
+	QRandomGenerator::global()->seed(QDateTime::currentDateTime().toMSecsSinceEpoch());
+	for (int i = 0; i < 10; i++) {
         pass *= 10;
-        pass += qrand() % 10;
+        pass += QRandomGenerator::global()->bounded(10);
     }
 
     // mono client currently needs sqlite
@@ -1021,7 +1022,7 @@ bool Core::createUser()
     QTextStream out(stdout);
     QTextStream in(stdin);
     out << "Add a new user:" << Qt::endl;
-    out << "Username: " Qt::flush;
+    out << "Username: " << Qt::flush;
     out.flush();
     QString username = in.readLine().trimmed();
 
@@ -1194,7 +1195,7 @@ QVariantMap Core::promptForSettings(const Backend* backend)
 
     for (int i = 0; i + 2 < setupData.size(); i += 3) {
         QString key = setupData[i].toString();
-        out << setupData[i + 1].toString() << " [" << setupData[i + 2].toString() << "]: " << flush;
+        out << setupData[i + 1].toString() << " [" << setupData[i + 2].toString() << "]: " << Qt::flush;
 
         bool noEcho = key.toLower().contains("password");
         if (noEcho) {

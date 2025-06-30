@@ -816,7 +816,14 @@ void EventStringifier::processCtcpEvent(CtcpEvent* e)
         return;
     }
 
-    handle(e->ctcpCmd(), Q_ARG(CtcpEvent*, e));
+    QString cmd = e->ctcpCmd().toUpper();
+	if (cmd == "ACTION") {
+        handleCtcpAction(e);
+    } else if (cmd == "PING") {
+        handleCtcpPing(e);
+    } else {
+        defaultHandler(cmd, e);
+    }
 }
 
 void EventStringifier::defaultHandler(const QString& ctcpCmd, CtcpEvent* e)

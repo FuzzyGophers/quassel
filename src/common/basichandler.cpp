@@ -44,7 +44,8 @@ const QHash<QString, int>& BasicHandler::handlerHash()
 {
     if (!_initDone) {
         for (int i = metaObject()->methodOffset(); i < metaObject()->methodCount(); i++) {
-            QString methodSignature = metaObject()->method(i).methodSignature();
+            QMetaMethod method = metaObject()->method(i);
+            QString methodSignature = QString::fromLatin1(method.methodSignature());
             if (methodSignature.startsWith("defaultHandler")) {
                 _defaultHandler = i;
                 continue;
@@ -53,9 +54,9 @@ const QHash<QString, int>& BasicHandler::handlerHash()
             if (!methodSignature.startsWith(_methodPrefix))
                 continue;
 
-            methodSignature = methodSignature.section('(', 0, 0);           // chop the attribute list
-            methodSignature = methodSignature.mid(_methodPrefix.length());  // strip "handle" or whatever the prefix is
-            _handlerHash[methodSignature] = i;
+            QString methodName = methodSignature.section('(', 0, 0);           // chop the parameter list
+            QString handlerName = methodName.mid(_methodPrefix.length());       // strip "handle" or other prefix
+            _handlerHash[handlerName.toLower()] = i;
         }
         _initDone = true;
     }
@@ -73,46 +74,24 @@ void BasicHandler::handle(const QString& member,
                           QGenericArgument val7,
                           QGenericArgument val8)
 {
-    // Now we try to find a handler for this message. BTW, I do love the Trolltech guys ;-)
-    // and now we even have a fast lookup! Thanks thiago!
-
-    QString handler = member.toLower();
-    handler[0] = handler[0].toUpper();
-
-    if (!handlerHash().contains(handler)) {
-        if (_defaultHandler == -1) {
-            qWarning() << QString("No such Handler: %1::%2%3").arg(metaObject()->className(), _methodPrefix, handler);
-            return;
-        }
-        else {
-            void* param[] = {nullptr,
-                             QGenericArgument("QString", &member).data(),
-                             val0.data(),
-                             val1.data(),
-                             val2.data(),
-                             val3.data(),
-                             val4.data(),
-                             val5.data(),
-                             val6.data(),
-                             val7.data(),
-                             val8.data(),
-                             val8.data()};
-            qt_metacall(QMetaObject::InvokeMetaMethod, _defaultHandler, param);
-            return;
-        }
+    if (!_initDone) {
+        handlerHash();
     }
 
-    void* param[] = {nullptr,
-                     val0.data(),
-                     val1.data(),
-                     val2.data(),
-                     val3.data(),
-                     val4.data(),
-                     val5.data(),
-                     val6.data(),
-                     val7.data(),
-                     val8.data(),
-                     val8.data(),
-                     nullptr};
-    qt_metacall(QMetaObject::InvokeMetaMethod, handlerHash()[handler], param);
+    QString handler = member;
+    handler[0] = handler[0].toUpper(); // Capitalize first letter to match method name (e.g., "Ping" -> "handleCtcpPing")
+
+    int methodIndex = _handlerHash.value(handler.toLower(), -1);
+    if (methodIndex != -1) {
+        QMetaMethod method = metaObject()->method(methodIndex);
+        method.invoke(this, Qt::DirectConnection, val0, val1, val2, val3, val4, val5, val6, val7, val8);
+        return;
+    }
+
+    if (_defaultHandler != -1) {
+        QMetaMethod defaultMethod = metaObject()->method(_defaultHandler);
+        defaultMethod.invoke(this, Qt::DirectConnection, Q_ARG(QString, member), val0);
+    } else {
+        qWarning() << QString("No such Handler: %1::%2%3").arg(metaObject()->className(), _methodPrefix, handler);
+    }
 }
