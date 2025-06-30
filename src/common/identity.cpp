@@ -21,14 +21,11 @@
 #include "identity.h"
 
 #include <QMetaProperty>
+#include <QProcessEnvironment>
+#include <QRandomGenerator>
+#include <QRegularExpression>
 #include <QString>
 #include <QVariantMap>
-
-#ifdef Q_OS_MAC
-#    include <CoreServices/CoreServices.h>
-#    include <Foundation/Foundation.h>
-#    include "mac_utils.h"
-#endif
 
 #ifdef Q_OS_UNIX
 #    include <pwd.h>
@@ -100,10 +97,10 @@ void Identity::init()
 
 QString Identity::defaultNick()
 {
-    QString nick = QString("quassel%1").arg(qrand() & 0xff);  // FIXME provide more sensible default nicks
+    QString nick = QString("quassel%1").arg(QRandomGenerator::global()->bounded(256));  // FIXME provide more sensible default nicks
 
 #ifdef Q_OS_MAC
-    QString shortUserName = QString::fromNSString(NSUserName());
+    QString shortUserName = QProcessEnvironment::systemEnvironment().value("USER");
     if (!shortUserName.isEmpty())
         nick = shortUserName;
 
@@ -141,7 +138,7 @@ QString Identity::defaultRealName()
     QString generalDefault = tr("Quassel IRC User");
 
 #ifdef Q_OS_MAC
-    return QString::fromNSString(NSUserName());
+    return QProcessEnvironment::systemEnvironment().value("USER", tr("Quassel IRC User"));
 
 #elif defined(Q_OS_UNIX)
     QString realName;
