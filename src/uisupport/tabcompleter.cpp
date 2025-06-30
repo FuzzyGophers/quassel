@@ -21,6 +21,7 @@
 #include "tabcompleter.h"
 
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
 
 #include "action.h"
 #include "actioncollection.h"
@@ -84,8 +85,8 @@ void TabCompleter::buildCompletionList()
     // channel completion - add all channels of the current network to the map
     if (tabAbbrev.startsWith('#')) {
         _completionType = ChannelTab;
-        foreach (IrcChannel* ircChannel, _currentNetwork->ircChannels()) {
-            if (regex.indexIn(ircChannel->name()) > -1)
+        for (IrcChannel* ircChannel : _currentNetwork->ircChannels()) {
+            if (regex.match(ircChannel->name()).hasMatch())
                 _completionMap[ircChannel->name()] = ircChannel->name();
         }
     }
@@ -97,17 +98,17 @@ void TabCompleter::buildCompletionList()
             IrcChannel* channel = _currentNetwork->ircChannel(_currentBufferName);
             if (!channel)
                 return;
-            foreach (IrcUser* ircUser, channel->ircUsers()) {
-                if (regex.indexIn(ircUser->nick()) > -1)
+            for (IrcUser* ircUser : channel->ircUsers()) {
+                if (regex.match(ircUser->nick()).hasMatch())
                     _completionMap[ircUser->nick().toLower()] = ircUser->nick();
             }
         } break;
         case BufferInfo::QueryBuffer:
-            if (regex.indexIn(_currentBufferName) > -1)
+            if (regex.match(_currentBufferName).hasMatch())
                 _completionMap[_currentBufferName.toLower()] = _currentBufferName;
             // fallthrough
         case BufferInfo::StatusBuffer:
-            if (!_currentNetwork->myNick().isEmpty() && regex.indexIn(_currentNetwork->myNick()) > -1)
+            if (!_currentNetwork->myNick().isEmpty() && regex.match(_currentNetwork->myNick()).hasMatch())
                 _completionMap[_currentNetwork->myNick().toLower()] = _currentNetwork->myNick();
             break;
         default:
@@ -174,7 +175,8 @@ bool TabCompleter::eventFilter(QObject* obj, QEvent* event)
 
     auto* keyEvent = static_cast<QKeyEvent*>(event);
 
-    if (keyEvent->key() == GraphicalUi::actionCollection("General")->action("TabCompletionKey")->shortcut()[0])
+    QAction* tabCompletionAction = GraphicalUi::actionCollection("General")->action("TabCompletionKey");
+    if (keyEvent->key() == tabCompletionAction->shortcut().value(0).key())
         complete();
     else
         reset();
