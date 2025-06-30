@@ -1227,9 +1227,9 @@ BufferInfo SqliteStorage::bufferInfo(UserId user, const NetworkId& networkId, Bu
                 qCritical() << "SqliteStorage::getBufferInfo(): received more then one Buffer!";
                 qCritical() << "         Query:" << query.lastQuery();
                 qCritical() << "  bound Values:";
-                QList<QVariant> list = query.boundValues().values();
-                for (const QVariant &val : list)
-                    qCritical() << i << ":" << list.at(i).toString().toLatin1().data();
+                QVariantList boundValues = query.boundValues();
+				for (int i = 0; i < boundValues.size(); ++i)
+						qCritical() << i << ":" << boundValues[i].toString().toLatin1().data();
                 Q_ASSERT(false);
             }
         }
