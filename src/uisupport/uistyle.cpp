@@ -25,6 +25,7 @@
 
 #include <QApplication>
 #include <QColor>
+#include <QRegularExpressionMatch>
 
 #include "buffersettings.h"
 #include "icon.h"
@@ -216,7 +217,8 @@ void UiStyle::updateSystemTimestampFormat()
     // Helpful interactive website for debugging and explaining:  https://regex101.com/
     const QRegularExpression regExpMatchAMPM(".*(\\b|_)(A|AP)(\\b|_).*", QRegularExpression::CaseInsensitiveOption);
 
-    if (regExpMatchAMPM.exactMatch(QLocale().timeFormat(QLocale::ShortFormat))) {
+    auto match = regExpMatchAMPM.match(QLocale().timeFormat(QLocale::ShortFormat));
+	if (match.hasMatch() && match.capturedStart() == 0 && match.capturedLength() == QLocale().timeFormat(QLocale::ShortFormat).length()) {
         // AM/PM style used
         _systemTimestampFormatString = " h:mm:ss ap";
     }
@@ -818,10 +820,10 @@ QString UiStyle::mircToInternal(const QString& mirc_)
             int i = pos + 1;
             QString ins;
             auto num = mirc.mid(i, 6);
-            if (!num.isEmpty() && rx.exactMatch(num)) {
+            if (!num.isEmpty() && rx.match(num).hasMatch() && rx.match(num).capturedLength() == num.length()) {
                 ins = "%Dhf#" + num.toLower();
                 i += 6;
-                if (i < mirc.length() && mirc[i] == ',' && !(num = mirc.mid(i + 1, 6)).isEmpty() && rx.exactMatch(num)) {
+                if (i < mirc.length() && mirc[i] == ',' && !(num = mirc.mid(i + 1, 6)).isEmpty() && rx.match(num).hasMatch() && rx.match(num).capturedLength() == num.length()) {
                     ins += "%Dhb#" + num.toLower();
                     i += 7;
                 }
@@ -959,7 +961,7 @@ void UiStyle::StyledMessage::style() const
         break;
     case Message::DayChange: {
         //: Day Change Message
-        t = tr("{Day changed to %1}").arg(timestamp().date().toString(Qt::DefaultLocaleLongDate));
+        t = tr("{Day changed to %1}").arg(QLocale().toString(timestamp().date(), QLocale::LongFormat));
     } break;
     case Message::Topic:
         t = QString("%1").arg(txt);
@@ -1120,12 +1122,12 @@ quint8 UiStyle::StyledMessage::senderHash() const
 
     if (!nick.isEmpty()) {
         int chopCount = 0;
-        while (chopCount < nick.size() && nick.at(nick.count() - 1 - chopCount) == '_')
+        while (chopCount < nick.size() && nick.at(nick.size() - 1 - chopCount) == '_')
             chopCount++;
         if (chopCount < nick.size())
             nick.chop(chopCount);
     }
-    quint16 hash = qChecksum(nick.toLatin1().data(), nick.toLatin1().size());
+    quint16 hash = qChecksum(QByteArrayView(nick.toLatin1()));
     return (_senderHash = (hash & 0xf) + 1);
 }
 

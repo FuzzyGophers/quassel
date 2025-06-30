@@ -553,7 +553,7 @@ void BufferView::wheelEvent(QWheelEvent* event)
     if (ItemViewSettings().mouseWheelChangesBuffer() == (bool)(event->modifiers() & Qt::AltModifier))
         return TreeViewTouch::wheelEvent(event);
 
-    int rowDelta = (event->delta() > 0) ? -1 : 1;
+    int rowDelta = (event->angleDelta().y() > 0) ? -1 : 1;
     changeBuffer((Direction)rowDelta);
 }
 
