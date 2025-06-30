@@ -43,7 +43,7 @@ void CoreUserInputHandler::handleUserInput(const BufferInfo& bufferInfo, const Q
     for (int i = 0; i < list.count(); i++) {
         QString cmd = list.at(i).second.section(' ', 0, 0).remove(0, 1).toUpper();
         QString payload = list.at(i).second.section(' ', 1);
-        handle(cmd, Q_ARG(BufferInfo, list.at(i).first), Q_ARG(QString, payload));
+        handle(cmd, QGenericArgument("BufferInfo", &list.at(i).first), QGenericArgument("QString", &payload));
     }
 }
 
@@ -145,12 +145,12 @@ void CoreUserInputHandler::banOrUnban(const BufferInfo& bufferInfo, const QStrin
             return;
         }
 
-        static const QRegularExpression ipAddress(R"(\d+\.\d+\.\d+\.\d+)");
-		QRegularExpressionMatch match = ipAddress.match(generalizedHost);
-		if (match.hasMatch()) {
+        static const QRegularExpression ipAddress(R"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})");
+        QRegularExpressionMatch match = ipAddress.match(generalizedHost);
+        if (match.hasMatch()) {
             int lastDotPos = generalizedHost.lastIndexOf('.') + 1;
             generalizedHost.replace(lastDotPos, generalizedHost.length() - lastDotPos, "*");
-		} else if { (generalizedHost.lastIndexOf(".") != -1 && generalizedHost.lastIndexOf(".", generalizedHost.lastIndexOf(".") - 1) != -1) {
+        } else if (generalizedHost.lastIndexOf(".") != -1 && generalizedHost.lastIndexOf(".", generalizedHost.lastIndexOf(".") - 1) != -1) {
             int secondLastPeriodPosition = generalizedHost.lastIndexOf(".", generalizedHost.lastIndexOf(".") - 1);
             generalizedHost.replace(0, secondLastPeriodPosition, "*");
         }
@@ -802,9 +802,9 @@ void CoreUserInputHandler::handleSetkey(const BufferInfo& bufferInfo, const QStr
         typeByTarget(bufname),
         bufname,
         tr("Error: Setting an encryption key requires Quassel to have been built "
-           "with support for the Qt Cryptographic Architecture (QCA) library. "
-           "Contact your distributor about a Quassel package with QCA "
-           "support, or rebuild Quassel with QCA present.")
+           "with support for the Qt Cryptographic Architecture (QCA2) library. "
+           "Contact your distributor about a Quassel package with QCA2 "
+           "support, or rebuild Quassel with QCA2 present.")
     ));
 #endif
 }
