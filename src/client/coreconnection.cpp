@@ -28,6 +28,7 @@
 #include "internalpeer.h"
 #include "network.h"
 #include "networkmodel.h"
+#include <QNetworkInformation>
 #include "quassel.h"
 #include "signalproxy.h"
 #include "util.h"
@@ -47,10 +48,13 @@ void CoreConnection::init()
     connect(Client::signalProxy(), &SignalProxy::lagUpdated, this, &CoreConnection::lagUpdated);
 
     _reconnectTimer.setSingleShot(true);
-    connect(&_reconnectTimer, &QTimer::timeout, this, &CoreConnection::reconnectTimeout);
+    connect(&_reconnectTimer, &QTimer::timeout, this, &CoreConnection::reconnectTimeout, Qt::QueuedConnection);
 
-    _qNetworkConfigurationManager = new QNetworkConfigurationManager(this);
-    connect(_qNetworkConfigurationManager.data(), &QNetworkConfigurationManager::onlineStateChanged, this, &CoreConnection::onlineStateChanged);
+    QNetworkInformation::loadBackendByFeatures(QNetworkInformation::Feature::Reachability);
+    _qNetworkInformation = QNetworkInformation::instance();
+    if (_qNetworkInformation) {
+        connect(_qNetworkInformation, &QNetworkInformation::reachabilityChanged, this, &CoreConnection::onlineStateChanged);
+    }
 
     CoreConnectionSettings s;
     s.initAndNotify("PingTimeoutInterval", this, &CoreConnection::pingTimeoutIntervalChanged, 60);
@@ -110,9 +114,9 @@ void CoreConnection::reconnectTimeout()
     if (!_peer) {
         CoreConnectionSettings s;
         if (_wantReconnect && s.autoReconnect()) {
-            // If using QNetworkConfigurationManager, we don't want to reconnect if we're offline
-            if (s.networkDetectionMode() == CoreConnectionSettings::UseQNetworkConfigurationManager) {
-                if (!_qNetworkConfigurationManager->isOnline()) {
+            // If using QNetworkInformation, we don't want to reconnect if we're offline
+            if (s.networkDetectionMode() == CoreConnectionSettings::UseQNetworkInformation) {
+                if (!_qNetworkInformation || _qNetworkInformation->reachability() != QNetworkInformation::Reachability::Online) {
                     return;
                 }
             }
@@ -124,10 +128,10 @@ void CoreConnection::reconnectTimeout()
 void CoreConnection::networkDetectionModeChanged(const QVariant& vmode)
 {
     CoreConnectionSettings s;
-    auto mode = (CoreConnectionSettings::NetworkDetectionMode)vmode.toInt();
-    if (mode == CoreConnectionSettings::UsePingTimeout)
+    auto mode = static_cast<CoreConnectionSettings::NetworkDetectionMode>(vmode.toInt());
+    if (mode == CoreConnectionSettings::UsePingTimeout) {
         Client::signalProxy()->setMaxHeartBeatCount(s.pingTimeoutInterval() / 30);
-    else {
+    } else {
         Client::signalProxy()->setMaxHeartBeatCount(-1);
     }
 }
@@ -144,24 +148,22 @@ void CoreConnection::reconnectIntervalChanged(const QVariant& interval)
     _reconnectTimer.setInterval(interval.toInt() * 1000);
 }
 
-void CoreConnection::onlineStateChanged(bool isOnline)
+// TODO: Fix based on QNetworkInformation::Reachability::Local.
+// See comments on line 183
+void CoreConnection::onlineStateChanged(QNetworkInformation::Reachability reachability)
 {
     CoreConnectionSettings s;
-    if (s.networkDetectionMode() != CoreConnectionSettings::UseQNetworkConfigurationManager)
+    if (s.networkDetectionMode() != CoreConnectionSettings::UseQNetworkInformation)
         return;
 
-    if (isOnline) {
-        // qDebug() << "QNetworkConfigurationManager reports Online";
-        if (state() == Disconnected) {
-            if (_wantReconnect && s.autoReconnect()) {
-                reconnectToCore();
-            }
+    if (reachability == QNetworkInformation::Reachability::Online) {
+        if (state() == Disconnected && _wantReconnect && s.autoReconnect()) {
+            reconnectToCore();
         }
-    }
-    else {
-        // qDebug() << "QNetworkConfigurationManager reports Offline";
-        if (state() != Disconnected && !isLocalConnection())
+    } else if (reachability == QNetworkInformation::Reachability::Disconnected) {
+        if (state() != Disconnected && !isLocalConnection()) {
             disconnectFromCore(tr("Network is down"), true);
+        }
     }
 }
 
@@ -178,6 +180,7 @@ bool CoreConnection::isEncrypted() const
     return _peer && _peer->isSecure();
 }
 
+// TODO: Qt6 provides QNetworkInformation::Reachability::Local.
 bool CoreConnection::isLocalConnection() const
 {
     if (!isConnected())
