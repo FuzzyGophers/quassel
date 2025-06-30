@@ -28,6 +28,7 @@
 #include <QHostAddress>
 #include <QMutex>
 #include <QObject>
+#include <QRegularExpression>
 #include <QString>
 
 #include "coreidentity.h"
