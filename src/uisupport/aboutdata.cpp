@@ -110,32 +110,6 @@ AboutData& AboutData::addCredits(std::initializer_list<AboutPerson> credits)
     return *this;
 }
 
-#ifdef HAVE_${KF_FULL}
-
-KAboutData AboutData::kAboutData() const
-{
-    KAboutData aboutData(Quassel::buildInfo().applicationName, tr("Quassel IRC"), Quassel::buildInfo().plainVersionString);
-    aboutData.addLicense(KAboutLicense::GPL_V2);
-    aboutData.addLicense(KAboutLicense::GPL_V3);
-    aboutData.setShortDescription(tr("A modern, distributed IRC client"));
-    aboutData.setProgramLogo(QVariant::fromValue(QImage(":/pics/quassel-logo.png")));
-    aboutData.setBugAddress("https://bugs.quassel-irc.org/projects/quassel-irc/issues/new");
-    aboutData.setOrganizationDomain(Quassel::buildInfo().organizationDomain.toUtf8());
-    aboutData.setDesktopFileName(Quassel::buildInfo().clientApplicationName);
-
-    for (const auto& person : authors()) {
-        aboutData.addAuthor(person.prettyName(), person.task(), person.emailAddress());
-    }
-
-    for (const auto& person : credits()) {
-        aboutData.addCredit(person.prettyName(), person.task(), person.emailAddress());
-    }
-
-    return aboutData;
-}
-
-#endif
-
 /**************************************************************************************************/
 
 /*
@@ -219,7 +193,7 @@ void AboutData::setQuasselPersons(AboutData* aboutData)
          {"Felix Geyer", "debfx", tr("Certificate handling improvements")},
          {"Felix Kaechele", "", tr("German translation"), "", QLocale::German},
          {"Florent Castelli", "", tr("Sanitize topic handling, twitch.tv support")},
-         {"Frederik M.J. Vestre", "freqmod", tr("Norwegian translation"), "", QLocale::Norwegian},
+         {"Frederik M.J. Vestre", "freqmod", tr("Norwegian translation"), "", QLocale::NorwegianBokmal},
          {"Gábor Németh", "ELITE_x", tr("Hungarian translation"), "", QLocale::Hungarian},
          {"Gryllida A", "gry", tr("IRC parser improvements")},
          {"György Balló", "", tr("Fixes")},
