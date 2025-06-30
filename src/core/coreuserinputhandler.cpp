@@ -145,12 +145,12 @@ void CoreUserInputHandler::banOrUnban(const BufferInfo& bufferInfo, const QStrin
             return;
         }
 
-        static QRegularExpression ipAddress(R"(\d+\.\d+\.\d+\.\d+)");
-        if (ipAddress.exactMatch(generalizedHost)) {
+        static const QRegularExpression ipAddress(R"(\d+\.\d+\.\d+\.\d+)");
+		QRegularExpressionMatch match = ipAddress.match(generalizedHost);
+		if (match.hasMatch()) {
             int lastDotPos = generalizedHost.lastIndexOf('.') + 1;
-            generalizedHost.replace(lastDotPos, generalizedHost.length() - lastDotPos, '*');
-        }
-        else if (generalizedHost.lastIndexOf(".") != -1 && generalizedHost.lastIndexOf(".", generalizedHost.lastIndexOf(".") - 1) != -1) {
+            generalizedHost.replace(lastDotPos, generalizedHost.length() - lastDotPos, "*");
+		} else if { (generalizedHost.lastIndexOf(".") != -1 && generalizedHost.lastIndexOf(".", generalizedHost.lastIndexOf(".") - 1) != -1) {
             int secondLastPeriodPosition = generalizedHost.lastIndexOf(".", generalizedHost.lastIndexOf(".") - 1);
             generalizedHost.replace(0, secondLastPeriodPosition, "*");
         }

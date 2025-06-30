@@ -48,6 +48,7 @@
 #include "remotepeer.h"
 #include "storage.h"
 #include "util.h"
+#include <QRegularExpressionMatch>
 
 class ProcessMessagesEvent : public QEvent
 {
@@ -611,16 +612,18 @@ void CoreSession::createNetwork(const NetworkInfo& info_, const QStringList& per
     id = info.networkId.toInt();
     if (!_networks.contains(id)) {
         // create persistent chans
-        QRegularExpression rx(R"(\s*(\S+)(?:\s*(\S+))?\s*)");
+        static const QRegularExpression rx(R"(\s*(\S+)(?:\s*(\S+))?\s*)");
+        QRegularExpressionMatch match;
         for (const QString& channel : persistentChans) {
-            if (!rx.exactMatch(channel)) {
+            match = rx.match(channel);
+            if (!match.hasMatch()) {
                 qWarning() << QString("Invalid persistent channel declaration: %1").arg(channel);
                 continue;
             }
-            Core::bufferInfo(user(), info.networkId, BufferInfo::ChannelBuffer, rx.cap(1), true);
-            Core::setChannelPersistent(user(), info.networkId, rx.cap(1), true);
-            if (!rx.cap(2).isEmpty())
-                Core::setPersistentChannelKey(user(), info.networkId, rx.cap(1), rx.cap(2));
+            Core::bufferInfo(user(), info.networkId, BufferInfo::ChannelBuffer, match.captured(1), true);
+            Core::setChannelPersistent(user(), info.networkId, match.captured(1), true);
+            if (!match.captured(2).isEmpty())
+                Core::setPersistentChannelKey(user(), info.networkId, match.captured(1), match.captured(2));
         }
 
         CoreNetwork* net = new CoreNetwork(id, this);

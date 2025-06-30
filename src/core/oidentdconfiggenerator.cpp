@@ -168,5 +168,5 @@ bool OidentdConfigGenerator::writeConfig()
 
 bool OidentdConfigGenerator::lineByUs(const QByteArray& line)
 {
-    return _quasselStanzaRx.exactMatch(line);
+    return _quasselStanzaRx.match(line).hasMatch();
 }

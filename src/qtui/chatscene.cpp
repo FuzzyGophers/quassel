@@ -31,6 +31,7 @@
 #include <QMenuBar>
 #include <QMimeData>
 #include <QPersistentModelIndex>
+#include <QRegularExpressionMatch>
 #include <QUrl>
 
 #ifdef HAVE_WEBENGINE
@@ -1338,7 +1339,8 @@ void ChatScene::updateTimestampHasBrackets()
         //   (^\s*\(.+\)\s*$)|(^\s*\{.+\}\s*$)|(^\s*\[.+\]\s*$)|(^\s*<.+>\s*$)
         // Note that '\' must be escaped as '\\'
         // Helpful interactive website for debugging and explaining:  https://regex101.com/
-        const QRegularExpression regExpMatchBrackets(R"(^\s*[({[<].+[)}\]>]\s*$)");
-        _timestampHasBrackets = regExpMatchBrackets.exactMatch(_timestampFormatString);
+        static const QRegularExpression regExpMatchBrackets(R"(^\s*[({[<].+[)}\]>]\s*$)");
+		QRegularExpressionMatch match = regExpMatchBrackets.match(_timestampFormatString);
+		_timestampHasBrackets = match.hasMatch();
     }
 }

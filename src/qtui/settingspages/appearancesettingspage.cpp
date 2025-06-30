@@ -28,8 +28,8 @@
 
 #include "buffersettings.h"
 #include "qtui.h"
-#include "qtuisettings.h"
 #include "qtuistyle.h"
+#include <QRegularExpressionMatch>
 
 AppearanceSettingsPage::AppearanceSettingsPage(QWidget* parent)
     : SettingsPage(tr("Interface"), QString(), parent)
@@ -87,13 +87,15 @@ void AppearanceSettingsPage::initLanguageComboBox()
 {
     QDir i18nDir(Quassel::translationDirPath(), "*.qm");
 
-    QRegularExpression rx("(qt_)?([a-zA-Z_]+)\\.qm");
+    static const QRegularExpression rx("(qt_)?([a-zA-Z_]+)\\.qm");
+    QRegularExpressionMatch match;
     foreach (QString translationFile, i18nDir.entryList()) {
-        if (!rx.exactMatch(translationFile))
+        match = rx.match(translationFile);
+        if (!match.hasMatch())
             continue;
-        if (!rx.cap(1).isEmpty())
+        if (!match.captured(1).isEmpty())
             continue;
-        QLocale locale(rx.cap(2));
+        QLocale locale(match.captured(2));
         _locales[QLocale::languageToString(locale.language())] = locale;
     }
     foreach (QString language, _locales.keys()) {
