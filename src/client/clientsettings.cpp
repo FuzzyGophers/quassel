@@ -23,6 +23,7 @@
 #include <utility>
 
 #include <QHostAddress>
+#include <QNetworkInformation>
 #include <QSslSocket>
 #include <QStringList>
 
@@ -221,9 +222,9 @@ void CoreConnectionSettings::setNetworkDetectionMode(NetworkDetectionMode mode)
 
 CoreConnectionSettings::NetworkDetectionMode CoreConnectionSettings::networkDetectionMode() const
 {
-    auto mode = localValue("NetworkDetectionMode", UseQNetworkConfigurationManager).toInt();
+    auto mode = localValue("NetworkDetectionMode", UseQNetworkInformation).toInt();
     if (mode == 0)
-        mode = UseQNetworkConfigurationManager;  // UseSolid is gone, map that to the new default
+        mode = UseQNetworkInformation;
     return static_cast<NetworkDetectionMode>(mode);
 }
 
