@@ -395,7 +395,8 @@ void ClientAuthHandler::checkAndEnableSsl(bool coreSupportsSsl)
             }
             s.setAccountValue("ShowNoCoreSslWarning", false);
             s.setAccountValue("SslCert", QString());
-            s.setAccountValue("SslCertDigestVersion", QVariant(QVariant::Int));
+			// TODO: this defaults to MD5 which has known collisions. Fix.
+            s.setAccountValue("SslCertDigestVersion", 0);
         }
         if (_legacy)
             onConnectionReady();
@@ -419,7 +420,8 @@ void ClientAuthHandler::onSslSocketEncrypted()
         // That way, a warning will appear in case it becomes invalid at some point
         CoreAccountSettings s;
         s.setAccountValue("SSLCert", QString());
-        s.setAccountValue("SslCertDigestVersion", QVariant(QVariant::Int));
+		// TODO: Fix MD5 usage
+        s.setAccountValue("SslCertDigestVersion", 0);
     }
 
     emit encrypted(true);
@@ -448,7 +450,7 @@ void ClientAuthHandler::onSslErrors()
         break;
 
     default:
-        qWarning() << "Certificate digest version" << QString(knownDigestVersion) << "is not supported";
+        qWarning() << "Certificate digest version" << QString::number(static_cast<int>(knownDigestVersion)) << "is not supported";
     }
 
     if (knownDigest != calculatedDigest) {
@@ -467,7 +469,8 @@ void ClientAuthHandler::onSslErrors()
         }
         else {
             s.setAccountValue("SslCert", QString());
-            s.setAccountValue("SslCertDigestVersion", QVariant(QVariant::Int));
+			// TODO: MD5 usage
+            s.setAccountValue("SslCertDigestVersion", 0);
         }
     }
     else if (knownDigestVersion != ClientAuthHandler::DigestVersion::Latest) {
