@@ -507,8 +507,13 @@ IrcUser* Network::newIrcUser(const QString& hostmask, const QVariantMap& initDat
     IrcUser* user = ircUserFactory(hostmask);
     _ircUsers[nick.toLower()] = user;
     connect(user, &IrcUser::nickSet, this, &Network::ircUserNickChanged);
-    connect(user, &QObject::destroyed, this, &Network::removeIrcUser);
-    user->initSet(initData);
+    connect(user, &QObject::destroyed, this, [this](QObject* obj) {
+        IrcUser* ircUser = qobject_cast<IrcUser*>(obj);
+        if (ircUser) {
+            removeIrcUser(ircUser);
+        }
+    });
+    user->fromVariantMap(initData);
     emit ircUserAdded(user);
     SYNC_OTHER(addIrcUser, ARG(hostmask))
     return user;
@@ -528,8 +533,13 @@ IrcChannel* Network::newIrcChannel(const QString& channelname, const QVariantMap
 
     IrcChannel* chan = ircChannelFactory(channelname);
     _ircChannels[channelname.toLower()] = chan;
-    connect(chan, &QObject::destroyed, this, &Network::removeIrcChannel);
-    chan->initSet(initData);
+    connect(chan, &QObject::destroyed, this, [this](QObject* obj) {
+        IrcChannel* ircChannel = qobject_cast<IrcChannel*>(obj);
+        if (ircChannel) {
+            removeIrcChannel(ircChannel);
+        }
+    });
+    chan->fromVariantMap(initData);
     emit ircChannelAdded(chan);
     SYNC_OTHER(addIrcChannel, ARG(channelname))
     return chan;
@@ -612,7 +622,8 @@ void Network::setCodecForServer(QStringConverter::Encoding encoding)
         _serverEncoder = QStringEncoder(_defaultEncoding);
         _serverDecoder = QStringDecoder(_defaultEncoding);
     }
-    SYNC_OTHER(setCodecForServer, ARG(QStringConverter::nameForEncoding(encoding)))
+    QString encodingName = QStringConverter::nameForEncoding(encoding);
+    SYNC_OTHER(setCodecForServer, ARG(encodingName))
 }
 
 void Network::setCodecForEncoding(const QString& codecName)
@@ -628,7 +639,8 @@ void Network::setCodecForEncoding(QStringConverter::Encoding encoding)
         qWarning() << "Invalid encoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to" << QStringConverter::nameForEncoding(_defaultEncoding);
         _encoder = QStringEncoder(_defaultEncoding);
     }
-    SYNC_OTHER(setCodecForEncoding, ARG(QStringConverter::nameForEncoding(encoding)))
+    QString encodingName = QStringConverter::nameForEncoding(encoding);
+    SYNC_OTHER(setCodecForEncoding, ARG(encodingName))
 }
 
 void Network::setCodecForDecoding(const QString& codecName)
@@ -644,7 +656,8 @@ void Network::setCodecForDecoding(QStringConverter::Encoding encoding)
         qWarning() << "Invalid decoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to" << QStringConverter::nameForEncoding(_defaultEncoding);
         _decoder = QStringDecoder(_defaultEncoding);
     }
-    SYNC_OTHER(setCodecForDecoding, ARG(QStringConverter::nameForEncoding(encoding)))
+    QString encodingName = QStringConverter::nameForEncoding(encoding);
+    SYNC_OTHER(setCodecForDecoding, ARG(encodingName))
 }
 
 QString Network::decodeString(const QByteArray& text) const
@@ -696,16 +709,19 @@ QString Network::defaultCodecForDecoding()
 
 void Network::setDefaultCodecForServer(const QString& name)
 {
+    Q_UNUSED(name);
     // Not implemented; would require static variable
 }
 
 void Network::setDefaultCodecForEncoding(const QString& name)
 {
+    Q_UNUSED(name);
     // Not implemented; would require static variable
 }
 
 void Network::setDefaultCodecForDecoding(const QString& name)
 {
+    Q_UNUSED(name);
     // Not implemented; would require static variable
 }
 
@@ -776,12 +792,20 @@ void Network::setNetworkInfo(const NetworkInfo& networkInfo)
 
 QVariantMap Network::initSupports() const
 {
-    return _supports;
+    QVariantMap supportsMap;
+    for (auto it = _supports.constBegin(); it != _supports.constEnd(); ++it) {
+        supportsMap.insert(it.key(), QVariant(it.value()));
+    }
+    return supportsMap;
 }
 
 QVariantMap Network::initCaps() const
 {
-    return _caps;
+    QVariantMap capsMap;
+    for (auto it = _caps.constBegin(); it != _caps.constEnd(); ++it) {
+        capsMap.insert(it.key(), QVariant(it.value()));
+    }
+    return capsMap;
 }
 
 void Network::initSetSupports(const QVariantMap& supports)
