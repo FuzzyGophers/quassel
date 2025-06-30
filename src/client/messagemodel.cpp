@@ -25,6 +25,7 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QEvent>
+#include <QTimeZone>
 
 #include "backlogsettings.h"
 #include "client.h"
@@ -39,6 +40,8 @@ public:
         : QEvent(QEvent::User)
     {}
 };
+
+// TODO: QDateTime is deprecated.
 
 MessageModel::MessageModel(QObject* parent)
     : QAbstractItemModel(parent)

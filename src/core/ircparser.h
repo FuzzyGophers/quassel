@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <QTimeZone>
+
 #include "coresession.h"
 #include "irctag.h"
 

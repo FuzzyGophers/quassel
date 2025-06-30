@@ -21,6 +21,8 @@
 #ifndef EVENTSTRINGIFIER_H
 #define EVENTSTRINGIFIER_H
 
+#include <QTimeZone>
+
 #include "basichandler.h"
 #include "ircevent.h"
 #include "message.h"

@@ -454,7 +454,7 @@ void EventStringifier::processIrcEvent301(IrcEvent* e)
         IrcUser* ircuser = e->network()->ircUser(nick);
         if (ircuser) {
             QDateTime now = QDateTime::currentDateTime();
-            now.setTimeZone(QTimeZone::UTC);
+            now.setTimeZone(QTimeZone::utc());
             // Don't print "user is away" messages more often than this
             // 1 hour = 60 min * 60 sec
             const int silenceTime = 60 * 60;

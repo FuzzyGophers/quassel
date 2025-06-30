@@ -21,6 +21,7 @@
 #include "ircparser.h"
 
 #include <QDebug>
+#include <QRegularExpressionMatch>
 
 #include "corenetwork.h"
 #include "eventmanager.h"
@@ -121,7 +122,7 @@ void IrcParser::processNetworkIncoming(NetworkDataEvent* e)
 
     if (net->capEnabled(IrcCap::SERVER_TIME) && tags.contains(IrcTags::SERVER_TIME)) {
         QDateTime serverTime = QDateTime::fromString(tags[IrcTags::SERVER_TIME], "yyyy-MM-ddThh:mm:ss.zzzZ");
-        serverTime.setTimeZone(QTimeZone::UTC);
+        serverTime.setTimeZone(QTimeZone::utc());
         if (serverTime.isValid()) {
             e->setTimestamp(serverTime);
         } else {
@@ -263,9 +264,10 @@ void IrcParser::processNetworkIncoming(NetworkDataEvent* e)
                 if (!net->isChannelName(target)) {
                     QString decMsg = net->serverDecode(params.at(1));
                     QRegularExpression welcomeRegExp(R"(^\[([^\]]+)\] )");
-                    if (welcomeRegExp.indexIn(decMsg) != -1) {
-                        QString channelname = welcomeRegExp.cap(1);
-                        decMsg = decMsg.mid(welcomeRegExp.matchedLength());
+                    QRegularExpressionMatch match = welcomeRegExp.match(decMsg);
+                        if (match.hasMatch()) {
+                            QString channelname = match.captured(1);
+							decMsg = decMsg.mid(match.capturedLength());
                         // we only have CoreIrcChannels in the core, so this cast is safe
                         CoreIrcChannel* chan = static_cast<CoreIrcChannel*>(net->ircChannel(channelname)); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
                         if (chan && !chan->receivedWelcomeMsg()) {
