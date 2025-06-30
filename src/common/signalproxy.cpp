@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <cstdarg>
 #include <utility>
 
 #include <QCoreApplication>
@@ -399,15 +400,15 @@ void SignalProxy::handle(Peer* peer, const SyncMessage& syncMessage)
     // We can no longer construct a QVariant from QMetaType::Void
     QVariant returnValue;
     int returnType = eMeta->returnType(slotId);
-    if (returnType != QMetaType::Void)
-        returnValue = QVariant(static_cast<QVariant::Type>(returnType));
+    if (returnType != QMetaType::UnknownType)
+        returnValue = QVariant(QMetaType(returnType));
 
     if (!invokeSlot(receiver, slotId, syncMessage.params, returnValue, peer)) {
         qWarning("SignalProxy::handleSync(): invokeMethod for \"%s\" failed ", eMeta->methodName(slotId).constData());
         return;
     }
 
-    if (returnValue.type() != QVariant::Invalid && eMeta->receiveMap().contains(slotId)) {
+    if (returnValue.metaType() != QMetaType()) {
         int receiverId = eMeta->receiveMap()[slotId];
         QVariantList returnParams;
         if (eMeta->argTypes(receiverId).count() > 1)
@@ -504,7 +505,7 @@ bool SignalProxy::invokeSlot(QObject* receiver, int methodId, const QVariantList
             qWarning() << "                            - make sure all your data types are known by the Qt MetaSystem";
             return false;
         }
-        if (args[i] != QMetaType::type(params[i].typeName())) {
+        if (args[i] != QMetaType::fromName(params[i].metaType().name()).id()) {
             qWarning() << "SignalProxy::invokeSlot(): incompatible param types to invoke" << eMeta->methodName(methodId);
             return false;
         }
@@ -512,7 +513,7 @@ bool SignalProxy::invokeSlot(QObject* receiver, int methodId, const QVariantList
         _a[i + 1] = const_cast<void*>(params[i].constData());
     }
 
-    if (returnValue.type() != QVariant::Invalid)
+    if (returnValue.metaType() != QMetaType())
         _a[0] = const_cast<void*>(returnValue.constData());
 
     Qt::ConnectionType type = QThread::currentThread() == receiver->thread() ? Qt::DirectConnection : Qt::QueuedConnection;
@@ -594,7 +595,7 @@ void SignalProxy::sync_call__(const SyncableObject* obj, SignalProxy::ProxyMode 
             qWarning() << "        - make sure all your data types are known by the Qt MetaSystem";
             return;
         }
-        params << QVariant(argTypes[i], va_arg(ap, void*));
+        params << QVariant(QMetaType(argTypes[i]), va_arg(ap, void*));
     }
 
     if (_restrictMessageTarget) {
@@ -796,7 +797,7 @@ const QHash<int, int>& SignalProxy::ExtendedMetaObject::receiveMap()
                 continue;
 
             returnTypeName = requestSlot.typeName();
-            if (QMetaType::Void == (QMetaType::Type)returnType(i))
+            if (QMetaType::UnknownType == QMetaType::fromName(returnTypeName).id())
                 continue;
 
             signature = requestSlot.methodSignature();
@@ -811,7 +812,7 @@ const QHash<int, int>& SignalProxy::ExtendedMetaObject::receiveMap()
             params = signature.mid(paramsPos);
 
             methodName = methodName.replace("request", "receive");
-            params = params.left(params.count() - 1) + ", " + returnTypeName + ")";
+            params = params.left(params.size() - 1) + ", " + returnTypeName + ")";
 
             signature = QMetaObject::normalizedSignature(methodName + params);
             receiverId = _meta->indexOfSlot(signature);
@@ -864,13 +865,13 @@ QString SignalProxy::ExtendedMetaObject::methodBaseName(const QMetaMethod& metho
 
 SignalProxy::ExtendedMetaObject::MethodDescriptor::MethodDescriptor(const QMetaMethod& method)
     : _methodName(SignalProxy::ExtendedMetaObject::methodName(method))
-    , _returnType(QMetaType::type(method.typeName()))
+    , _returnType(QMetaType::fromName(method.typeName()).id())
 {
     // determine argTypes
     QList<QByteArray> paramTypes = method.parameterTypes();
     QList<int> argTypes;
     for (int i = 0; i < paramTypes.count(); i++) {
-        argTypes.append(QMetaType::type(paramTypes[i]));
+        argTypes.append(QMetaType::fromName(paramTypes[i]).id());
     }
     _argTypes = argTypes;
 
