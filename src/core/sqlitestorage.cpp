@@ -1228,7 +1228,7 @@ BufferInfo SqliteStorage::bufferInfo(UserId user, const NetworkId& networkId, Bu
                 qCritical() << "         Query:" << query.lastQuery();
                 qCritical() << "  bound Values:";
                 QList<QVariant> list = query.boundValues().values();
-                for (int i = 0; i < list.size(); ++i)
+                for (const QVariant &val : list)
                     qCritical() << i << ":" << list.at(i).toString().toLatin1().data();
                 Q_ASSERT(false);
             }

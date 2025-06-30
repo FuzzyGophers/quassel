@@ -22,6 +22,7 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QMetaType>
 #include <QMutexLocker>
 #include <QSqlDriver>
 #include <QSqlError>
@@ -272,7 +273,7 @@ bool AbstractSqlStorage::upgradeDb()
             if (!watchQuery(query)) {
                 // Individual upgrade query failed, bail out
                 qCritical() << qPrintable(QString("Unable to upgrade Logging Backend!  Upgrade query in schema version %1 failed (step: %2).")
-                                          .arg(QString::number(ver), queryResource.queryFilename));
+										  .arg(ver).arg(queryResource.queryFilename));
                 return false;
             }
             else {
@@ -357,7 +358,7 @@ bool AbstractSqlStorage::watchQuery(QSqlQuery& query)
             qCritical() << "unhandled Error in QSqlQuery!";
         qCritical() << "                  last Query:\n" << qPrintable(query.lastQuery());
         qCritical() << "              executed Query:\n" << qPrintable(query.executedQuery());
-        QVariantMap boundValues = query.boundValues();
+        QVariantList boundValues = query.boundValues();
         QStringList valueStrings;
         QVariantMap::const_iterator iter;
         for (iter = boundValues.constBegin(); iter != boundValues.constEnd(); ++iter) {
@@ -365,7 +366,7 @@ bool AbstractSqlStorage::watchQuery(QSqlQuery& query)
             QSqlField field;
             if (query.driver()) {
                 // let the driver do the formatting
-                field.setType(iter.value().type());
+                field.setMetaType(QMetaType(iter.value().metaType().id()));
                 if (iter.value().isNull())
                     field.clear();
                 else

@@ -24,6 +24,7 @@
 #include <QDataStream>
 #include <QSqlDriver>
 #include <QSqlField>
+#include <QTimeZone>
 
 #include "network.h"
 #include "quassel.h"

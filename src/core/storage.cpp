@@ -23,6 +23,7 @@
 #include <random>
 
 #include <QCryptographicHash>
+#include <QtGlobal>
 
 Storage::Storage(QObject* parent)
     : QObject(parent)
@@ -47,7 +48,7 @@ bool Storage::checkHashedPassword(const UserId user, const QString& password, co
         break;
 
     default:
-        qWarning() << "Password hash version" << QString(version) << "is not supported, please reset password";
+        qWarning() << "Password hash version" << static_cast<int>(version) << "is not supported, please reset password";
     }
 
     if (passwordCorrect && version < Storage::HashVersion::Latest) {
