@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include <QCoreApplication>
+#include <QtGlobal>
 
 #include "coreauthhandler.h"
 #include "coresession.h"
@@ -1019,20 +1020,20 @@ bool Core::createUser()
 {
     QTextStream out(stdout);
     QTextStream in(stdin);
-    out << "Add a new user:" << endl;
-    out << "Username: ";
+    out << "Add a new user:" << Qt::endl;
+    out << "Username: " Qt::flush;
     out.flush();
     QString username = in.readLine().trimmed();
 
     disableStdInEcho();
-    out << "Password: ";
+    out << "Password: " << Qt::flush;
     out.flush();
     QString password = in.readLine().trimmed();
-    out << endl;
-    out << "Repeat Password: ";
+    out << Qt::endl;
+    out << "Repeat Password: " << Qt::flush;
     out.flush();
     QString password2 = in.readLine().trimmed();
-    out << endl;
+    out << Qt::endl;
     enableStdInEcho();
 
     if (password != password2) {
@@ -1045,7 +1046,7 @@ bool Core::createUser()
     }
 
     if (_configured && _storage->addUser(username, password).isValid()) {
-        out << "Added user " << username << " successfully!" << endl;
+			out << "Added user " << username << " successfully!" << Qt::endl;
         return true;
     }
     else {
@@ -1060,26 +1061,26 @@ bool Core::changeUserPass(const QString& username)
     QTextStream in(stdin);
     UserId userId = _storage->getUserId(username);
     if (!userId.isValid()) {
-        out << "User " << username << " does not exist." << endl;
+			out << "User " << username << " does not exist." << Qt::endl;
         return false;
     }
 
     if (!canChangeUserPassword(userId)) {
-        out << "User " << username << " is configured through an auth provider that has forbidden manual password changing." << endl;
+			out << "User " << username << " is configured through an auth provider that has forbidden manual password changing." << Qt::endl;
         return false;
     }
 
-    out << "Change password for user: " << username << endl;
+    out << "Change password for user: " << username << Qt::endl;
 
     disableStdInEcho();
     out << "New Password: ";
     out.flush();
     QString password = in.readLine().trimmed();
-    out << endl;
+    out << Qt::endl;
     out << "Repeat Password: ";
     out.flush();
     QString password2 = in.readLine().trimmed();
-    out << endl;
+    out << Qt::endl;
     enableStdInEcho();
 
     if (password != password2) {
@@ -1092,7 +1093,7 @@ bool Core::changeUserPass(const QString& username)
     }
 
     if (_configured && _storage->updateUser(userId, password)) {
-        out << "Password changed successfully!" << endl;
+			out << "Password changed successfully!" << Qt::endl;
         return true;
     }
     else {
@@ -1189,7 +1190,7 @@ QVariantMap Core::promptForSettings(const Backend* backend)
 
     QTextStream out(stdout);
     QTextStream in(stdin);
-    out << "Default values are in brackets" << endl;
+    out << "Default values are in brackets" << Qt::endl;
 
     for (int i = 0; i + 2 < setupData.size(); i += 3) {
         QString key = setupData[i].toString();
@@ -1201,7 +1202,7 @@ QVariantMap Core::promptForSettings(const Backend* backend)
         }
         QString input = in.readLine().trimmed();
         if (noEcho) {
-            out << endl;
+				out << Qt::endl;
             enableStdInEcho();
         }
 
