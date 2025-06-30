@@ -23,20 +23,22 @@
 
 #include "graphicalui.h"
 
+#include <QApplication>
+
 #include "actioncollection.h"
 #include "contextmenuactionprovider.h"
 #include "toolbaractionprovider.h"
 #include "uisettings.h"
-
-#ifdef Q_WS_X11
-#    include <QX11Info>
-#endif
 
 QWidget* GraphicalUi::_mainWidget = nullptr;
 QHash<QString, ActionCollection*> GraphicalUi::_actionCollections;
 ContextMenuActionProvider* GraphicalUi::_contextMenuActionProvider = nullptr;
 ToolBarActionProvider* GraphicalUi::_toolBarActionProvider = nullptr;
 UiStyle* GraphicalUi::_uiStyle = nullptr;
+
+#ifdef Q_OS_WIN
+#    include <windows.h>
+#endif
 
 GraphicalUi::GraphicalUi(QObject* parent)
     : AbstractUi(parent)
@@ -51,9 +53,6 @@ GraphicalUi::GraphicalUi(QObject* parent)
 
 #ifdef Q_OS_WIN
     _dwTickCount = 0;
-#endif
-#ifdef Q_OS_MAC
-    GetFrontProcess(&_procNum);
 #endif
 }
 
@@ -88,7 +87,7 @@ QHash<QString, ActionCollection*> GraphicalUi::actionCollections()
 
 void GraphicalUi::loadShortcuts()
 {
-    foreach (ActionCollection* coll, actionCollections())
+    for (ActionCollection* coll : actionCollections())
         coll->readSettings();
 }
 
@@ -96,7 +95,7 @@ void GraphicalUi::saveShortcuts()
 {
     ShortcutSettings s;
     s.clear();
-    foreach (ActionCollection* coll, actionCollections())
+    for (ActionCollection* coll : actionCollections())
         coll->writeSettings();
 }
 
@@ -137,31 +136,17 @@ bool GraphicalUi::eventFilter(QObject* obj, QEvent* event)
     return AbstractUi::eventFilter(obj, event);
 }
 
-// NOTE: Window activation stuff seems to work just fine in Plasma 5 without requiring X11 hacks.
-// TODO: Evaluate cleaning all this up once we can get rid of Qt4/KDE4
-
-// Code taken from KStatusNotifierItem for handling minimize/restore
-
 bool GraphicalUi::checkMainWidgetVisibility(bool perform)
 {
-    bool needsActivation{true};
+    bool needsActivation = true;
 
-#ifdef Q_OS_WIN
-    // the problem is that we lose focus when the systray icon is activated
-    // and we don't know the former active window
-    // therefore we watch for activation event and use our stopwatch :)
-    if (GetTickCount() - _dwTickCount < 300) {
-        // we were active in the last 300ms -> hide it
-        needsActivation = false;
+    if (_mainWidget) {
+        // Check if the main widget is visible and not minimized
+        needsActivation = !(_mainWidget->isVisible() && !_mainWidget->isMinimized());
     }
-#else
-    if (mainWidget()->isVisible() && !mainWidget()->isMinimized() && mainWidget()->isActiveWindow()) {
-        needsActivation = false;
-    }
-#endif
 
     if (perform) {
-        minimizeRestore(needsActivation);
+        minimizeRestore(!needsActivation);
     }
     return needsActivation;
 }
@@ -173,43 +158,36 @@ bool GraphicalUi::isMainWidgetVisible()
 
 void GraphicalUi::minimizeRestore(bool show)
 {
-    if (show)
-        activateMainWidget();
-    else
-        hideMainWidget();
+    if (!_mainWidget) {
+        return;
+    }
+
+    if (show) {
+        _mainWidget->showNormal();
+        _mainWidget->raise();
+        _mainWidget->activateWindow();
+    } else if (instance()->isHidingMainWidgetAllowed()) {
+        _mainWidget->hide();
+    }
 }
 
 void GraphicalUi::activateMainWidget()
 {
-#ifdef Q_WS_X11
-    // Bypass focus stealing prevention
-    QX11Info::setAppUserTime(QX11Info::appTime());
-#endif
-
-    if (mainWidget()->windowState() & Qt::WindowMinimized) {
-        // restore
-        mainWidget()->setWindowState((mainWidget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+    if (_mainWidget) {
+        if (_mainWidget->windowState() & Qt::WindowMinimized) {
+            _mainWidget->setWindowState((_mainWidget->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+        }
+        _mainWidget->show();
+        _mainWidget->raise();
+        _mainWidget->activateWindow();
     }
-
-    // this does not actually work on all platforms... and causes more evil than good
-    // mainWidget()->move(mainWidget()->frameGeometry().topLeft()); // avoid placement policies
-#ifdef Q_OS_MAC
-    SetFrontProcess(&instance()->_procNum);
-#else
-    mainWidget()->show();
-    mainWidget()->raise();
-    mainWidget()->activateWindow();
-#endif
 }
 
 void GraphicalUi::hideMainWidget()
 {
-    if (instance()->isHidingMainWidgetAllowed())
-#ifdef Q_OS_MAC
-        ShowHideProcess(&instance()->_procNum, false);
-#else
-        mainWidget()->hide();
-#endif
+    if (_mainWidget && instance()->isHidingMainWidgetAllowed()) {
+        _mainWidget->hide();
+    }
 }
 
 void GraphicalUi::toggleMainWidget()

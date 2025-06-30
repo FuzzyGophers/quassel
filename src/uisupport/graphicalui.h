@@ -33,9 +33,6 @@ class UiStyle;
 #ifdef Q_OS_WIN
 #    include <windows.h>
 #endif
-#ifdef Q_OS_MAC
-#    include <Foundation/Foundation.h>
-#endif
 
 class UISUPPORT_EXPORT GraphicalUi : public AbstractUi, protected Singleton<GraphicalUi>
 {
@@ -64,16 +61,16 @@ public:
     inline static UiStyle* uiStyle();
     inline static QWidget* mainWidget();
 
-    //! Force the main widget to the front and focus it (may not work in all window systems)
+    //! Force the main widget to the front and focus it
     static void activateMainWidget();
 
-    //! Hide main widget (storing the current desktop if possible)
+    //! Hide main widget
     static void hideMainWidget();
 
     //! Toggle main widget
     static void toggleMainWidget();
 
-    //! Check if the main widget if (fully, in KDE) visible
+    //! Check if the main widget is visible
     static bool isMainWidgetVisible();
 
 protected:
@@ -84,15 +81,13 @@ protected:
     void setMainWidget(QWidget*);
 
     //! Check if the mainWidget is visible and optionally toggle its visibility
-    /** With KDE integration, we check if the mainWidget is (partially) obscured in order to determine if
-     *  it should be activated or hidden. Without KDE, we need to resort to checking the current state
-     *  as Qt knows it, ignoring windows covering it.
-     *  @param  performToggle If true, toggle the window's state in addition to checking visibility
-     *  @return True, if the window is currently *not* visible (needs activation)
+    /** We use Qt's visibility checks to determine if the mainWidget should be activated or hidden.
+     *  @param performToggle If true, toggle the window's state in addition to checking visibility
+     *  @return True if the window is currently *not* visible (needs activation)
      */
     bool checkMainWidgetVisibility(bool performToggle);
 
-    //! Minimize to or restore main widget
+    //! Minimize or restore main widget
     virtual void minimizeRestore(bool show);
 
     //! Whether it is allowed to hide the mainWidget
@@ -120,34 +115,31 @@ private:
 #ifdef Q_OS_WIN
     DWORD _dwTickCount;
 #endif
-#ifdef Q_OS_MAC
-    ProcessSerialNumber _procNum;
-#endif
 };
 
 // inlines
 
-ContextMenuActionProvider* GraphicalUi::contextMenuActionProvider()
+inline ContextMenuActionProvider* GraphicalUi::contextMenuActionProvider()
 {
     return _contextMenuActionProvider;
 }
 
-ToolBarActionProvider* GraphicalUi::toolBarActionProvider()
+inline ToolBarActionProvider* GraphicalUi::toolBarActionProvider()
 {
     return _toolBarActionProvider;
 }
 
-UiStyle* GraphicalUi::uiStyle()
+inline UiStyle* GraphicalUi::uiStyle()
 {
     return _uiStyle;
 }
 
-QWidget* GraphicalUi::mainWidget()
+inline QWidget* GraphicalUi::mainWidget()
 {
     return _mainWidget;
 }
 
-bool GraphicalUi::isHidingMainWidgetAllowed() const
+inline bool GraphicalUi::isHidingMainWidgetAllowed() const
 {
     return false;
 }
