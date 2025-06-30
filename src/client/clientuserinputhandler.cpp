@@ -60,9 +60,10 @@ void ClientUserInputHandler::handleUserInput(const BufferInfo& bufferInfo, const
         return;
 
     if (!msg.startsWith('/')) {
-        if (_nickRx.indexIn(msg) == 0) {
+        QRegularExpressionMatch match = _nickRx.match(msg);
+        if (match.hasMatch()) {
             const Network* net = Client::network(bufferInfo.networkId());
-            IrcUser* user = net ? net->ircUser(_nickRx.cap(1)) : nullptr;
+            IrcUser* user = net ? net->ircUser(match.captured(1)) : nullptr;
             if (user)
                 user->setLastSpokenTo(bufferInfo.bufferId(), QDateTime::currentDateTime().toUTC());
         }
@@ -73,7 +74,7 @@ void ClientUserInputHandler::handleUserInput(const BufferInfo& bufferInfo, const
     for (int i = 0; i < clist.count(); i++) {
         QString cmd = clist.at(i).second.section(' ', 0, 0).remove(0, 1).toUpper();
         QString payload = clist.at(i).second.section(' ', 1);
-        handle(cmd, Q_ARG(BufferInfo, clist.at(i).first), Q_ARG(QString, payload));
+        handle(cmd, QGenericArgument("BufferInfo", &clist.at(i).first), QGenericArgument("QString", &payload));
     }
 }
 
