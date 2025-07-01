@@ -30,6 +30,7 @@
 #include <QFile>
 #include <QLocale>
 #include <QObject>
+#include <QRandomGenerator>
 #include <QString>
 #include <QStringList>
 #include <QMetaType>
@@ -221,6 +222,9 @@ public slots:
      */
     void quit();
 
+	// Returns the Quassel random number generator
+	static QRandomGenerator* randomGenerator();
+
 signals:
     void messageLogged(const QDateTime& timeStamp, const QString& msg);
 
@@ -257,6 +261,8 @@ private:
 
     QCommandLineParser _cliParser;
 
+	static QRandomGenerator* _randomGenerator; // Quassel random generator
+	
     Logger* _logger;
     AbstractSignalWatcher* _signalWatcher{nullptr};
 

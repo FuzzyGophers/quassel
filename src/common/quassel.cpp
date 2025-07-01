@@ -32,6 +32,7 @@
 #include <QLibraryInfo>
 #include <QMetaEnum>
 #include <QSettings>
+#include <QTime>
 #include <QTranslator>
 #include <QUuid>
 
@@ -57,6 +58,10 @@ Quassel::Quassel()
     , _logger{new Logger{this}}
 {
 #ifdef EMBED_DATA
+    // Ensure QCoreApplication is initialized before accessing QTime
+    if (!QCoreApplication::instance()) {
+        qWarning() << "QCoreApplication not initialized during Quassel construction.";
+    }
     Q_INIT_RESOURCE(i18n);
 #endif
 }
@@ -65,7 +70,17 @@ void Quassel::init(RunMode runMode)
 {
     _runMode = runMode;
 
-    QRandomGenerator::global()->seed(QTime(0, 0, 0).msecsTo(QTime::currentTime()));
+    // Initialize and seed the Quassel random generator
+	if (!_randomGenerator) {
+        _randomGenerator = new QRandomGenerator();
+		QTime currentTime = QTime::currentTime();
+		if (currentTime.isValid()) {
+            _randomGenerator->seed(static_cast<quint32>(currentTime.msecsSinceStartOfDay()));
+        } else {
+            qWarning() << "Invalid system time, using default seed.";
+			_randomGenerator->seed(0);
+        }
+    }
 
     setupSignalHandling();
     setupEnvironment();
@@ -84,6 +99,13 @@ void Quassel::init(RunMode runMode)
     Network::setDefaultCodecForDecoding("ISO-8859-15");
 }
 
+QRandomGenerator* Quassel::_randomGenerator = nullptr;
+
+QRandomGenerator* Quassel::randomGenerator()
+{
+    return _randomGenerator;
+}
+
 Logger* Quassel::logger() const
 {
     return _logger;
@@ -100,6 +122,8 @@ void Quassel::quit()
     if (!_quitting) {
         _quitting = true;
         qInfo() << "Quitting...";
+		delete _randomGenerator;
+		_randomGenerator = nullptr;
         if (_quitHandlers.empty()) {
             QCoreApplication::quit();
         }

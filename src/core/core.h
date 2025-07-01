@@ -39,6 +39,7 @@
 #include "message.h"
 #include "metricsserver.h"
 #include "oidentdconfiggenerator.h"
+#include "quassel.h"
 #include "sessionthread.h"
 #include "singleton.h"
 #include "sslserver.h"

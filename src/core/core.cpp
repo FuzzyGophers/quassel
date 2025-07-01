@@ -23,7 +23,6 @@
 #include <algorithm>
 
 #include <QCoreApplication>
-#include <QRandomGenerator>
 #include <QtGlobal>
 
 #include "coreauthhandler.h"
@@ -397,10 +396,9 @@ QString Core::setupCoreForInternalUsage()
     Q_ASSERT(!_registeredStorageBackends.empty());
 
     int pass = 0;
-	QRandomGenerator::global()->seed(QDateTime::currentDateTime().toMSecsSinceEpoch());
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 10; ++i) {
         pass *= 10;
-        pass += QRandomGenerator::global()->bounded(10);
+        pass += Quassel::randomGenerator()->bounded(10);
     }
 
     // mono client currently needs sqlite
