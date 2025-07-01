@@ -28,7 +28,7 @@
 #include <QTableView>
 #include <QToolBar>
 
-#ifdef HAVE_${KF_FULL}
+#ifdef HAVE_KF6
 #    include <kconfigwidgets_version.h>
 
 #    include <KConfigWidgets/KStandardAction>
@@ -426,7 +426,7 @@ void MainWin::setupActions()
                      coll,
                      QtUi::style(),
                      &UiStyle::reload,
-                     QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_R))}});
+                     QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_R))}});
 
     // Other
     coll->addAction("HideCurrentBuffer", new Action(tr("Hide Current Buffer"), coll, this, &MainWin::hideCurrentBuffer, QKeySequence::Close));
@@ -434,46 +434,47 @@ void MainWin::setupActions()
     // Text formatting
     coll = QtUi::actionCollection("TextFormat", tr("Text formatting"));
 
-    coll->addActions(
-        {{"FormatApplyColor",
-          new Action(icon::get("format-text-color"),
-                     tr("Apply foreground color"),
-                     coll,
-                     this,
-                     &MainWin::onFormatApplyColorTriggered,
-                     QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_G))},
-         {"FormatApplyColorFill",
-          new Action(icon::get("format-fill-color"),
-                     tr("Apply background color"),
-                     coll,
-                     this,
-                     &MainWin::onFormatApplyColorFillTriggered,
-                     QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_B))},
-         {"FormatClear",
-          new Action(icon::get("edit-clear"),
-                     tr("Clear formatting"),
-                     coll,
-                     this,
-                     &MainWin::onFormatClearTriggered,
-                     QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_C))},
-         {"FormatBold",
-          new Action(icon::get("format-text-bold"), tr("Toggle bold"), coll, this, &MainWin::onFormatBoldTriggered, QKeySequence::Bold)},
-         {"FormatItalic",
-          new Action(icon::get("format-text-italic"), tr("Toggle italics"), coll, this, &MainWin::onFormatItalicTriggered, QKeySequence::Italic)},
-         {"FormatUnderline",
-          new Action(icon::get("format-text-underline"),
-                     tr("Toggle underline"),
-                     coll,
-                     this,
-                     &MainWin::onFormatUnderlineTriggered,
-                     QKeySequence::Underline)},
-         {"FormatStrikethrough",
-          new Action(icon::get("format-text-strikethrough"),
-                     tr("Toggle strikethrough"),
-                     coll,
-                     this,
-                     &MainWin::onFormatStrikethroughTriggered,
-                     QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S))}});
+    coll->addActions({
+        {"FormatApplyColor",
+         new Action(icon::get("format-text-color"),
+                    tr("Apply foreground color"),
+                    coll,
+                    this,
+                    &MainWin::onFormatApplyColorTriggered,
+                    QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_G))},
+        {"FormatApplyColorFill",
+         new Action(icon::get("format-fill-color"),
+                    tr("Apply background color"),
+                    coll,
+                    this,
+                    &MainWin::onFormatApplyColorFillTriggered,
+                    QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_B))},
+        {"FormatClear",
+         new Action(icon::get("edit-clear"),
+                    tr("Clear formatting"),
+                    coll,
+                    this,
+                    &MainWin::onFormatClearTriggered,
+                    QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_C))},
+        {"FormatBold",
+         new Action(icon::get("format-text-bold"), tr("Toggle bold"), coll, this, &MainWin::onFormatBoldTriggered, QKeySequence::Bold)},
+        {"FormatItalic",
+         new Action(icon::get("format-text-italic"), tr("Toggle italics"), coll, this, &MainWin::onFormatItalicTriggered, QKeySequence::Italic)},
+        {"FormatUnderline",
+         new Action(icon::get("format-text-underline"),
+                    tr("Toggle underline"),
+                    coll,
+                    this,
+                    &MainWin::onFormatUnderlineTriggered,
+                    QKeySequence::Underline)},
+        {"FormatStrikethrough",
+         new Action(icon::get("format-text-strikethrough"),
+                    tr("Toggle strikethrough"),
+                    coll,
+                    this,
+                    &MainWin::onFormatStrikethroughTriggered,
+                    QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S))}
+    });
 
     // Navigation
     coll = QtUi::actionCollection("Navigation", tr("Navigation"));

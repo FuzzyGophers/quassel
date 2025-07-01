@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2022 by the Quassel Project                        *
+ *   Copyright (C) 2005-2025 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -25,7 +25,6 @@
 #include <QHeaderView>
 #include <QItemSelectionModel>
 #include <QMessageBox>
-#include <QModelIndex>
 #include <QPainter>
 #include <QString>
 
@@ -188,7 +187,7 @@ void IgnoreListDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
         QStyleOptionButton opts;
         opts.direction = option.direction;
         opts.rect = option.rect;
-        opts.rect.moveLeft(option.rect.center().rx() - 10);
+        opts.rect.moveLeft(option.rect.center().x() - 10);
         opts.state = option.state;
         opts.state |= index.data().toBool() ? QStyle::State_On : QStyle::State_Off;
         style->drawControl(QStyle::CE_CheckBox, &opts, painter);
@@ -278,9 +277,9 @@ IgnoreListEditDlg::IgnoreListEditDlg(const IgnoreListManager::IgnoreListItem& it
 
     connect(ui.ignoreRuleLineEdit, &QLineEdit::textChanged, this, &IgnoreListEditDlg::widgetHasChanged);
     connect(ui.scopeRuleTextEdit, &QPlainTextEdit::textChanged, this, &IgnoreListEditDlg::widgetHasChanged);
-    connect(&_typeButtonGroup, selectOverload<int>(&QButtonGroup::buttonClicked), this, &IgnoreListEditDlg::widgetHasChanged);
-    connect(&_strictnessButtonGroup, selectOverload<int>(&QButtonGroup::buttonClicked), this, &IgnoreListEditDlg::widgetHasChanged);
-    connect(&_scopeButtonGroup, selectOverload<int>(&QButtonGroup::buttonClicked), this, &IgnoreListEditDlg::widgetHasChanged);
+    connect(&_typeButtonGroup, &QButtonGroup::buttonClicked, this, [this](QAbstractButton*) { widgetHasChanged(); });
+    connect(&_strictnessButtonGroup, &QButtonGroup::buttonClicked, this, [this](QAbstractButton*) { widgetHasChanged(); });
+    connect(&_scopeButtonGroup, &QButtonGroup::buttonClicked, this, [this](QAbstractButton*) { widgetHasChanged(); });
     connect(ui.isRegExCheckBox, &QCheckBox::stateChanged, this, &IgnoreListEditDlg::widgetHasChanged);
     connect(ui.isActiveCheckBox, &QCheckBox::stateChanged, this, &IgnoreListEditDlg::widgetHasChanged);
 

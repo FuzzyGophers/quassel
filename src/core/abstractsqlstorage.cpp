@@ -273,7 +273,7 @@ bool AbstractSqlStorage::upgradeDb()
             if (!watchQuery(query)) {
                 // Individual upgrade query failed, bail out
                 qCritical() << qPrintable(QString("Unable to upgrade Logging Backend!  Upgrade query in schema version %1 failed (step: %2).")
-										  .arg(ver).arg(queryResource.queryFilename));
+                                          .arg(ver).arg(queryResource.queryFilename));
                 return false;
             }
             else {
@@ -342,13 +342,11 @@ int AbstractSqlStorage::schemaVersion()
     return _schemaVersion;
 }
 
-
 QString AbstractSqlStorage::schemaVersionUpgradeStep()
 {
     // By default, assume there's no pending upgrade
     return {};
 }
-
 
 bool AbstractSqlStorage::watchQuery(QSqlQuery& query)
 {
@@ -360,32 +358,31 @@ bool AbstractSqlStorage::watchQuery(QSqlQuery& query)
         qCritical() << "              executed Query:\n" << qPrintable(query.executedQuery());
         QVariantList boundValues = query.boundValues();
         QStringList valueStrings;
-        QVariantMap::const_iterator iter;
-        for (iter = boundValues.constBegin(); iter != boundValues.constEnd(); ++iter) {
+        for (int i = 0; i < boundValues.size(); ++i) {
             QString value;
             QSqlField field;
             if (query.driver()) {
                 // let the driver do the formatting
-                field.setMetaType(QMetaType(iter.value().metaType().id()));
-                if (iter.value().isNull())
+                field.setMetaType(QMetaType(boundValues[i].metaType().id()));
+                if (boundValues[i].isNull())
                     field.clear();
                 else
-                    field.setValue(iter.value());
+                    field.setValue(boundValues[i]);
                 value = query.driver()->formatValue(field);
             }
             else {
-                switch (iter.value().type()) {
+                switch (boundValues[i].type()) {
                 case QVariant::Invalid:
                     value = "NULL";
                     break;
                 case QVariant::Int:
-                    value = iter.value().toString();
+                    value = boundValues[i].toString();
                     break;
                 default:
-                    value = QString("'%1'").arg(iter.value().toString());
+                    value = QString("'%1'").arg(boundValues[i].toString());
                 }
             }
-            valueStrings << QString("%1=%2").arg(iter.key(), value);
+            valueStrings << QString("%1=%2").arg(QString::number(i), value);
         }
         qCritical() << "                bound Values:" << qPrintable(valueStrings.join(", "));
         qCritical() << "                  Error Code:" << qPrintable(query.lastError().nativeErrorCode());

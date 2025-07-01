@@ -182,7 +182,7 @@ void CoreConfigWizard::prepareCoreSetup(const QString& backend,
                                         const QVariantMap& authProperties)
 {
     // Prevent the user from changing any settings he already specified...
-    for (auto&& idx : visitedPages())
+    for (auto&& idx : visitedIds())
         page(idx)->setEnabled(false);
 
     // FIXME? We need to be able to set up older cores that don't have auth backend support.
@@ -223,7 +223,7 @@ void CoreConfigWizard::coreSetupFailed(const QString& error)
 
 void CoreConfigWizard::startOver()
 {
-    foreach (int idx, visitedPages())
+    foreach (int idx, visitedIds())
         page(idx)->setEnabled(true);
     setStartId(CoreConfigWizard::AdminUserPage);
     restart();

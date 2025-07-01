@@ -85,8 +85,7 @@ NetworksSettingsPage::NetworksSettingsPage(QWidget* parent)
         {QStringConverter::System, "System"}
     };
 	
-    for (const auto& pair : encodingNames) {
-        QString codecName = pair.second;
+    for (const QString& codecName : encodingNames.values()) {
         ui.sendEncoding->addItem(codecName);
         ui.recvEncoding->addItem(codecName);
         ui.serverEncoding->addItem(codecName);

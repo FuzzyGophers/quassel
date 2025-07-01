@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include <QGraphicsTextItem>
+#include <QInputDevice>
 #include <QKeyEvent>
 #include <QMenu>
 #include <QScrollBar>
@@ -111,7 +112,7 @@ bool ChatView::event(QEvent* event)
         }
     }
 
-    if (event->type() == QEvent::TouchBegin && ((QTouchEvent*)event)->device()->type() == QTouchDevice::TouchScreen) {
+    if (event->type() == QEvent::TouchBegin && static_cast<QTouchEvent*>(event)->device()->type() == QInputDevice::DeviceType::TouchScreen) {
         // Enable scrolling by dragging, disable selecting/clicking content
         setDragMode(QGraphicsView::ScrollHandDrag);
         setInteractive(false);
@@ -145,7 +146,7 @@ bool ChatView::event(QEvent* event)
         // Applying the movement happens automatically by the drag-mode
     }
     if (event->type() == QEvent::Wheel
-        || (event->type() == QEvent::TouchBegin && ((QTouchEvent*)event)->device()->type() == QTouchDevice::TouchScreen)
+        || (event->type() == QEvent::TouchBegin && static_cast<QTouchEvent*>(event)->device()->type() == QInputDevice::DeviceType::TouchScreen)
         || event->type() == QEvent::TouchUpdate) {
         if (requestBacklogForScroll()) {
             return true;

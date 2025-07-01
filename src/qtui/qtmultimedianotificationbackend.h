@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2022 by the Quassel Project                        *
+ *   Copyright (C) 2005-2025 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,11 +18,13 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#pragma once
+#ifndef QTMULTIMEDIANOTIFICATIONBACKEND_H
+#define QTMULTIMEDIANOTIFICATIONBACKEND_H
 
 #include <memory>
 
-#include <QMediaPlayer>
+#include <QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QAudioOutput>
 
 #include "abstractnotificationbackend.h"
 #include "settingspage.h"
@@ -50,6 +52,7 @@ private:
 
     bool _enabled;
     std::unique_ptr<QMediaPlayer> _media;
+    std::unique_ptr<QAudioOutput> _audioOutput;
 };
 
 class QtMultimediaNotificationBackend::ConfigWidget : public SettingsPage
@@ -76,4 +79,7 @@ private:
     bool _audioAvailable;
     QString _filename;
     std::unique_ptr<QMediaPlayer> _audioPreview;
+    std::unique_ptr<QAudioOutput> _audioPreviewOutput;
 };
+
+#endif // QTMULTIMEDIANOTIFICATIONBACKEND_H

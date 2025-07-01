@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2022 by the Quassel Project                        *
+ *   Copyright (C) 2005-2025 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -44,7 +44,7 @@ InputWidget::InputWidget(QWidget* parent)
     , _networkId(0)
 {
     ui.setupUi(this);
-    connect(ui.ownNick, selectOverload<const QString&>(&QComboBox::activated), this, &InputWidget::changeNick);
+    connect(ui.ownNick, &QComboBox::activated, this, [this](int index) { changeNick(ui.ownNick->itemText(index)); });
 
     layout()->setAlignment(ui.ownNick, Qt::AlignBottom);
     layout()->setAlignment(ui.inputEdit, Qt::AlignBottom);
@@ -156,7 +156,7 @@ void InputWidget::setCustomFont(const QVariant& v)
     QFont font = v.value<QFont>();
     if (font.family().isEmpty())
         font = QApplication::font();
-    // we don't want font styles as this conflics with mirc code richtext editing
+    // we don't want font styles as this conflicts with mirc code richtext editing
     font.setBold(false);
     font.setItalic(false);
     font.setUnderline(false);

@@ -22,7 +22,7 @@
 
 #include <QUuid>
 
-#ifdef HAVE_${KF_FULL}
+#ifdef HAVE_KF6
 #    include <KXmlGui/KMainWindow>
 #else
 #    include <QMainWindow>

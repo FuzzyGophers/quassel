@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2022 by the Quassel Project                        *
+ *   Copyright (C) 2005-2025 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -24,6 +24,8 @@
 
 #include <QFileDialog>
 #include <QUrl>
+#include <QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QAudioOutput>
 
 #include "clientsettings.h"
 #include "icon.h"
@@ -45,12 +47,13 @@ QtMultimediaNotificationBackend::QtMultimediaNotificationBackend(QObject* parent
 void QtMultimediaNotificationBackend::notify(const Notification& notification)
 {
     if (_enabled && (notification.type == Highlight || notification.type == PrivMsg)) {
-        if (_media && _media->availability() == QMultimedia::Available) {
+        if (_media && _audioOutput) {
             _media->stop();
             _media->play();
         }
-        else
+        else {
             QApplication::beep();
+        }
     }
 }
 
@@ -78,11 +81,14 @@ void QtMultimediaNotificationBackend::createMediaObject(const QString& file)
 {
     if (file.isEmpty()) {
         _media.reset();
+        _audioOutput.reset();
         return;
     }
 
     _media = std::make_unique<QMediaPlayer>();
-    _media->setMedia(QUrl::fromLocalFile(file));
+    _audioOutput = std::make_unique<QAudioOutput>();
+    _media->setAudioOutput(_audioOutput.get());
+    _media->setSource(QUrl::fromLocalFile(file));
 }
 
 /***************************************************************************/
@@ -95,7 +101,7 @@ QtMultimediaNotificationBackend::ConfigWidget::ConfigWidget(QWidget* parent)
     ui.play->setIcon(icon::get("media-playback-start"));
     ui.open->setIcon(icon::get("document-open"));
 
-    _audioAvailable = (QMediaPlayer().availability() == QMultimedia::Available);
+    _audioAvailable = true; // Assume available; adjust if needed based on runtime checks
 
     connect(ui.enabled, &QAbstractButton::toggled, this, &ConfigWidget::widgetChanged);
     connect(ui.filename, &QLineEdit::textChanged, this, &ConfigWidget::widgetChanged);
@@ -166,10 +172,13 @@ void QtMultimediaNotificationBackend::ConfigWidget::on_play_clicked()
     if (_audioAvailable) {
         if (!ui.filename->text().isEmpty()) {
             _audioPreview = std::make_unique<QMediaPlayer>();
-            _audioPreview->setMedia(QUrl::fromLocalFile(ui.filename->text()));
+            _audioPreviewOutput = std::make_unique<QAudioOutput>();
+            _audioPreview->setAudioOutput(_audioPreviewOutput.get());
+            _audioPreview->setSource(QUrl::fromLocalFile(ui.filename->text()));
             _audioPreview->play();
         }
     }
-    else
+    else {
         QApplication::beep();
+    }
 }

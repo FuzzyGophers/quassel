@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005-2012 by the Quassel Project                        *
+ *   Copyright (C) 2005-2025 by the Quassel Project                        *
  *   devel@quassel-irc.org                                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -24,22 +24,56 @@
 #include <QCheckBox>
 #include <QHBoxLayout>
 
-#import <Foundation/NSUserNotification.h>
+#import <UserNotifications/UserNotifications.h>
+
+@interface QuasselNotificationDelegate : NSObject <UNUserNotificationCenterDelegate>
+@end
+
+@implementation QuasselNotificationDelegate
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+       didReceiveNotificationResponse:(UNNotificationResponse *)response
+                withCompletionHandler:(void (^)(void))completionHandler
+{
+    // Handle notification response if needed (e.g., activate Quassel when clicked)
+    completionHandler();
+}
+@end
 
 namespace {
 
 void SendNotificationCenterMessage(NSString* title, NSString* subtitle) {
-    NSUserNotificationCenter* center =
-            [NSUserNotificationCenter defaultUserNotificationCenter];
-    NSUserNotification* notification =
-            [[NSUserNotification alloc] init];
-
-    [notification setTitle: title];
-    [notification setSubtitle: subtitle];
-
-    [center deliverNotification: notification];
-
-    [notification release];
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    
+    // Request authorization for notifications
+    [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert | UNAuthorizationOptionSound)
+                         completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (!granted) {
+            NSLog(@"Notification authorization denied: %@", error.localizedDescription);
+            return;
+        }
+        
+        // Create notification content
+        UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+        [content setTitle:title];
+        [content setSubtitle:subtitle];
+        [content setSound:[UNNotificationSound defaultSound]];
+        
+        // Create a unique request identifier
+        NSString *identifier = [NSString stringWithFormat:@"QuasselNotification-%f", [[NSDate date] timeIntervalSince1970]];
+        
+        // Create the notification request
+        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:identifier
+                                                                            content:content
+                                                                            trigger:nil];
+        
+        // Deliver the notification
+        [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"Failed to deliver notification: %@", error.localizedDescription);
+            }
+            [content release];
+        }];
+    }];
 }
 
 }
@@ -50,6 +84,20 @@ OSXNotificationBackend::OSXNotificationBackend(QObject *parent)
 {
     NotificationSettings notificationSettings;
     notificationSettings.initAndNotify("OSXNotification/Enabled", this, &OSXNotificationBackend::enabledChanged, true);
+    
+    // Set up the notification delegate
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate = [[QuasselNotificationDelegate alloc] init];
+}
+
+OSXNotificationBackend::~OSXNotificationBackend()
+{
+    // Clean up the delegate
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    if (center.delegate) {
+        [center.delegate release];
+        center.delegate = nil;
+    }
 }
 
 void OSXNotificationBackend::enabledChanged(const QVariant &value)
@@ -64,17 +112,21 @@ void OSXNotificationBackend::notify(const Notification &notification)
         return;
     }
 
-    NSString* message = [[NSString alloc] initWithUTF8String:notification.sender.toUtf8().constData()];
-    NSString* summary = [[NSString alloc] initWithUTF8String:notification.message.toUtf8().constData()];
-
+    // Convert QString to NSString
+    NSString *message = [[NSString alloc] initWithUTF8String:notification.sender.toUtf8().constData()];
+    NSString *summary = [[NSString alloc] initWithUTF8String:notification.message.toUtf8().constData()];
+    
     SendNotificationCenterMessage(message, summary);
-
+    
     [message release];
     [summary release];
 }
 
-void OSXNotificationBackend::close(uint notificationId)
+void OSXNotificationBackend::close(uint /*notificationId*/)
 {
+    // Optionally implement closing notifications if needed
+    // UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    // [center removeDeliveredNotificationsWithIdentifiers:@[identifier]];
 }
 
 SettingsPage *OSXNotificationBackend::createConfigWidget() const
@@ -85,7 +137,7 @@ SettingsPage *OSXNotificationBackend::createConfigWidget() const
 OSXNotificationBackend::ConfigWidget::ConfigWidget(QWidget *parent)
     : SettingsPage("Internal", "OSXNotification", parent)
 {
-    _enabledBox = new QCheckBox(tr("Show OS X notifications"));
+    _enabledBox = new QCheckBox(tr("Show macOS notifications"));
     connect(_enabledBox, &QCheckBox::toggled, this, &ConfigWidget::widgetChanged);
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->addWidget(_enabledBox);
@@ -116,7 +168,6 @@ void OSXNotificationBackend::ConfigWidget::load()
     _enabledBox->setChecked(_enabled);
     setChangedState(false);
 }
-
 
 void OSXNotificationBackend::ConfigWidget::save()
 {
