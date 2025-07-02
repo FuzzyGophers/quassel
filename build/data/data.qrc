@@ -1,7 +1,0 @@
-<!DOCTYPE RCC>
-<RCC version="1.0">
-<qresource prefix="/data">
-    <file timestamp="2025-07-01T12:15:37">networks.ini</file>
-    <file timestamp="2025-07-01T17:41:45">stylesheets/default.qss</file>
-</qresource>
-</RCC>

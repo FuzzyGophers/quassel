@@ -1,6 +1,0 @@
-# CMake generated Testfile for 
-# Source directory: /Users/aaronbauman/repos/quassel/src/qtui
-# Build directory: /Users/aaronbauman/repos/quassel/build/src/qtui
-# 
-# This file includes the relevant testing commands required for 
-# testing this directory and lists subdirectories to be tested as well.
