@@ -47,24 +47,36 @@ QString SqliteStorage::description() const
 
 int SqliteStorage::installedSchemaVersion()
 {
-    // only used when there is a singlethread (during startup)
-    // so we don't need locking here
+    // Only used during startup (single-threaded), so no locking needed
     QSqlDatabase db = logDb();
-	QSqlQuery query(db);
-	query.prepare("SELECT value FROM coreinfo WHERE key = 'schemaversion'");
-	query.exec();
-    if (query.first())
-        return query.value(0).toInt();
-	else
-		watchQuery(query); // log errors
 
-    // maybe it's really old... (schema version 0)
-    query.prepare("SELECT MAX(version) FROM coreinfo");
-	query.exec();
-    if (query.first())
+    // Check if coreinfo table exists
+    QSqlQuery tableCheckQuery(db);
+    tableCheckQuery.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='coreinfo'");
+    safeExec(tableCheckQuery);
+    if (!tableCheckQuery.first()) {
+        // Fresh database, no coreinfo table; return -1 to signal initialization needed
+        return -1;
+    }
+
+    // Try querying schemaversion
+    QSqlQuery query(db);
+    query.prepare("SELECT value FROM coreinfo WHERE key = 'schemaversion'");
+    safeExec(query);
+    if (query.first()) {
         return query.value(0).toInt();
-	else
-		watchQuery(query); // log errors
+    } else {
+        watchQuery(query); // Log errors only if table exists
+    }
+
+    // Fallback for older schema (version 0)
+    query.prepare("SELECT MAX(version) FROM coreinfo");
+    safeExec(query);
+    if (query.first()) {
+        return query.value(0).toInt();
+    } else {
+        watchQuery(query); // Log errors only if table exists
+    }
 
     return AbstractSqlStorage::installedSchemaVersion();
 }
