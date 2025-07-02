@@ -351,9 +351,8 @@ QString AbstractSqlStorage::schemaVersionUpgradeStep()
 bool AbstractSqlStorage::watchQuery(QSqlQuery& query)
 {
     bool queryError = query.lastError().isValid();
-    if (queryError || _debug) {
-        if (queryError)
-            qCritical() << "unhandled Error in QSqlQuery!";
+    if (queryError) {
+        qCritical() << "unhandled Error in QSqlQuery!";
         qCritical() << "                  last Query:\n" << qPrintable(query.lastQuery());
         qCritical() << "              executed Query:\n" << qPrintable(query.executedQuery());
         QVariantList boundValues = query.boundValues();
@@ -362,7 +361,6 @@ bool AbstractSqlStorage::watchQuery(QSqlQuery& query)
             QString value;
             QSqlField field;
             if (query.driver()) {
-                // let the driver do the formatting
                 field.setMetaType(QMetaType(boundValues[i].metaType().id()));
                 if (boundValues[i].isNull())
                     field.clear();
@@ -389,8 +387,39 @@ bool AbstractSqlStorage::watchQuery(QSqlQuery& query)
         qCritical() << "               Error Message:" << qPrintable(query.lastError().text());
         qCritical() << "              Driver Message:" << qPrintable(query.lastError().driverText());
         qCritical() << "                  DB Message:" << qPrintable(query.lastError().databaseText());
-
-        return !queryError;
+        return false;
+    }
+    else if (_debug) {
+        qDebug() << "Debug Query:\n" << qPrintable(query.lastQuery());
+        qDebug() << "Executed Query:\n" << qPrintable(query.executedQuery());
+        QVariantList boundValues = query.boundValues();
+        QStringList valueStrings;
+        for (int i = 0; i < boundValues.size(); ++i) {
+            QString value;
+            QSqlField field;
+            if (query.driver()) {
+                field.setMetaType(QMetaType(boundValues[i].metaType().id()));
+                if (boundValues[i].isNull())
+                    field.clear();
+                else
+                    field.setValue(boundValues[i]);
+                value = query.driver()->formatValue(field);
+            }
+            else {
+                switch (boundValues[i].type()) {
+                case QVariant::Invalid:
+                    value = "NULL";
+                    break;
+                case QVariant::Int:
+                    value = boundValues[i].toString();
+                    break;
+                default:
+                    value = QString("'%1'").arg(boundValues[i].toString());
+                }
+            }
+            valueStrings << QString("%1=%2").arg(QString::number(i), value);
+        }
+        qDebug() << "Bound Values:" << qPrintable(valueStrings.join(", "));
     }
     return true;
 }
