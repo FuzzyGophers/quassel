@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 quassel_add_module(Test::Main EXPORT NOINSTALL)
 
 target_sources(${TARGET} PRIVATE

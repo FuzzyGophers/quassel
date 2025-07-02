@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # Main CMake file for building Quassel IRC
 #
 # See INSTALL for possible CMake options (or read the code, Luke)

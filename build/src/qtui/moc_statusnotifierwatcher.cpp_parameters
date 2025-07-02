@@ -1,0 +1,8 @@
+-I/Users/aaronbauman/repos/quassel/src/qtui
+-I/Users/aaronbauman/repos/quassel/build/src/qtui
+-DQT_NO_DEPRECATED_WARNINGS
+-DQT_MAC_USE_COCOA
+-D_DARWIN_C_SOURCE
+-o
+/Users/aaronbauman/repos/quassel/build/src/qtui/moc_statusnotifierwatcher.cpp
+/Users/aaronbauman/repos/quassel/build/src/qtui/statusnotifierwatcher.h

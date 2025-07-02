@@ -1,0 +1,25 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/aaronbauman/repos/quassel/build/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/data/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/icons/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/pics/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/po/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/src/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/src/common/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/src/core/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/src/client/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/src/uisupport/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/src/qtui/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/src/test/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/src/test/global/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/src/test/main/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/src/test/util/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/src/main/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/tests/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/tests/common/cmake_install.cmake",
+		"/Users/aaronbauman/repos/quassel/build/tests/core/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

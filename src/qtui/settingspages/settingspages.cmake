@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # Putting $FOO in SETTINGSPAGES automatically includes
 # $FOOsettingspage.cpp, $FOOsettingspage.h and $FOOsettingspage.ui
 

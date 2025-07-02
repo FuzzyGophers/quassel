@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+
 #include "macosutils.h"
 
 #ifdef Q_OS_MAC
