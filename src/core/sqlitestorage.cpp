@@ -23,6 +23,7 @@
 #include <QByteArray>
 #include <QDataStream>
 #include <QLatin1String>
+#include <QStringConverter>
 #include <QVariant>
 
 #include "network.h"
@@ -1784,68 +1785,82 @@ int SqliteStorage::highlightCount(BufferId bufferId, MsgId lastSeenMsgId)
     return result;
 }
 
+#include <QStringConverter> // For QStringEncoder and QStringDecoder
+
 bool SqliteStorage::logMessage(Message& msg)
 {
     QSqlDatabase db = logDb();
     db.transaction();
     bool error = false;
-    qint64 senderId = -1;
 
-    // Step 1: Ensure the sender exists and get its senderid
-    {
-        if (msg.sender().isEmpty()) {
-            qWarning() << "Empty sender for message, cannot log message.";
-            db.rollback();
-            unlock();
-            return false;
+    // Sanitize strings for UTF-8 compatibility
+    auto sanitizeString = [](const QString& input) -> QString {
+        if (input.isEmpty()) {
+            return input;
         }
+        // Try to validate as UTF-8
+        QStringConverter::Encoding encoding = QStringConverter::Utf8;
+        QStringEncoder encoder(encoding);
+        QStringDecoder decoder(encoding);
+        QByteArray utf8Data = encoder(input);
+        QString result = decoder(utf8Data);
+        if (result == input && !utf8Data.isEmpty()) {
+            return input; // Valid UTF-8
+        }
+        // Fallback to Latin1
+        qWarning() << "UTF-8 decoding failed for input:" << qPrintable(input);
+        return QString::fromLatin1(input.toLatin1());
+    };
 
+    // Handle empty sender
+    QString sender = msg.sender().isEmpty() ? QStringLiteral("Server") : sanitizeString(msg.sender());
+    QString realName = sanitizeString(msg.realName());
+    QString avatarUrl = sanitizeString(msg.avatarUrl());
+    QString senderPrefixes = sanitizeString(msg.senderPrefixes());
+    QString message = sanitizeString(msg.contents());
+
+    // Log warning for empty sender
+    if (msg.sender().isEmpty()) {
+        qWarning() << "Empty sender for message, using default 'Server'. Message details:"
+                   << "type=" << msg.type()
+                   << "buffer=" << msg.bufferInfo().bufferName()
+                   << "content=" << msg.contents();
+    }
+
+    // Step 1: Ensure the sender exists
+    {
         QSqlQuery addSenderQuery(db);
         addSenderQuery.prepare(queryString("insert_sender"));
-        addSenderQuery.bindValue(":sender", QVariant(msg.sender()));
-        addSenderQuery.bindValue(":realname", QVariant(msg.realName()));
-        addSenderQuery.bindValue(":avatarurl", QVariant(msg.avatarUrl()));
+        addSenderQuery.bindValue(":sender", QVariant(sender));
+        addSenderQuery.bindValue(":realname", QVariant(realName));
+        addSenderQuery.bindValue(":avatarurl", QVariant(avatarUrl));
         lockForWrite();
         safeExec(addSenderQuery);
-        if (addSenderQuery.lastError().isValid()) {
-            if (addSenderQuery.lastError().nativeErrorCode() == QLatin1String{"19"}) {
-                // Sender already exists, fetch its senderid
-                QSqlQuery selectSenderQuery(db);
-                selectSenderQuery.prepare("SELECT senderid FROM sender WHERE sender = :sender");
-                selectSenderQuery.bindValue(":sender", QVariant(msg.sender()));
-                safeExec(selectSenderQuery);
-                if (selectSenderQuery.first()) {
-                    senderId = selectSenderQuery.value(0).toLongLong();
-                } else {
-                    qCritical() << "Failed to fetch senderid after unique constraint violation:" << qPrintable(selectSenderQuery.lastError().text());
-                    error = true;
-                }
-            } else {
-                qCritical() << "Failed to insert sender:" << qPrintable(addSenderQuery.lastError().text());
-                error = true;
-            }
-        } else {
-            senderId = addSenderQuery.lastInsertId().toLongLong();
+        if (addSenderQuery.lastError().isValid() && addSenderQuery.lastError().nativeErrorCode() != QLatin1String{"19"}) {
+            qCritical() << "Failed to insert sender:" << qPrintable(sender)
+                        << "Error:" << qPrintable(addSenderQuery.lastError().text());
+            error = true;
         }
     }
 
-    // Step 2: Insert the message using the senderid
-    if (!error && senderId >= 0) {
+    // Step 2: Insert the message (senderid is handled by the query's subquery)
+    if (!error) {
         QSqlQuery logMessageQuery(db);
         logMessageQuery.prepare(queryString("insert_message"));
         logMessageQuery.bindValue(":time", msg.timestamp().toMSecsSinceEpoch());
         logMessageQuery.bindValue(":bufferid", static_cast<int>(msg.bufferInfo().bufferId().toInt()));
         logMessageQuery.bindValue(":type", static_cast<int>(msg.type()));
         logMessageQuery.bindValue(":flags", static_cast<int>(msg.flags()));
-        logMessageQuery.bindValue(":senderid", senderId); // Bind senderid instead of sender
-        logMessageQuery.bindValue(":sender", QVariant(msg.sender()));
-        logMessageQuery.bindValue(":realname", QVariant(msg.realName()));
-        logMessageQuery.bindValue(":avatarurl", QVariant(msg.avatarUrl()));
-        logMessageQuery.bindValue(":senderprefixes", QVariant(msg.senderPrefixes()));
-        logMessageQuery.bindValue(":message", QVariant(msg.contents()));
+        logMessageQuery.bindValue(":sender", QVariant(sender));
+        logMessageQuery.bindValue(":realname", QVariant(realName));
+        logMessageQuery.bindValue(":avatarurl", QVariant(avatarUrl));
+        logMessageQuery.bindValue(":senderprefixes", QVariant(senderPrefixes));
+        logMessageQuery.bindValue(":message", QVariant(message));
         safeExec(logMessageQuery);
         if (logMessageQuery.lastError().isValid()) {
-            qCritical() << "Failed to insert backlog message:" << qPrintable(logMessageQuery.lastError().text());
+            qCritical() << "Failed to insert backlog message. Bound values:"
+                        << logMessageQuery.boundValues()
+                        << "Error:" << qPrintable(logMessageQuery.lastError().text());
             error = true;
         } else {
             MsgId msgId = logMessageQuery.lastInsertId().toLongLong();
@@ -1856,9 +1871,6 @@ bool SqliteStorage::logMessage(Message& msg)
                 error = true;
             }
         }
-    } else if (!error) {
-        qCritical() << "Invalid senderid for message logging";
-        error = true;
     }
 
     if (error) {
