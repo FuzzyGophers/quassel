@@ -519,7 +519,7 @@ void CoreSessionEventProcessor::processIrcEventMode(IrcEvent* e)
         QString addModes;
         QString removeModes;
         bool add = false;
-        for (int c = 0; c < modeString.count(); c++) {
+        for (int c = 0; c < modeString.length(); c++) {
             if (modeString[c] == '+') {
                 add = true;
                 continue;
@@ -1324,7 +1324,7 @@ void CoreSessionEventProcessor::processWhoInformation(Network* net,
                 if (ircChan) {
                     // Do one mode at a time
                     // TODO Better way of syncing this without breaking protocol?
-                    for (int i = 0; i < validModes.count(); ++i) {
+                    for (int i = 0; i < validModes.length(); ++i) {
                         ircChan->addUserMode(ircUser, validModes.at(i));
                     }
                 }

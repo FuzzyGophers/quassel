@@ -190,10 +190,10 @@ void BufferView::joinChannel(const QModelIndex& index)
 
 void BufferView::dropEvent(QDropEvent* event)
 {
-    QModelIndex index = indexAt(event->pos());
+    QModelIndex index = indexAt(event->position().toPoint());
 
     QRect indexRect = visualRect(index);
-    QPoint cursorPos = event->pos();
+    QPoint cursorPos = event->position().toPoint();
 
     // check if we're really _on_ the item and not indicating a move to just above or below the item
     // Magic margin number for this is from QAbstractItemViewPrivate::position()
@@ -566,7 +566,7 @@ void BufferView::filterTextChanged(const QString& filterString)
 void BufferView::changeHighlight(BufferView::Direction direction)
 {
     // If for some weird reason we get a new delegate
-    auto delegate = qobject_cast<BufferViewDelegate*>(itemDelegate(_currentHighlight));
+    auto delegate = qobject_cast<BufferViewDelegate*>(itemDelegateForIndex(_currentHighlight));
     if (delegate) {
         delegate->currentHighlight = QModelIndex();
     }
@@ -589,7 +589,7 @@ void BufferView::changeHighlight(BufferView::Direction direction)
 
     _currentHighlight = newIndex;
 
-    delegate = qobject_cast<BufferViewDelegate*>(itemDelegate(_currentHighlight));
+    delegate = qobject_cast<BufferViewDelegate*>(itemDelegateForIndex(_currentHighlight));
     if (delegate) {
         delegate->currentHighlight = _currentHighlight;
     }
@@ -612,7 +612,7 @@ void BufferView::selectHighlighted()
 void BufferView::clearHighlight()
 {
     // If for some weird reason we get a new delegate
-    auto delegate = qobject_cast<BufferViewDelegate*>(itemDelegate(_currentHighlight));
+    auto delegate = qobject_cast<BufferViewDelegate*>(itemDelegateForIndex(_currentHighlight));
     if (delegate) {
         delegate->currentHighlight = QModelIndex();
     }
@@ -660,7 +660,7 @@ bool BufferViewDelegate::editorEvent(QEvent* event, QAbstractItemModel* model, c
     QRect checkRect = viewOpt.widget->style()->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &viewOpt, viewOpt.widget);
     auto* me = static_cast<QMouseEvent*>(event);
 
-    if (me->button() != Qt::LeftButton || !checkRect.contains(me->pos()))
+    if (me->button() != Qt::LeftButton || !checkRect.contains(me->position().toPoint()))
         return QStyledItemDelegate::editorEvent(event, model, option, index);
 
     auto state = static_cast<Qt::CheckState>(value.toInt());

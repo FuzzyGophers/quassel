@@ -1189,8 +1189,8 @@ QVariantMap Core::promptForSettings(const Backend* backend)
 
         QVariant value{setupData[i + 2]};
         if (!input.isEmpty()) {
-            switch (value.type()) {
-            case QVariant::Int:
+            switch (value.metaType().id()) {
+            case QMetaType::Int:
                 value = input.toInt();
                 break;
             default:

@@ -49,14 +49,22 @@ int SqliteStorage::installedSchemaVersion()
 {
     // only used when there is a singlethread (during startup)
     // so we don't need locking here
-    QSqlQuery query = logDb().exec("SELECT value FROM coreinfo WHERE key = 'schemaversion'");
+    QSqlDatabase db = logDb();
+	QSqlQuery query(db);
+	query.prepare("SELECT value FROM coreinfo WHERE key = 'schemaversion'");
+	query.exec();
     if (query.first())
         return query.value(0).toInt();
+	else
+		watchQuery(query); // log errors
 
     // maybe it's really old... (schema version 0)
-    query = logDb().exec("SELECT MAX(version) FROM coreinfo");
+    query.prepare("SELECT MAX(version) FROM coreinfo");
+	query.exec();
     if (query.first())
         return query.value(0).toInt();
+	else
+		watchQuery(query); // log errors
 
     return AbstractSqlStorage::installedSchemaVersion();
 }
@@ -2377,7 +2385,9 @@ void SqliteMigrationReader::setMaxId(MigrationObject mo)
         _maxId = 0;
         return;
     }
-    QSqlQuery query = logDb().exec(queryString);
+    QSqlQuery query(logDb());
+	query.prepare(queryString);
+	query.exec();
     query.first();
     _maxId = query.value(0).toLongLong();
 }

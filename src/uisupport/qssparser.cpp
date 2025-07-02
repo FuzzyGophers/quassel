@@ -724,7 +724,7 @@ void QssParser::parseFont(const QString& value, QTextCharFormat* format)
     else
         format->setFontPointSize(match.captured(2).toInt());
 
-    format->setFontFamily(match.captured(4));
+    format->setFontFamilies(QStringList(match.captured(4)));
 }
 
 void QssParser::parseFontStyle(const QString& value, QTextCharFormat* format)
@@ -782,5 +782,5 @@ void QssParser::parseFontFamily(const QString& value, QTextCharFormat* format)
     if (family.startsWith('"') && family.endsWith('"')) {
         family = family.mid(1, family.length() - 2);
     }
-    format->setFontFamily(family);
+    format->setFontFamilies(QStringList(family));
 }

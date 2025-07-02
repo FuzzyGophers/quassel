@@ -262,9 +262,8 @@ IgnoreListEditDlg::IgnoreListEditDlg(const IgnoreListManager::IgnoreListItem& it
     connect(&_typeButtonGroup, &QButtonGroup::buttonClicked, this, [this](QAbstractButton*) { widgetHasChanged(); });
     connect(&_strictnessButtonGroup, &QButtonGroup::buttonClicked, this, [this](QAbstractButton*) { widgetHasChanged(); });
     connect(&_scopeButtonGroup, &QButtonGroup::buttonClicked, this, [this](QAbstractButton*) { widgetHasChanged(); });
-    connect(ui.isRegExCheckBox, &QCheckBox::stateChanged, this, &IgnoreListEditDlg::widgetHasChanged);
-    connect(ui.isActiveCheckBox, &QCheckBox::stateChanged, this, &IgnoreListEditDlg::widgetHasChanged);
-
+    connect(ui.isRegExCheckBox, &QCheckBox::checkStateChanged, this, &IgnoreListEditDlg::widgetHasChanged);
+    connect(ui.isActiveCheckBox, &QCheckBox::checkStateChanged, this, &IgnoreListEditDlg::widgetHasChanged);
     connect(ui.buttonBox->button(QDialogButtonBox::Ok), &QAbstractButton::clicked, this, &IgnoreListEditDlg::aboutToAccept);
     widgetHasChanged();
 }

@@ -187,8 +187,9 @@ bool AbstractSqlStorage::setup(const QVariantMap& settings, const QProcessEnviro
     }
 
     db.transaction();
-    foreach (auto queryResource, setupQueries()) {
-        QSqlQuery query = db.exec(queryResource.queryString);
+    for (const auto& queryResource : setupQueries()) {
+        QSqlQuery query(db);
+		query.exec(queryResource.queryString);
         if (!watchQuery(query)) {
             qCritical() << qPrintable(QString("Unable to setup Logging Backend!  Setup query failed (step: %1).")
                                       .arg(queryResource.queryFilename));
@@ -231,7 +232,7 @@ bool AbstractSqlStorage::upgradeDb()
     bool resumingUpgrade = !previousLaunchUpgradeStep.isEmpty();
 
     for (int ver = installedSchemaVersion() + 1; ver <= schemaVersion(); ver++) {
-        foreach (auto queryResource, upgradeQueries(ver)) {
+        for (const auto& queryResource : upgradeQueries(ver)) {
             if (resumingUpgrade) {
                 // An upgrade was interrupted.  Check if this matches the the last successful query.
                 if (previousLaunchUpgradeStep == queryResource.queryFilename) {
@@ -251,7 +252,8 @@ bool AbstractSqlStorage::upgradeDb()
             }
 
             // Run the upgrade query
-            QSqlQuery query = db.exec(queryResource.queryString);
+            QSqlQuery query(db);
+			query.exec(queryResource.queryString);
             if (!watchQuery(query)) {
                 // Individual upgrade query failed, bail out
                 qCritical() << qPrintable(QString("Unable to upgrade Logging Backend!  Upgrade query in schema version %1 failed (step: %2).")
@@ -343,7 +345,7 @@ bool AbstractSqlStorage::watchQuery(QSqlQuery& query)
             QString value;
             QSqlField field;
             if (query.driver()) {
-                field.setMetaType(QMetaType(boundValues[i].metaType().id()));
+                field.setMetaType(boundValues[i].metaType());
                 if (boundValues[i].isNull())
                     field.clear();
                 else
@@ -351,11 +353,11 @@ bool AbstractSqlStorage::watchQuery(QSqlQuery& query)
                 value = query.driver()->formatValue(field);
             }
             else {
-                switch (boundValues[i].type()) {
-                case QVariant::Invalid:
+                switch (boundValues[i].metaType().id()) {
+                case QMetaType::UnknownType:
                     value = "NULL";
                     break;
-                case QVariant::Int:
+                case QMetaType::Int:
                     value = boundValues[i].toString();
                     break;
                 default:
@@ -380,7 +382,7 @@ bool AbstractSqlStorage::watchQuery(QSqlQuery& query)
             QString value;
             QSqlField field;
             if (query.driver()) {
-                field.setMetaType(QMetaType(boundValues[i].metaType().id()));
+                field.setMetaType(boundValues[i].metaType());
                 if (boundValues[i].isNull())
                     field.clear();
                 else
@@ -388,11 +390,11 @@ bool AbstractSqlStorage::watchQuery(QSqlQuery& query)
                 value = query.driver()->formatValue(field);
             }
             else {
-                switch (boundValues[i].type()) {
-                case QVariant::Invalid:
+                switch (boundValues[i].metaType().id()) {
+                case QMetaType::UnknownType:
                     value = "NULL";
                     break;
-                case QVariant::Int:
+                case QMetaType::Int:
                     value = boundValues[i].toString();
                     break;
                 default:

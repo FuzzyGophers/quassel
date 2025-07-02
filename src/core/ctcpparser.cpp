@@ -186,14 +186,14 @@ void CtcpParser::parseSimple(IrcEventRawMessage* e,
                              CtcpEvent::CtcpType ctcptype,
                              Message::Flags flags)
 {
-    if (dequotedMessage.count(XDELIM) != 2 || dequotedMessage[0] != '\001' || dequotedMessage[dequotedMessage.count() - 1] != '\001') {
+    if (dequotedMessage.count(XDELIM) != 2 || dequotedMessage[0] != '\001' || dequotedMessage[dequotedMessage.length() - 1] != '\001') {
         displayMsg(e, messagetype, targetDecode(e, dequotedMessage), e->prefix(), e->target(), flags);
     }
     else {
         int spacePos;
         QString ctcpcmd, ctcpparam;
 
-        QByteArray ctcp = xdelimDequote(dequotedMessage.mid(1, dequotedMessage.count() - 2));
+        QByteArray ctcp = xdelimDequote(dequotedMessage.mid(1, dequotedMessage.size() - 2));
         spacePos = ctcp.indexOf(' ');
         if (spacePos != -1) {
             ctcpcmd = targetDecode(e, ctcp.left(spacePos));
@@ -261,9 +261,9 @@ void CtcpParser::parseStandard(IrcEventRawMessage* e,
             displayMsg(e, messagetype, targetDecode(e, dequotedMessage.left(xdelimPos)), e->prefix(), e->target(), flags);
 
         xdelimEndPos = dequotedMessage.indexOf(XDELIM, xdelimPos + 1);
-        if (xdelimEndPos == -1) {
-            // no matching end delimiter found... treat rest of the message as ctcp
-            xdelimEndPos = dequotedMessage.count();
+		if (xdelimEndPos == -1) {
+				// no matching end delimiter found... treat rest of the message as ctcp
+				xdelimEndPos = dequotedMessage.length();
         }
         ctcp = xdelimDequote(dequotedMessage.mid(xdelimPos + 1, xdelimEndPos - xdelimPos - 1));
         dequotedMessage = dequotedMessage.mid(xdelimEndPos + 1);

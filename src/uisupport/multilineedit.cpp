@@ -698,7 +698,7 @@ void MultiLineEdit::on_textChanged()
                 msg += "<p>";
                 for (int i = 0; i < 4; i++) {
                     msg += lines[i].left(40).toHtmlEscaped();
-                    if (lines[i].count() > 40)
+                    if (lines[i].length() > 40)
                         msg += "...";
                     msg += "<br />";
                 }

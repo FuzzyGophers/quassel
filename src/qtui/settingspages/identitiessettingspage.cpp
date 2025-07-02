@@ -370,7 +370,7 @@ IdentityId CreateIdentityDlg::duplicateId() const
 
 void CreateIdentityDlg::on_identityName_textChanged(const QString& text)
 {
-    ui.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(text.count());
+    ui.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(text.length());
 }
 
 /*********************************************************************************************/

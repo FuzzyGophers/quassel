@@ -971,20 +971,20 @@ int CoreUserInputHandler::lastParamOverrun(const QString& cmd, const QList<QByte
     // 512 - nicklen - userlen - hostlen - commandlen - sum(param[0]..param[n-1])) - 2 (for CRLF) - 4 (":!@" + 1space between prefix and
     // command) - max(paramcount - 1, 0) (space for simple params) - 2 (space and colon for last param)
     IrcUser* me = network()->me();
-    int maxLen = 480 - cmd.toLatin1().count();  // educated guess in case we don't know us (yet?)
+    int maxLen = 480 - cmd.toLatin1().length();  // educated guess in case we don't know us (yet?)
 
     if (me)
-        maxLen = 512 - serverEncode(me->nick()).count() - serverEncode(me->user()).count() - serverEncode(me->host()).count()
-                 - cmd.toLatin1().count() - 6;
+        maxLen = 512 - serverEncode(me->nick()).length() - serverEncode(me->user()).length() - serverEncode(me->host()).length()
+                 - cmd.toLatin1().length() - 6;
 
     if (!params.isEmpty()) {
-        for (int i = 0; i < params.count() - 1; i++) {
-            maxLen -= (params[i].count() + 1);
+        for (int i = 0; i < params.length() - 1; i++) {
+            maxLen -= (params[i].length() + 1);
         }
         maxLen -= 2;  // " :" last param separator;
 
-        if (params.last().count() > maxLen) {
-            return params.last().count() - maxLen;
+        if (params.last().length() > maxLen) {
+            return params.last().length() - maxLen;
         }
         else {
             return 0;

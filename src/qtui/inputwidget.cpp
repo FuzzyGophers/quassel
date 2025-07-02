@@ -113,7 +113,7 @@ InputWidget::InputWidget(QWidget* parent)
 
     ActionCollection* coll = QtUi::actionCollection();
     coll->addAction("FocusInputLine",
-                    new Action{tr("Focus Input Line"), coll, this, selectOverload<>(&QWidget::setFocus), QKeySequence(Qt::CTRL + Qt::Key_L)});
+                    new Action{tr("Focus Input Line"), coll, this, selectOverload<>(&QWidget::setFocus), QKeySequence(Qt::CTRL | Qt::Key_L)});
 
     connect(inputLine(),
             &MultiLineEdit::textEntered,

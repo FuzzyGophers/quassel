@@ -347,7 +347,7 @@ void MainWin::setupActions()
          {"CoreInfo", new Action(icon::get("help-about"), tr("Core &Info..."), coll, this, &MainWin::showCoreInfoDlg)},
          {"ConfigureNetworks",
           new Action(icon::get("configure"), tr("Configure &Networks..."), coll, this, &MainWin::onConfigureNetworksTriggered)},
-         {"Quit", new Action(icon::get("application-exit"), tr("&Quit"), coll, Quassel::instance(), &Quassel::quit, Qt::CTRL + Qt::Key_Q)}});
+         {"Quit", new Action(icon::get("application-exit"), tr("&Quit"), coll, Quassel::instance(), &Quassel::quit, Qt::CTRL | Qt::Key_Q)}});
 
     // View
     coll->addAction("ConfigureBufferViews", new Action(tr("&Configure Chat Lists..."), coll, this, &MainWin::onConfigureViewsTriggered));
@@ -463,9 +463,9 @@ void MainWin::setupActions()
 
     coll->addActions(
         {{"JumpHotBuffer",
-          new Action(tr("Jump to hot chat"), coll, this, &MainWin::onJumpHotBufferTriggered, QKeySequence(Qt::META + Qt::Key_A))},
+          new Action(tr("Jump to hot chat"), coll, this, &MainWin::onJumpHotBufferTriggered, QKeySequence(Qt::META | Qt::Key_A))},
          {"ActivateBufferFilter",
-          new Action(tr("Activate the buffer search"), coll, this, &MainWin::onBufferSearchTriggered, QKeySequence(Qt::CTRL + Qt::Key_S))}});
+          new Action(tr("Activate the buffer search"), coll, this, &MainWin::onBufferSearchTriggered, QKeySequence(Qt::CTRL | Qt::Key_S))}});
 
     // Jump keys
 #ifdef Q_OS_MAC
@@ -549,14 +549,14 @@ void MainWin::setupActions()
                                coll,
                                this,
                                &MainWin::nextBuffer,
-                               QKeySequence(Qt::ALT + Qt::Key_Down)));
+                               QKeySequence(Qt::ALT | Qt::Key_Down)));
     coll->addAction("PreviousBuffer",
                     new Action(icon::get("go-up"),
                                tr("Go to Previous Chat"),
                                coll,
                                this,
                                &MainWin::previousBuffer,
-                               QKeySequence(Qt::ALT + Qt::Key_Up)));
+                               QKeySequence(Qt::ALT | Qt::Key_Up)));
 }
 
 void MainWin::setupMenus()

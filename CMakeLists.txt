@@ -20,9 +20,6 @@ message(STATUS "Using CMake ${CMAKE_VERSION}")
 # Set up build type rather early
 include(BuildType)
 
-# Suppress Qt 6 deprecation warnings
-add_definitions(-DQT_NO_DEPRECATED_WARNINGS)
-
 # Support ccache if found
 # This should happen before calling project(), so compiler settings are validated.
 option(USE_CCACHE "Enable support for ccache if available" ON)
