@@ -116,8 +116,8 @@ void AbstractSqlStorage::dbConnect(QSqlDatabase& db)
 Storage::State AbstractSqlStorage::init(const QVariantMap& settings, const QProcessEnvironment& environment, bool loadFromEnvironment)
 {
     setConnectionProperties(settings, environment, loadFromEnvironment);
-
-    _debug = Quassel::isOptionSet("debug");
+	_debug = true;
+    // _debug = Quassel::isOptionSet("debug");
 
     QSqlDatabase db = logDb();
     if (!db.isValid() || !db.isOpen())
