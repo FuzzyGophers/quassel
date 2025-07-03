@@ -57,9 +57,9 @@ Network::~Network()
 
 bool Network::Server::operator==(const Server& other) const
 {
-    return host == other.host && port == other.port && password == other.password && useSsl == other.useSsl && sslVerify == other.sslVerify && sslVersion == other.sslVersion
-           && useProxy == other.useProxy && proxyType == other.proxyType && proxyHost == other.proxyHost && proxyPort == other.proxyPort && proxyUser == other.proxyUser
-           && proxyPass == other.proxyPass;
+    return host == other.host && port == other.port && password == other.password && useSsl == other.useSsl && sslVerify == other.sslVerify
+           && sslVersion == other.sslVersion && useProxy == other.useProxy && proxyType == other.proxyType && proxyHost == other.proxyHost
+           && proxyPort == other.proxyPort && proxyUser == other.proxyUser && proxyPass == other.proxyPass;
 }
 
 bool Network::Server::operator!=(const Server& other) const
@@ -358,7 +358,7 @@ void Network::determinePrefixes() const
 {
     if (_supports.contains("PREFIX")) {
         // PREFIX=(ov)@+
-        QString prefix = _supports.value("PREFIX"); // (ov)@+
+        QString prefix = _supports.value("PREFIX");  // (ov)@+
         int start = prefix.indexOf('(');
         int middle = prefix.indexOf(')');
         if (start >= 0 && middle > start) {
@@ -471,7 +471,7 @@ bool Network::saslMaybeSupports(const QString& saslMechanism) const
 
     QString mechanisms = capValue(IrcCap::SASL);
     if (mechanisms.isEmpty())
-        return true; // No mechanisms advertised, assume all are possible
+        return true;  // No mechanisms advertised, assume all are possible
 
     return mechanisms.toUpper().split(',').contains(saslMechanism.toUpper());
 }
@@ -567,12 +567,9 @@ void Network::removeIrcChannel(IrcChannel* ircChannel)
 
 void Network::removeChansAndUsers()
 {
-    while (!_ircUsers.isEmpty()) {
-        delete _ircUsers.begin().value();
-    }
-    while (!_ircChannels.isEmpty()) {
-        delete _ircChannels.begin().value();
-    }
+    // Clear containers without deleting objects as Qt managers their lifetime
+    _ircUsers.clear();
+    _ircChannels.clear();
 }
 
 QString Network::codecForServer() const
@@ -601,7 +598,8 @@ void Network::setCodecForServer(QStringConverter::Encoding encoding)
     _serverEncoder = QStringEncoder(encoding);
     _serverDecoder = QStringDecoder(encoding);
     if (!_serverEncoder.isValid()) {
-        qWarning() << "Invalid encoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to" << QStringConverter::nameForEncoding(_defaultEncoding);
+        qWarning() << "Invalid encoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to"
+                   << QStringConverter::nameForEncoding(_defaultEncoding);
         _serverEncoder = QStringEncoder(_defaultEncoding);
         _serverDecoder = QStringDecoder(_defaultEncoding);
     }
@@ -619,7 +617,8 @@ void Network::setCodecForEncoding(QStringConverter::Encoding encoding)
 {
     _encoder = QStringEncoder(encoding);
     if (!_encoder.isValid()) {
-        qWarning() << "Invalid encoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to" << QStringConverter::nameForEncoding(_defaultEncoding);
+        qWarning() << "Invalid encoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to"
+                   << QStringConverter::nameForEncoding(_defaultEncoding);
         _encoder = QStringEncoder(_defaultEncoding);
     }
     QString encodingName = QStringConverter::nameForEncoding(encoding);
@@ -636,7 +635,8 @@ void Network::setCodecForDecoding(QStringConverter::Encoding encoding)
 {
     _decoder = QStringDecoder(encoding);
     if (!_decoder.isValid()) {
-        qWarning() << "Invalid decoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to" << QStringConverter::nameForEncoding(_defaultEncoding);
+        qWarning() << "Invalid decoding for" << QStringConverter::nameForEncoding(encoding) << ", falling back to"
+                   << QStringConverter::nameForEncoding(_defaultEncoding);
         _decoder = QStringDecoder(_defaultEncoding);
     }
     QString encodingName = QStringConverter::nameForEncoding(encoding);
@@ -855,14 +855,15 @@ IrcUser* Network::updateNickFromMask(const QString& mask)
 bool NetworkInfo::operator==(const NetworkInfo& other) const
 {
     return networkName == other.networkName && serverList == other.serverList && perform == other.perform && skipCaps == other.skipCaps
-           && autoIdentifyService == other.autoIdentifyService && autoIdentifyPassword == other.autoIdentifyPassword && saslAccount == other.saslAccount
-           && saslPassword == other.saslPassword && codecForServer == other.codecForServer && codecForEncoding == other.codecForEncoding
-           && codecForDecoding == other.codecForDecoding && networkId == other.networkId && identity == other.identity
-           && messageRateBurstSize == other.messageRateBurstSize && messageRateDelay == other.messageRateDelay
+           && autoIdentifyService == other.autoIdentifyService && autoIdentifyPassword == other.autoIdentifyPassword
+           && saslAccount == other.saslAccount && saslPassword == other.saslPassword && codecForServer == other.codecForServer
+           && codecForEncoding == other.codecForEncoding && codecForDecoding == other.codecForDecoding && networkId == other.networkId
+           && identity == other.identity && messageRateBurstSize == other.messageRateBurstSize && messageRateDelay == other.messageRateDelay
            && autoReconnectInterval == other.autoReconnectInterval && autoReconnectRetries == other.autoReconnectRetries
            && rejoinChannels == other.rejoinChannels && useRandomServer == other.useRandomServer && useAutoIdentify == other.useAutoIdentify
-           && useSasl == other.useSasl && useAutoReconnect == other.useAutoReconnect && unlimitedReconnectRetries == other.unlimitedReconnectRetries
-           && useCustomMessageRate == other.useCustomMessageRate && unlimitedMessageRate == other.unlimitedMessageRate;
+           && useSasl == other.useSasl && useAutoReconnect == other.useAutoReconnect
+           && unlimitedReconnectRetries == other.unlimitedReconnectRetries && useCustomMessageRate == other.useCustomMessageRate
+           && unlimitedMessageRate == other.unlimitedMessageRate;
 }
 
 bool NetworkInfo::operator!=(const NetworkInfo& other) const
@@ -882,21 +883,21 @@ void NetworkInfo::skipCapsFromString(const QString& flattenedSkipCaps)
 
 QDataStream& operator<<(QDataStream& out, const NetworkInfo& info)
 {
-    out << info.networkName << info.serverList << info.perform << info.skipCaps << info.autoIdentifyService << info.autoIdentifyPassword << info.saslAccount
-        << info.saslPassword << info.codecForServer << info.codecForEncoding << info.codecForDecoding << info.networkId << info.identity
-        << info.messageRateBurstSize << info.messageRateDelay << info.autoReconnectInterval << info.autoReconnectRetries << info.rejoinChannels
-        << info.useRandomServer << info.useAutoIdentify << info.useSasl << info.useAutoReconnect << info.unlimitedReconnectRetries << info.useCustomMessageRate
-        << info.unlimitedMessageRate;
+    out << info.networkName << info.serverList << info.perform << info.skipCaps << info.autoIdentifyService << info.autoIdentifyPassword
+        << info.saslAccount << info.saslPassword << info.codecForServer << info.codecForEncoding << info.codecForDecoding << info.networkId
+        << info.identity << info.messageRateBurstSize << info.messageRateDelay << info.autoReconnectInterval << info.autoReconnectRetries
+        << info.rejoinChannels << info.useRandomServer << info.useAutoIdentify << info.useSasl << info.useAutoReconnect
+        << info.unlimitedReconnectRetries << info.useCustomMessageRate << info.unlimitedMessageRate;
     return out;
 }
 
 QDataStream& operator>>(QDataStream& in, NetworkInfo& info)
 {
-    in >> info.networkName >> info.serverList >> info.perform >> info.skipCaps >> info.autoIdentifyService >> info.autoIdentifyPassword >> info.saslAccount
-        >> info.saslPassword >> info.codecForServer >> info.codecForEncoding >> info.codecForDecoding >> info.networkId >> info.identity
-        >> info.messageRateBurstSize >> info.messageRateDelay >> info.autoReconnectInterval >> info.autoReconnectRetries >> info.rejoinChannels
-        >> info.useRandomServer >> info.useAutoIdentify >> info.useSasl >> info.useAutoReconnect >> info.unlimitedReconnectRetries >> info.useCustomMessageRate
-        >> info.unlimitedMessageRate;
+    in >> info.networkName >> info.serverList >> info.perform >> info.skipCaps >> info.autoIdentifyService >> info.autoIdentifyPassword
+        >> info.saslAccount >> info.saslPassword >> info.codecForServer >> info.codecForEncoding >> info.codecForDecoding >> info.networkId
+        >> info.identity >> info.messageRateBurstSize >> info.messageRateDelay >> info.autoReconnectInterval >> info.autoReconnectRetries
+        >> info.rejoinChannels >> info.useRandomServer >> info.useAutoIdentify >> info.useSasl >> info.useAutoReconnect
+        >> info.unlimitedReconnectRetries >> info.useCustomMessageRate >> info.unlimitedMessageRate;
     return in;
 }
 
@@ -908,15 +909,15 @@ QDebug operator<<(QDebug dbg, const NetworkInfo& i)
 
 QDataStream& operator<<(QDataStream& out, const Network::Server& server)
 {
-    out << server.host << server.port << server.password << server.useSsl << server.sslVerify << server.sslVersion << server.useProxy << server.proxyType
-        << server.proxyHost << server.proxyPort << server.proxyUser << server.proxyPass;
+    out << server.host << server.port << server.password << server.useSsl << server.sslVerify << server.sslVersion << server.useProxy
+        << server.proxyType << server.proxyHost << server.proxyPort << server.proxyUser << server.proxyPass;
     return out;
 }
 
 QDataStream& operator>>(QDataStream& in, Network::Server& server)
 {
-    in >> server.host >> server.port >> server.password >> server.useSsl >> server.sslVerify >> server.sslVersion >> server.useProxy >> server.proxyType
-        >> server.proxyHost >> server.proxyPort >> server.proxyUser >> server.proxyPass;
+    in >> server.host >> server.port >> server.password >> server.useSsl >> server.sslVerify >> server.sslVersion >> server.useProxy
+        >> server.proxyType >> server.proxyHost >> server.proxyPort >> server.proxyUser >> server.proxyPass;
     return in;
 }
 
