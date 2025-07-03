@@ -1,17 +1,9 @@
 // SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
-/*
-  This file has been derived from Konversation, the KDE IRC client.
-  You can redistribute it and/or modify it under the terms of the
-  GNU General Public License as published by the Free Software Foundation;
-  either version 2 of the License, or (at your option) any later version.
-*/
-
-/*
-  Copyright (C) 1997 Robey Pointer <robeypointer@gmail.com>
-  Copyright (C) 2005 Ismail Donmez <ismail@kde.org>
-  Copyright (C) 2009 Travis McHenry <tmchenryaz@cox.net>
-  Copyright (C) 2009 Johannes Huber <johu@gmx.de>
-*/
+// SPDX-FileCopyrightText: 1997 Robey Pointer <robeypointer@gmail.com>
+// SPDX-FileCopyrightText: 2005 Ismail Donmez <ismail@kde.org>
+// SPDX-FileCopyrightText: 2009 Travis McHenry <tmchenryaz@cox.net>
+// SPDX-FileCopyrightText: 2009 Johannes Huber <johu@gmx.de>
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #ifndef CIPHER_H
 #define CIPHER_H
