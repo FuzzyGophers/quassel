@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <QMetaMethod>
 
+#include "bufferinfo.h"
+
 BasicHandler::BasicHandler(QObject* parent)
     : QObject(parent)
     , _methodPrefix("handle")
@@ -75,7 +77,14 @@ void BasicHandler::handle(const QString& member,
 
     if (_defaultHandler != -1) {
         QMetaMethod defaultMethod = metaObject()->method(_defaultHandler);
-        defaultMethod.invoke(this, Qt::DirectConnection, Q_ARG(QString, member), val0);
+        BufferInfo* bufferInfo = static_cast<BufferInfo*>(val0.data());
+        QString* text = static_cast<QString*>(val1.data());
+        if (bufferInfo && text) {
+            defaultMethod.invoke(this, Qt::DirectConnection, Q_ARG(QString, member), Q_ARG(BufferInfo, *bufferInfo), Q_ARG(QString, *text));
+        }
+        else {
+            qWarning() << "Invalid arguments for defaultHandler: bufferInfo=" << bufferInfo << ", text=" << text;
+        }
     }
     else {
         qWarning() << QString("No such Handler: %1::%2%3").arg(metaObject()->className(), _methodPrefix, handler);
