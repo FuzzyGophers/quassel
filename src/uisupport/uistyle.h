@@ -38,20 +38,12 @@ public:
 // So we use the old one on Qt 5.5, and the new one everywhere else.
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     using FormatContainer = QVector<QTextLayout::FormatRange>;
-    static inline void setTextLayoutFormats(QTextLayout& layout, const FormatContainer& formats) {
-        layout.setFormats(formats);
-    }
-    static inline QVector<QTextLayout::FormatRange> containerToVector(const FormatContainer& container) {
-        return container;
-    }
+    static inline void setTextLayoutFormats(QTextLayout& layout, const FormatContainer& formats) { layout.setFormats(formats); }
+    static inline QVector<QTextLayout::FormatRange> containerToVector(const FormatContainer& container) { return container; }
 #else
     using FormatContainer = QList<QTextLayout::FormatRange>;
-    static inline void setTextLayoutFormats(QTextLayout& layout, const FormatContainer& formats) {
-        layout.setAdditionalFormats(formats);
-    }
-    static inline QVector<QTextLayout::FormatRange> containerToVector(const FormatContainer& container) {
-        return container.toVector();
-    }
+    static inline void setTextLayoutFormats(QTextLayout& layout, const FormatContainer& formats) { layout.setAdditionalFormats(formats); }
+    static inline QVector<QTextLayout::FormatRange> containerToVector(const FormatContainer& container) { return container.toVector(); }
 #endif
 
     //! This enumerates the possible formats a text element may have. */
@@ -63,46 +55,46 @@ public:
      */
     enum class FormatType : quint32
     {
-        Base            = 0x00000000,
-        Invalid         = 0xffffffff,
+        Base = 0x00000000,
+        Invalid = 0xffffffff,
 
         // Message Formats (mutually exclusive!)
-        PlainMsg        = 0x00000001,
-        NoticeMsg       = 0x00000002,
-        ActionMsg       = 0x00000003,
-        NickMsg         = 0x00000004,
-        ModeMsg         = 0x00000005,
-        JoinMsg         = 0x00000006,
-        PartMsg         = 0x00000007,
-        QuitMsg         = 0x00000008,
-        KickMsg         = 0x00000009,
-        KillMsg         = 0x0000000a,
-        ServerMsg       = 0x0000000b,
-        InfoMsg         = 0x0000000c,
-        ErrorMsg        = 0x0000000d,
-        DayChangeMsg    = 0x0000000e,
-        TopicMsg        = 0x0000000f,
+        PlainMsg = 0x00000001,
+        NoticeMsg = 0x00000002,
+        ActionMsg = 0x00000003,
+        NickMsg = 0x00000004,
+        ModeMsg = 0x00000005,
+        JoinMsg = 0x00000006,
+        PartMsg = 0x00000007,
+        QuitMsg = 0x00000008,
+        KickMsg = 0x00000009,
+        KillMsg = 0x0000000a,
+        ServerMsg = 0x0000000b,
+        InfoMsg = 0x0000000c,
+        ErrorMsg = 0x0000000d,
+        DayChangeMsg = 0x0000000e,
+        TopicMsg = 0x0000000f,
         NetsplitJoinMsg = 0x00000010,
         NetsplitQuitMsg = 0x00000020,
-        InviteMsg       = 0x00000030,
+        InviteMsg = 0x00000030,
 
         // Standard Formats
-        Bold            = 0x00000100,
-        Italic          = 0x00000200,
-        Underline       = 0x00000400,
-        Strikethrough   = 0x00000800,
+        Bold = 0x00000100,
+        Italic = 0x00000200,
+        Underline = 0x00000400,
+        Strikethrough = 0x00000800,
 
         // Individual parts of a message
-        Timestamp       = 0x00001000,
-        Sender          = 0x00002000,
-        Contents        = 0x00004000,
-        Nick            = 0x00008000,
-        Hostmask        = 0x00010000,
-        ChannelName     = 0x00020000,
-        ModeFlags       = 0x00040000,
+        Timestamp = 0x00001000,
+        Sender = 0x00002000,
+        Contents = 0x00004000,
+        Nick = 0x00008000,
+        Hostmask = 0x00010000,
+        ChannelName = 0x00020000,
+        ModeFlags = 0x00040000,
 
         // URL is special, we want that to take precedence over the rest...
-        Url             = 0x00080000
+        Url = 0x00080000
 
         // mIRC Colors - we assume those to be present only in plain contents
         // foreground: 0x0.400000
@@ -111,34 +103,34 @@ public:
 
     enum class MessageLabel : quint32
     {
-        None      = 0x00000000,
-        OwnMsg    = 0x00000001,
+        None = 0x00000000,
+        OwnMsg = 0x00000001,
         Highlight = 0x00000002,
-        Selected  = 0x00000004,
-        Hovered   = 0x00000008,
-        Last      = Hovered
+        Selected = 0x00000004,
+        Hovered = 0x00000008,
+        Last = Hovered
     };
 
     enum class ItemFormatType : quint32
     {
         None = 0x00000000,
 
-        BufferViewItem    = 0x00000001,
-        NickViewItem      = 0x00000002,
+        BufferViewItem = 0x00000001,
+        NickViewItem = 0x00000002,
 
-        NetworkItem       = 0x00000010,
+        NetworkItem = 0x00000010,
         ChannelBufferItem = 0x00000020,
-        QueryBufferItem   = 0x00000040,
-        IrcUserItem       = 0x00000080,
-        UserCategoryItem  = 0x00000100,
+        QueryBufferItem = 0x00000040,
+        IrcUserItem = 0x00000080,
+        UserCategoryItem = 0x00000100,
 
-        InactiveBuffer    = 0x00001000,
-        ActiveBuffer      = 0x00002000,
-        UnreadBuffer      = 0x00004000,
+        InactiveBuffer = 0x00001000,
+        ActiveBuffer = 0x00002000,
+        UnreadBuffer = 0x00004000,
         HighlightedBuffer = 0x00008000,
-        UserAway          = 0x00010000,
+        UserAway = 0x00010000,
 
-        Invalid           = 0xffffffff
+        Invalid = 0xffffffff
     };
 
     enum class FormatProperty
@@ -180,9 +172,9 @@ public:
     /// Display of sender prefix modes
     enum class SenderPrefixMode
     {
-        NoModes     = 0, ///< Hide sender modes
-        HighestMode = 1, ///< Show the highest active sender mode
-        AllModes    = 2  ///< Show all active sender modes
+        NoModes = 0,      ///< Hide sender modes
+        HighestMode = 1,  ///< Show the highest active sender mode
+        AllModes = 2      ///< Show all active sender modes
     };
     // Do not change SenderPrefixMode numbering without also adjusting
     // ChatViewSettingsPage::initSenderPrefixComboBox() and chatviewsettingspage.ui "defaultValue"
@@ -214,22 +206,22 @@ public:
      * @see UiStyle::ColorRole
      */
     const QList<QColor> defaultSenderColors = QList<QColor>{
-        QColor(204, 0  , 0  ),    ///< Sender00
-        QColor(0  , 108, 173),  ///< Sender01
-        QColor(77 , 153, 0  ),   ///< Sender02
-        QColor(102, 0  , 204),  ///< Sender03
-        QColor(166, 125, 0  ),  ///< Sender04
-        QColor(0  , 153, 39 ),   ///< Sender05
-        QColor(0  , 48 , 192),   ///< Sender06
-        QColor(204, 0  , 154),  ///< Sender07
-        QColor(185, 70 , 0  ),   ///< Sender08
-        QColor(134, 153,   0),  ///< Sender09
-        QColor(20 , 153,   0),   ///< Sender10
-        QColor(0  , 153,  96),   ///< Sender11
-        QColor(0  , 108, 173),  ///< Sender12
-        QColor(0  , 153, 204),  ///< Sender13
-        QColor(179, 0  , 204),  ///< Sender14
-        QColor(204, 0  , 77 ),   ///< Sender15
+        QColor(204, 0, 0),    ///< Sender00
+        QColor(0, 108, 173),  ///< Sender01
+        QColor(77, 153, 0),   ///< Sender02
+        QColor(102, 0, 204),  ///< Sender03
+        QColor(166, 125, 0),  ///< Sender04
+        QColor(0, 153, 39),   ///< Sender05
+        QColor(0, 48, 192),   ///< Sender06
+        QColor(204, 0, 154),  ///< Sender07
+        QColor(185, 70, 0),   ///< Sender08
+        QColor(134, 153, 0),  ///< Sender09
+        QColor(20, 153, 0),   ///< Sender10
+        QColor(0, 153, 96),   ///< Sender11
+        QColor(0, 108, 173),  ///< Sender12
+        QColor(0, 153, 204),  ///< Sender13
+        QColor(179, 0, 204),  ///< Sender14
+        QColor(204, 0, 77),   ///< Sender15
     };
     // Explicitly declare QList<QColor> type for defaultSenderColors, otherwise error C2797
     // "list initialization inside member initializer list" will occur in Windows builds with Visual

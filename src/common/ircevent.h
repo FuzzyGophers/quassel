@@ -14,13 +14,13 @@
 class COMMON_EXPORT IrcEvent : public NetworkEvent
 {
 public:
-    explicit IrcEvent(
-        EventManager::EventType type, Network* network, QHash<IrcTagKey, QString> tags, QString prefix, QStringList params = {})
+    explicit IrcEvent(EventManager::EventType type, Network* network, QHash<IrcTagKey, QString> tags, QString prefix, QStringList params = {})
         : NetworkEvent(type, network)
         , _tags(std::move(tags))
         , _prefix(std::move(prefix))
         , _params(std::move(params))
-    {}
+    {
+    }
 
     inline QString prefix() const { return _prefix; }
     inline void setPrefix(const QString& prefix) { _prefix = prefix; }
@@ -55,16 +55,13 @@ private:
 class COMMON_EXPORT IrcEventNumeric : public IrcEvent
 {
 public:
-    explicit IrcEventNumeric(uint number,
-                             Network* network,
-                             QHash<IrcTagKey, QString> tags,
-                             QString prefix,
-                             QString target,
-                             QStringList params = {})
+    explicit IrcEventNumeric(
+        uint number, Network* network, QHash<IrcTagKey, QString> tags, QString prefix, QString target, QStringList params = {})
         : IrcEvent(EventManager::IrcEventNumeric, network, std::move(tags), std::move(prefix), std::move(params))
         , _number(number)
         , _target(std::move(target))
-    {}
+    {
+    }
 
     inline uint number() const { return _number; }
 
@@ -80,9 +77,7 @@ protected:
     {
         dbg << ", num = " << number();
         NetworkEvent::debugInfo(dbg);
-        dbg << ", target = " << qPrintable(target())
-            << ", prefix = " << qPrintable(prefix())
-            << ", params = " << params();
+        dbg << ", target = " << qPrintable(target()) << ", prefix = " << qPrintable(prefix()) << ", params = " << params();
     }
 
 private:
@@ -122,9 +117,7 @@ protected:
     inline void debugInfo(QDebug& dbg) const override
     {
         NetworkEvent::debugInfo(dbg);
-        dbg << ", target = " << qPrintable(target())
-            << ", prefix = " << qPrintable(prefix())
-            << ", msg = " << rawMessage();
+        dbg << ", target = " << qPrintable(target()) << ", prefix = " << qPrintable(prefix()) << ", msg = " << rawMessage();
     }
 
 private:

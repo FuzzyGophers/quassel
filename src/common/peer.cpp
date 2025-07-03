@@ -6,7 +6,8 @@
 Peer::Peer(AuthHandler* authHandler, QObject* parent)
     : QObject(parent)
     , _authHandler(authHandler)
-{}
+{
+}
 
 AuthHandler* Peer::authHandler() const
 {

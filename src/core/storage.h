@@ -508,7 +508,8 @@ public:
                                                      MsgId last = -1,
                                                      int limit = -1,
                                                      Message::Types type = Message::Types{-1},
-                                                     Message::Flags flags = Message::Flags{-1}) = 0;
+                                                     Message::Flags flags = Message::Flags{-1})
+        = 0;
 
     //! Request a certain number messages stored in a given buffer, matching certain filters, ascending
     /** \param buffer   The buffer we request messages from
@@ -525,7 +526,8 @@ public:
                                                     MsgId last = -1,
                                                     int limit = -1,
                                                     Message::Types type = Message::Types{-1},
-                                                    Message::Flags flags = Message::Flags{-1}) = 0;
+                                                    Message::Flags flags = Message::Flags{-1})
+        = 0;
 
     //! Request a certain number of messages across all buffers
     /** \param first    if != -1 return only messages with a MsgId >= first
@@ -547,7 +549,8 @@ public:
                                                         MsgId last = -1,
                                                         int limit = -1,
                                                         Message::Types type = Message::Types{-1},
-                                                        Message::Flags flags = Message::Flags{-1}) = 0;
+                                                        Message::Flags flags = Message::Flags{-1})
+        = 0;
 
     //! Fetch all authusernames
     /** \return      Map of all current UserIds to permitted idents

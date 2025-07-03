@@ -3,11 +3,11 @@
 
 #include "qssparser.h"
 
-#include <QRegularExpressionMatch>
 #include <tuple>
 #include <utility>
 
 #include <QApplication>
+#include <QRegularExpressionMatch>
 
 QssParser::QssParser()
 {
@@ -99,7 +99,8 @@ void QssParser::processStyleSheet(QString& ss)
     // Log the final stylesheet for debugging
     if (ss.trimmed().isEmpty()) {
         qWarning() << Q_FUNC_INFO << tr("Processed stylesheet is empty");
-    } else {
+    }
+    else {
         qDebug() << Q_FUNC_INFO << tr("Processed stylesheet: %1").arg(ss);
     }
 }
@@ -585,7 +586,8 @@ QBrush QssParser::parseBrush(const QString& str, bool* ok)
     }
     else if (str.startsWith("qradialgradient")) {
         static const QString rxFloat(R"(\s*(-?\s*[0-9]*\.?[0-9]+)\s*)");
-        static const QRegularExpression rx(QString(R"(qradialgradient\s*\(\s*cx:%1,\s*cy:%1,\s*radius:%1,\s*fx:%1,\s*fy:%1,(.+)\))").arg(rxFloat));
+        static const QRegularExpression rx(
+            QString(R"(qradialgradient\s*\(\s*cx:%1,\s*cy:%1,\s*radius:%1,\s*fx:%1,\s*fy:%1,(.+)\))").arg(rxFloat));
         QRegularExpressionMatch match = rx.match(str);
         if (!match.hasMatch()) {
             qWarning() << Q_FUNC_INFO << tr("Invalid gradient declaration: %1").arg(str);

@@ -156,7 +156,8 @@ class COMMON_EXPORT CertManager : public SyncableObject
 public:
     CertManager(IdentityId id, QObject* parent = nullptr)
         : SyncableObject(QString::number(id.toInt()), parent)
-    {}
+    {
+    }
 
     virtual const QSslKey& sslKey() const = 0;
     inline QByteArray sslKeyPem() const { return sslKey().toPem(); }

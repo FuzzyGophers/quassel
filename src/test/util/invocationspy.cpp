@@ -8,7 +8,8 @@ namespace test {
 InvocationSpy::InvocationSpy(QObject* parent)
     : QObject(parent)
     , _internalSpy{this, &InvocationSpy::notified}
-{}
+{
+}
 
 void InvocationSpy::notify()
 {

@@ -14,7 +14,8 @@
 
 CoreUserInputHandler::CoreUserInputHandler(CoreNetwork* parent)
     : CoreBasicHandler(parent)
-{}
+{
+}
 
 void CoreUserInputHandler::handleUserInput(const BufferInfo& bufferInfo, const QString& msg)
 {
@@ -105,12 +106,10 @@ void CoreUserInputHandler::banOrUnban(const BufferInfo& bufferInfo, const QStrin
         banChannel = bufferInfo.bufferName();
     }
     else {
-        emit displayMsg(NetworkInternalMessage(
-            Message::Error,
-            BufferInfo::StatusBuffer,
-            "",
-            QString("Error: channel unknown in command: /BAN %1").arg(msg)
-        ));
+        emit displayMsg(NetworkInternalMessage(Message::Error,
+                                               BufferInfo::StatusBuffer,
+                                               "",
+                                               QString("Error: channel unknown in command: /BAN %1").arg(msg)));
         return;
     }
 
@@ -119,12 +118,10 @@ void CoreUserInputHandler::banOrUnban(const BufferInfo& bufferInfo, const QStrin
         // generalizedHost changes <nick> to  *!ident@*.sld.tld.
         QString generalizedHost = ircuser->host();
         if (generalizedHost.isEmpty()) {
-            emit displayMsg(NetworkInternalMessage(
-                Message::Error,
-                BufferInfo::StatusBuffer,
-                "",
-                QString("Error: host unknown in command: /BAN %1").arg(msg)
-            ));
+            emit displayMsg(NetworkInternalMessage(Message::Error,
+                                                   BufferInfo::StatusBuffer,
+                                                   "",
+                                                   QString("Error: host unknown in command: /BAN %1").arg(msg)));
             return;
         }
 
@@ -133,7 +130,8 @@ void CoreUserInputHandler::banOrUnban(const BufferInfo& bufferInfo, const QStrin
         if (match.hasMatch()) {
             int lastDotPos = generalizedHost.lastIndexOf('.') + 1;
             generalizedHost.replace(lastDotPos, generalizedHost.length() - lastDotPos, "*");
-        } else if (generalizedHost.lastIndexOf(".") != -1 && generalizedHost.lastIndexOf(".", generalizedHost.lastIndexOf(".") - 1) != -1) {
+        }
+        else if (generalizedHost.lastIndexOf(".") != -1 && generalizedHost.lastIndexOf(".", generalizedHost.lastIndexOf(".") - 1) != -1) {
             int secondLastPeriodPosition = generalizedHost.lastIndexOf(".", generalizedHost.lastIndexOf(".") - 1);
             generalizedHost.replace(0, secondLastPeriodPosition, "*");
         }
@@ -167,14 +165,8 @@ void CoreUserInputHandler::handleCtcp(const BufferInfo& bufferInfo, const QStrin
     // FIXME make this a proper event
     coreNetwork()->coreSession()->ctcpParser()->query(coreNetwork(), nick, ctcpTag, message);
     if (!network()->capEnabled(IrcCap::ECHO_MESSAGE)) {
-        emit displayMsg(NetworkInternalMessage(
-            Message::Action,
-            BufferInfo::StatusBuffer,
-            "",
-            verboseMessage,
-            network()->myNick(),
-            Message::Flag::Self
-        ));
+        emit displayMsg(
+            NetworkInternalMessage(Message::Action, BufferInfo::StatusBuffer, "", verboseMessage, network()->myNick(), Message::Flag::Self));
     }
 }
 
@@ -186,12 +178,10 @@ void CoreUserInputHandler::handleDelkey(const BufferInfo& bufferInfo, const QStr
         return;
 
     if (!Cipher::neededFeaturesAvailable()) {
-        emit displayMsg(NetworkInternalMessage(
-            Message::Error,
-            typeByTarget(bufname),
-            bufname,
-            tr("Error: QCA provider plugin not found. It is usually provided by the qca-ossl plugin.")
-        ));
+        emit displayMsg(NetworkInternalMessage(Message::Error,
+                                               typeByTarget(bufname),
+                                               bufname,
+                                               tr("Error: QCA provider plugin not found. It is usually provided by the qca-ossl plugin.")));
         return;
     }
 
@@ -206,42 +196,29 @@ void CoreUserInputHandler::handleDelkey(const BufferInfo& bufferInfo, const QStr
             typeByTarget(bufname),
             bufname,
             tr("[usage] /delkey <nick|channel> deletes the encryption key for nick or channel or just /delkey when in a "
-               "channel or query.")
-        ));
+               "channel or query.")));
         return;
     }
 
     QString target = parms.at(0);
 
     if (network()->cipherKey(target).isEmpty()) {
-        emit displayMsg(NetworkInternalMessage(
-            Message::Info,
-            typeByTarget(bufname),
-            bufname,
-            tr("No key has been set for %1.").arg(target)
-        ));
+        emit displayMsg(NetworkInternalMessage(Message::Info, typeByTarget(bufname), bufname, tr("No key has been set for %1.").arg(target)));
         return;
     }
 
     network()->setCipherKey(target, QByteArray());
-    emit displayMsg(NetworkInternalMessage(
-        Message::Info,
-        typeByTarget(bufname),
-        bufname,
-        tr("The key for %1 has been deleted.").arg(target)
-    ));
+    emit displayMsg(NetworkInternalMessage(Message::Info, typeByTarget(bufname), bufname, tr("The key for %1 has been deleted.").arg(target)));
 
 #else
     Q_UNUSED(msg)
-    emit displayMsg(NetworkInternalMessage(
-        Message::Error,
-        typeByTarget(bufname),
-        bufname,
-        tr("Error: Setting an encryption key requires Quassel to have been built "
-           "with support for the Qt Cryptographic Architecture (QCA2) library. "
-           "Contact your distributor about a Quassel package with QCA2 "
-           "support, or rebuild Quassel with QCA2 present.")
-    ));
+    emit displayMsg(NetworkInternalMessage(Message::Error,
+                                           typeByTarget(bufname),
+                                           bufname,
+                                           tr("Error: Setting an encryption key requires Quassel to have been built "
+                                              "with support for the Qt Cryptographic Architecture (QCA2) library. "
+                                              "Contact your distributor about a Quassel package with QCA2 "
+                                              "support, or rebuild Quassel with QCA2 present.")));
 #endif
 }
 
@@ -382,12 +359,10 @@ void CoreUserInputHandler::handleKeyx(const BufferInfo& bufferInfo, const QStrin
         return;
 
     if (!Cipher::neededFeaturesAvailable()) {
-        emit displayMsg(NetworkInternalMessage(
-            Message::Error,
-            typeByTarget(bufname),
-            bufname,
-            tr("Error: QCA provider plugin not found. It is usually provided by the qca-ossl plugin.")
-        ));
+        emit displayMsg(NetworkInternalMessage(Message::Error,
+                                               typeByTarget(bufname),
+                                               bufname,
+                                               tr("Error: QCA provider plugin not found. It is usually provided by the qca-ossl plugin.")));
         return;
     }
 
@@ -396,24 +371,20 @@ void CoreUserInputHandler::handleKeyx(const BufferInfo& bufferInfo, const QStrin
     if (parms.count() == 0 && !bufferInfo.bufferName().isEmpty() && bufferInfo.acceptsRegularMessages())
         parms.prepend(bufferInfo.bufferName());
     else if (parms.count() != 1) {
-        emit displayMsg(NetworkInternalMessage(
-            Message::Info,
-            typeByTarget(bufname),
-            bufname,
-            tr("[usage] /keyx [<nick>] Initiates a DH1080 key exchange with the target.")
-        ));
+        emit displayMsg(NetworkInternalMessage(Message::Info,
+                                               typeByTarget(bufname),
+                                               bufname,
+                                               tr("[usage] /keyx [<nick>] Initiates a DH1080 key exchange with the target.")));
         return;
     }
 
     QString target = parms.at(0);
 
     if (network()->isChannelName(target)) {
-        emit displayMsg(NetworkInternalMessage(
-            Message::Info,
-            typeByTarget(bufname),
-            bufname,
-            tr("It is only possible to exchange keys in a query buffer.")
-        ));
+        emit displayMsg(NetworkInternalMessage(Message::Info,
+                                               typeByTarget(bufname),
+                                               bufname,
+                                               tr("It is only possible to exchange keys in a query buffer.")));
         return;
     }
 
@@ -423,34 +394,24 @@ void CoreUserInputHandler::handleKeyx(const BufferInfo& bufferInfo, const QStrin
 
     QByteArray pubKey = cipher->initKeyExchange();
     if (pubKey.isEmpty())
-        emit displayMsg(NetworkInternalMessage(
-            Message::Error,
-            typeByTarget(bufname),
-            bufname,
-            tr("Failed to initiate key exchange with %1.").arg(target)
-        ));
+        emit displayMsg(
+            NetworkInternalMessage(Message::Error, typeByTarget(bufname), bufname, tr("Failed to initiate key exchange with %1.").arg(target)));
     else {
         QList<QByteArray> params;
         params << serverEncode(target) << serverEncode("DH1080_INIT ") + pubKey;
         emit putCmd("NOTICE", params);
-        emit displayMsg(NetworkInternalMessage(
-            Message::Info,
-            typeByTarget(bufname),
-            bufname,
-            tr("Initiated key exchange with %1.").arg(target)
-        ));
+        emit displayMsg(
+            NetworkInternalMessage(Message::Info, typeByTarget(bufname), bufname, tr("Initiated key exchange with %1.").arg(target)));
     }
 #else
     Q_UNUSED(msg)
-    emit displayMsg(NetworkInternalMessage(
-        Message::Error,
-        typeByTarget(bufname),
-        bufname,
-        tr("Error: Setting an encryption key requires Quassel to have been built "
-           "with support for the Qt Cryptographic Architecture (QCA) library. "
-           "Contact your distributor about a Quassel package with QCA "
-           "support, or rebuild Quassel with QCA present.")
-    ));
+    emit displayMsg(NetworkInternalMessage(Message::Error,
+                                           typeByTarget(bufname),
+                                           bufname,
+                                           tr("Error: Setting an encryption key requires Quassel to have been built "
+                                              "with support for the Qt Cryptographic Architecture (QCA) library. "
+                                              "Contact your distributor about a Quassel package with QCA "
+                                              "support, or rebuild Quassel with QCA present.")));
 #endif
 }
 
@@ -496,14 +457,8 @@ void CoreUserInputHandler::handleMe(const BufferInfo& bufferInfo, const QString&
         // Handle each separated message independently
         coreNetwork()->coreSession()->ctcpParser()->query(coreNetwork(), bufferInfo.bufferName(), "ACTION", message);
         if (!network()->capEnabled(IrcCap::ECHO_MESSAGE)) {
-            emit displayMsg(NetworkInternalMessage(
-                Message::Action,
-                bufferInfo.type(),
-                bufferInfo.bufferName(),
-                message,
-                network()->myNick(),
-                Message::Self
-            ));
+            emit displayMsg(
+                NetworkInternalMessage(Message::Action, bufferInfo.type(), bufferInfo.bufferName(), message, network()->myNick(), Message::Self));
         }
     }
 }
@@ -516,12 +471,7 @@ void CoreUserInputHandler::handleMode(const BufferInfo& bufferInfo, const QStrin
     if (!params.isEmpty()) {
         if (params[0] == "-reset" && params.count() == 1) {
             network()->resetPersistentModes();
-            emit displayMsg(NetworkInternalMessage(
-                Message::Info,
-                BufferInfo::StatusBuffer,
-                "",
-                tr("Your persistent modes have been reset.")
-            ));
+            emit displayMsg(NetworkInternalMessage(Message::Info, BufferInfo::StatusBuffer, "", tr("Your persistent modes have been reset.")));
             return;
         }
         if (!network()->isChannelName(params[0]) && !network()->isMyNick(params[0]))
@@ -578,14 +528,8 @@ void CoreUserInputHandler::handleNotice(const BufferInfo& bufferInfo, const QStr
         params << serverEncode(bufferName) << channelEncode(bufferInfo.bufferName(), message);
         emit putCmd("NOTICE", params);
         if (!network()->capEnabled(IrcCap::ECHO_MESSAGE)) {
-            emit displayMsg(NetworkInternalMessage(
-                Message::Notice,
-                typeByTarget(bufferName),
-                bufferName,
-                message,
-                network()->myNick(),
-                Message::Self
-            ));
+            emit displayMsg(
+                NetworkInternalMessage(Message::Notice, typeByTarget(bufferName), bufferName, message, network()->myNick(), Message::Self));
         }
     }
 }
@@ -636,14 +580,8 @@ void CoreUserInputHandler::handlePrint(const BufferInfo& bufferInfo, const QStri
         return;  // server buffer
 
     QByteArray encMsg = channelEncode(bufferInfo.bufferName(), msg);
-    emit displayMsg(NetworkInternalMessage(
-        Message::Info,
-        bufferInfo.type(),
-        bufferInfo.bufferName(),
-        msg,
-        network()->myNick(),
-        Message::Self
-    ));
+    emit displayMsg(
+        NetworkInternalMessage(Message::Info, bufferInfo.type(), bufferInfo.bufferName(), msg, network()->myNick(), Message::Self));
 }
 
 // TODO: implement queries
@@ -658,26 +596,18 @@ void CoreUserInputHandler::handleQuery(const BufferInfo& bufferInfo, const QStri
     for (const auto& message : messages) {
         // Handle each separated message independently
         if (message.isEmpty()) {
-            emit displayMsg(NetworkInternalMessage(
-                Message::Server,
-                BufferInfo::QueryBuffer,
-                target,
-                tr("Starting query with %1").arg(target),
-                network()->myNick(),
-                Message::Self
-            ));
+            emit displayMsg(NetworkInternalMessage(Message::Server,
+                                                   BufferInfo::QueryBuffer,
+                                                   target,
+                                                   tr("Starting query with %1").arg(target),
+                                                   network()->myNick(),
+                                                   Message::Self));
             // handleMsg is a no-op if message is empty
         }
         else {
             if (!network()->capEnabled(IrcCap::ECHO_MESSAGE)) {
-                emit displayMsg(NetworkInternalMessage(
-                    Message::Plain,
-                    BufferInfo::QueryBuffer,
-                    target,
-                    message,
-                    network()->myNick(),
-                    Message::Self
-                ));
+                emit displayMsg(
+                    NetworkInternalMessage(Message::Plain, BufferInfo::QueryBuffer, target, message, network()->myNick(), Message::Self));
             }
             // handleMsg needs the target specified at the beginning of the message
             handleMsg(bufferInfo, target + " " + message);
@@ -723,14 +653,8 @@ void CoreUserInputHandler::handleSay(const BufferInfo& bufferInfo, const QString
         putPrivmsg(bufferInfo.bufferName(), message, encodeFunc);
 #endif
         if (!network()->capEnabled(IrcCap::ECHO_MESSAGE)) {
-            emit displayMsg(NetworkInternalMessage(
-                Message::Plain,
-                bufferInfo.type(),
-                bufferInfo.bufferName(),
-                message,
-                network()->myNick(),
-                Message::Self
-            ));
+            emit displayMsg(
+                NetworkInternalMessage(Message::Plain, bufferInfo.type(), bufferInfo.bufferName(), message, network()->myNick(), Message::Self));
         }
     }
 }
@@ -743,12 +667,10 @@ void CoreUserInputHandler::handleSetkey(const BufferInfo& bufferInfo, const QStr
         return;
 
     if (!Cipher::neededFeaturesAvailable()) {
-        emit displayMsg(NetworkInternalMessage(
-            Message::Error,
-            typeByTarget(bufname),
-            bufname,
-            tr("Error: QCA provider plugin not found. It is usually provided by the qca-ossl plugin.")
-        ));
+        emit displayMsg(NetworkInternalMessage(Message::Error,
+                                               typeByTarget(bufname),
+                                               bufname,
+                                               tr("Error: QCA provider plugin not found. It is usually provided by the qca-ossl plugin.")));
         return;
     }
 
@@ -757,14 +679,13 @@ void CoreUserInputHandler::handleSetkey(const BufferInfo& bufferInfo, const QStr
     if (parms.count() == 1 && !bufferInfo.bufferName().isEmpty() && bufferInfo.acceptsRegularMessages())
         parms.prepend(bufferInfo.bufferName());
     else if (parms.count() != 2) {
-        emit displayMsg(NetworkInternalMessage(
-            Message::Info,
-            typeByTarget(bufname),
-            bufname,
-            tr("[usage] /setkey <nick|channel> <key> sets the encryption key for nick or channel. "
-               "/setkey <key> when in a channel or query buffer sets the key for it. "
-               "Prefix <key> by cbc: or ebc: to explicitly set the encryption mode respectively. Default is CBC.")
-        ));
+        emit displayMsg(
+            NetworkInternalMessage(Message::Info,
+                                   typeByTarget(bufname),
+                                   bufname,
+                                   tr("[usage] /setkey <nick|channel> <key> sets the encryption key for nick or channel. "
+                                      "/setkey <key> when in a channel or query buffer sets the key for it. "
+                                      "Prefix <key> by cbc: or ebc: to explicitly set the encryption mode respectively. Default is CBC.")));
         return;
     }
 
@@ -772,23 +693,16 @@ void CoreUserInputHandler::handleSetkey(const BufferInfo& bufferInfo, const QStr
     QByteArray key = parms.at(1).toLocal8Bit();
     network()->setCipherKey(target, key);
 
-    emit displayMsg(NetworkInternalMessage(
-        Message::Info,
-        typeByTarget(bufname),
-        bufname,
-        tr("The key for %1 has been set.").arg(target)
-    ));
+    emit displayMsg(NetworkInternalMessage(Message::Info, typeByTarget(bufname), bufname, tr("The key for %1 has been set.").arg(target)));
 #else
     Q_UNUSED(msg)
-    emit displayMsg(NetworkInternalMessage(
-        Message::Error,
-        typeByTarget(bufname),
-        bufname,
-        tr("Error: Setting an encryption key requires Quassel to have been built "
-           "with support for the Qt Cryptographic Architecture (QCA2) library. "
-           "Contact your distributor about a Quassel package with QCA2 "
-           "support, or rebuild Quassel with QCA2 present.")
-    ));
+    emit displayMsg(NetworkInternalMessage(Message::Error,
+                                           typeByTarget(bufname),
+                                           bufname,
+                                           tr("Error: Setting an encryption key requires Quassel to have been built "
+                                              "with support for the Qt Cryptographic Architecture (QCA2) library. "
+                                              "Contact your distributor about a Quassel package with QCA2 "
+                                              "support, or rebuild Quassel with QCA2 present.")));
 #endif
 }
 
@@ -806,12 +720,10 @@ void CoreUserInputHandler::handleShowkey(const BufferInfo& bufferInfo, const QSt
         return;
 
     if (!Cipher::neededFeaturesAvailable()) {
-        emit displayMsg(NetworkInternalMessage(
-            Message::Error,
-            typeByTarget(bufname),
-            bufname,
-            tr("Error: QCA provider plugin not found. It is usually provided by the qca-ossl plugin.")
-        ));
+        emit displayMsg(NetworkInternalMessage(Message::Error,
+                                               typeByTarget(bufname),
+                                               bufname,
+                                               tr("Error: QCA provider plugin not found. It is usually provided by the qca-ossl plugin.")));
         return;
     }
 
@@ -826,8 +738,7 @@ void CoreUserInputHandler::handleShowkey(const BufferInfo& bufferInfo, const QSt
             typeByTarget(bufname),
             bufname,
             tr("[usage] /showkey <nick|channel> shows the encryption key for nick or channel or just /showkey when in a "
-               "channel or query.")
-        ));
+               "channel or query.")));
         return;
     }
 
@@ -835,33 +746,25 @@ void CoreUserInputHandler::handleShowkey(const BufferInfo& bufferInfo, const QSt
     QByteArray key = network()->cipherKey(target);
 
     if (key.isEmpty()) {
-        emit displayMsg(NetworkInternalMessage(
-            Message::Info,
-            typeByTarget(bufname),
-            bufname,
-            tr("No key has been set for %1.").arg(target)
-        ));
+        emit displayMsg(NetworkInternalMessage(Message::Info, typeByTarget(bufname), bufname, tr("No key has been set for %1.").arg(target)));
         return;
     }
 
-    emit displayMsg(NetworkInternalMessage(
-        Message::Info,
-        typeByTarget(bufname),
-        bufname,
-        tr("The key for %1 is %2:%3").arg(target, network()->cipherUsesCBC(target) ? "CBC" : "ECB", QString(key))
-    ));
+    emit displayMsg(
+        NetworkInternalMessage(Message::Info,
+                               typeByTarget(bufname),
+                               bufname,
+                               tr("The key for %1 is %2:%3").arg(target, network()->cipherUsesCBC(target) ? "CBC" : "ECB", QString(key))));
 
 #else
     Q_UNUSED(msg)
-    emit displayMsg(NetworkInternalMessage(
-        Message::Error,
-        typeByTarget(bufname),
-        bufname,
-        tr("Error: Setting an encryption key requires Quassel to have been built "
-           "with support for the Qt Cryptographic Architecture (QCA2) library. "
-           "Contact your distributor about a Quassel package with QCA2 "
-           "support, or rebuild Quassel with QCA2 present.")
-    ));
+    emit displayMsg(NetworkInternalMessage(Message::Error,
+                                           typeByTarget(bufname),
+                                           bufname,
+                                           tr("Error: Setting an encryption key requires Quassel to have been built "
+                                              "with support for the Qt Cryptographic Architecture (QCA2) library. "
+                                              "Contact your distributor about a Quassel package with QCA2 "
+                                              "support, or rebuild Quassel with QCA2 present.")));
 #endif
 }
 

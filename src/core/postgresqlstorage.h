@@ -154,12 +154,24 @@ protected:
     QSqlQuery executePreparedQuery(const QString& queryname, const QVariant& param, QSqlDatabase& db);
     void deallocateQuery(const QString& queryname, const QSqlDatabase& db);
 
-    void savePoint(const QString& handle, const QSqlDatabase& db) {
-        QSqlQuery query(db); query.prepare(QString("SAVEPOINT %1").arg(handle)); query.exec(); }
-    void rollbackSavePoint(const QString& handle, const QSqlDatabase& db) {
-        QSqlQuery query(db); query.prepare(QString("ROLLBACK TO SAVEPOINT %1").arg(handle)); query.exec(); }
-    void releaseSavePoint(const QString& handle, const QSqlDatabase& db) {
-        QSqlQuery query(db); query.prepare(QString("RELEASE SAVEPOINT %1").arg(handle)); query.exec(); }
+    void savePoint(const QString& handle, const QSqlDatabase& db)
+    {
+        QSqlQuery query(db);
+        query.prepare(QString("SAVEPOINT %1").arg(handle));
+        query.exec();
+    }
+    void rollbackSavePoint(const QString& handle, const QSqlDatabase& db)
+    {
+        QSqlQuery query(db);
+        query.prepare(QString("ROLLBACK TO SAVEPOINT %1").arg(handle));
+        query.exec();
+    }
+    void releaseSavePoint(const QString& handle, const QSqlDatabase& db)
+    {
+        QSqlQuery query(db);
+        query.prepare(QString("RELEASE SAVEPOINT %1").arg(handle));
+        query.exec();
+    }
 
 private:
     void bindNetworkInfo(QSqlQuery& query, const NetworkInfo& info);
@@ -216,7 +228,8 @@ private:
         Sequence(const char* table, const char* field)
             : table(table)
             , field(field)
-        {}
+        {
+        }
     };
 
     QSet<int> _validIdentities;

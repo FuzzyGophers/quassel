@@ -38,7 +38,7 @@ public:
         ChannelDescription(QString channelName_, quint32 userCount_, QString topic_)
             : channelName(std::move(channelName_))
             , userCount(userCount_)
-            , topic(std::move(topic_)){};
+            , topic(std::move(topic_)) {};
     };
 
 public slots:
@@ -47,7 +47,7 @@ public slots:
         REQUEST(ARG(netId), ARG(channelFilters));
         return QVariantList();
     }
-    inline virtual void receiveChannelList(const NetworkId&, const QStringList&, const QVariantList&){};
+    inline virtual void receiveChannelList(const NetworkId&, const QStringList&, const QVariantList&) {};
     inline virtual void reportFinishedList(const NetworkId& netId) { SYNC(ARG(netId)) }
     inline virtual void reportError(const QString& error) { SYNC(ARG(error)) }
 };

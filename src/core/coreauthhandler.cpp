@@ -3,9 +3,8 @@
 
 #include "coreauthhandler.h"
 
-#include <QtEndian>
-
 #include <QSslSocket>
+#include <QtEndian>
 
 #include "core.h"
 
@@ -35,7 +34,7 @@ void CoreAuthHandler::onReadyRead()
 
     if (!_proxyReceived) {
         quint32 magic;
-        socket()->peek((char*) &magic, 4);
+        socket()->peek((char*)&magic, 4);
         magic = qFromBigEndian<quint32>(magic);
 
         if (magic == QuasselProtocol::proxyMagic) {
@@ -161,8 +160,8 @@ bool CoreAuthHandler::checkClientRegistered()
     if (!_clientRegistered) {
         qWarning() << qPrintable(tr("Client")) << qPrintable(hostAddress().toString())
                    << qPrintable(tr("did not send a registration message before trying to login, rejecting."));
-        _peer->dispatch(
-            QuasselProtocol::ClientDenied(tr("<b>Client not initialized!</b><br>You need to send a registration message before trying to login.")));
+        _peer->dispatch(QuasselProtocol::ClientDenied(
+            tr("<b>Client not initialized!</b><br>You need to send a registration message before trying to login.")));
         _peer->close();
         return false;
     }
@@ -179,7 +178,8 @@ void CoreAuthHandler::handle(const QuasselProtocol::RegisterClient& msg)
 
     if (Quassel::isOptionSet("require-ssl") && !useSsl && !_peer->isLocal()) {
         qInfo() << qPrintable(tr("SSL required but non-SSL connection attempt from %1").arg(hostAddress().toString()));
-        _peer->dispatch(QuasselProtocol::ClientDenied(tr("<b>SSL is required!</b><br>You need to use SSL in order to connect to this core.")));
+        _peer->dispatch(
+            QuasselProtocol::ClientDenied(tr("<b>SSL is required!</b><br>You need to use SSL in order to connect to this core.")));
         _peer->close();
         return;
     }
@@ -309,8 +309,7 @@ QHostAddress CoreAuthHandler::hostAddress() const
 
 bool CoreAuthHandler::isLocal() const
 {
-    return hostAddress() == QHostAddress::LocalHost ||
-           hostAddress() == QHostAddress::LocalHostIPv6;
+    return hostAddress() == QHostAddress::LocalHost || hostAddress() == QHostAddress::LocalHostIPv6;
 }
 
 /*** SSL Stuff ***/

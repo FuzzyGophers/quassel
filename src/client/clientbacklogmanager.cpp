@@ -16,7 +16,8 @@
 
 ClientBacklogManager::ClientBacklogManager(QObject* parent)
     : BacklogManager(parent)
-{}
+{
+}
 
 QVariantList ClientBacklogManager::requestBacklog(BufferId bufferId, MsgId first, MsgId last, int limit, int additional)
 {
@@ -74,7 +75,8 @@ void ClientBacklogManager::requestInitialBacklog()
 {
     if (_initBacklogRequested) {
         Q_ASSERT(_requester);
-        qWarning() << "ClientBacklogManager::requestInitialBacklog() called twice in the same session! (Backlog has already been requested)";
+        qWarning()
+            << "ClientBacklogManager::requestInitialBacklog() called twice in the same session! (Backlog has already been requested)";
         return;
     }
 

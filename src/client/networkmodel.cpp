@@ -432,7 +432,8 @@ QString BufferItem::toolTip(int column) const
  *****************************************/
 StatusBufferItem::StatusBufferItem(const BufferInfo& bufferInfo, NetworkItem* parent)
     : BufferItem(bufferInfo, parent)
-{}
+{
+}
 
 QString StatusBufferItem::toolTip(int column) const
 {

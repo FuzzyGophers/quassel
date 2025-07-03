@@ -4,9 +4,9 @@
 #include "ircencoder.h"
 
 QByteArray IrcEncoder::writeMessage(const QHash<IrcTagKey, QString>& tags,
-                                   const QByteArray& prefix,
-                                   const QString& cmd,
-                                   const QList<QByteArray>& params)
+                                    const QByteArray& prefix,
+                                    const QString& cmd,
+                                    const QList<QByteArray>& params)
 {
     QByteArray msg;
     writeTags(msg, tags);
@@ -19,12 +19,7 @@ QByteArray IrcEncoder::writeMessage(const QHash<IrcTagKey, QString>& tags,
 void IrcEncoder::writeTagValue(QByteArray& msg, const QString& value)
 {
     QString it = value;
-    msg += it.replace("\\", R"(\\)")
-             .replace(";", R"(\:)")
-             .replace(" ", R"(\s)")
-             .replace("\r", R"(\r)")
-             .replace("\n", R"(\n)")
-             .toUtf8();
+    msg += it.replace("\\", R"(\\)").replace(";", R"(\:)").replace(" ", R"(\s)").replace("\r", R"(\r)").replace("\n", R"(\n)").toUtf8();
 }
 
 void IrcEncoder::writeTags(QByteArray& msg, const QHash<IrcTagKey, QString>& tags)

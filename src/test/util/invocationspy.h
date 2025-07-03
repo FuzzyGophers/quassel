@@ -109,7 +109,8 @@ public:
      * @param sig The signal
      */
     template<typename TSender, typename TSignal>
-    void connect(const TSender* sender, TSignal sig) {
+    void connect(const TSender* sender, TSignal sig)
+    {
         _connections.emplace_back(QObject::connect(sender, sig, this, &SignalSpy::notify));
     }
 

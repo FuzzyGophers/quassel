@@ -9,7 +9,8 @@
 
 AuthHandler::AuthHandler(QObject* parent)
     : QObject(parent)
-{}
+{
+}
 
 QSslSocket* AuthHandler::socket() const
 {

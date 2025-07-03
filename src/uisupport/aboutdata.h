@@ -12,7 +12,11 @@
 class UISUPPORT_EXPORT AboutPerson
 {
 public:
-    AboutPerson(QString name, QString nick, QString task, QString emailAddress = QString(), QLocale::Language translatedLanguage = QLocale::AnyLanguage);
+    AboutPerson(QString name,
+                QString nick,
+                QString task,
+                QString emailAddress = QString(),
+                QLocale::Language translatedLanguage = QLocale::AnyLanguage);
 
     QString name() const;
     QString nick() const;

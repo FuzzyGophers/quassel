@@ -291,12 +291,9 @@ void ChatMonitorSettingsPage::on_showBacklogUnavailableDetails_clicked()
     QMessageBox::information(this,
                              tr("Messages from backlog are not fetched"),
                              QString("<p>%1</p><p>%2</p>")
-                                     .arg(tr("No initial backlog will be fetched when using the backlog request method of <i>%1</i>.")
-                                             .arg(tr("Only fetch when needed").replace(" ", "&nbsp;")),
-                                          tr("Configure this in the <i>%1</i> settings page.")
-                                             .arg(tr("Backlog Fetching").replace(" ", "&nbsp;"))
-                                     )
-    );
+                                 .arg(tr("No initial backlog will be fetched when using the backlog request method of <i>%1</i>.")
+                                          .arg(tr("Only fetch when needed").replace(" ", "&nbsp;")),
+                                      tr("Configure this in the <i>%1</i> settings page.").arg(tr("Backlog Fetching").replace(" ", "&nbsp;"))));
     // Re-use translations of "Only fetch when needed" and "Backlog Fetching" as this is a
     // word-for-word reference, forcing all spaces to be non-breaking
 }

@@ -7,7 +7,8 @@
 
 BufferSyncer::BufferSyncer(QObject* parent)
     : SyncableObject(parent)
-{}
+{
+}
 
 BufferSyncer::BufferSyncer(QHash<BufferId, MsgId> lastMsg,
                            QHash<BufferId, MsgId> lastSeenMsg,
@@ -21,7 +22,8 @@ BufferSyncer::BufferSyncer(QHash<BufferId, MsgId> lastMsg,
     , _markerLines(std::move(markerLines))
     , _bufferActivities(std::move(activities))
     , _highlightCounts(std::move(highlightCounts))
-{}
+{
+}
 
 MsgId BufferSyncer::lastMsg(BufferId buffer) const
 {

@@ -361,7 +361,7 @@ void ExpressionMatch::cacheRegEx()
         // MatchRegEx, they probably need to fix their regex rule.  For the other modes, there's
         // probably a bug in the parsing routines (which should also be fixed).
         qInfo() << "Could not parse expression match rule" << _sourceExpression << "(match mode:" << (int)_sourceMode
-                 << "), this rule will be ignored";
+                << "), this rule will be ignored";
     }
 }
 

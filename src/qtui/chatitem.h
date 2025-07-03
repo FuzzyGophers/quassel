@@ -155,7 +155,8 @@ class TimestampChatItem : public ChatItem
 public:
     TimestampChatItem(const QRectF& boundingRect, ChatLine* parent)
         : ChatItem(boundingRect, parent)
-    {}
+    {
+    }
     inline int type() const override { return ChatScene::TimestampChatItemType; }
     inline ChatLineModel::ColumnType column() const override { return ChatLineModel::TimestampColumn; }
 };
@@ -169,7 +170,8 @@ class SenderChatItem : public ChatItem
 public:
     SenderChatItem(const QRectF& boundingRect, ChatLine* parent)
         : ChatItem(boundingRect, parent)
-    {}
+    {
+    }
     inline ChatLineModel::ColumnType column() const override { return ChatLineModel::SenderColumn; }
     void handleClick(const QPointF& pos, ChatScene::ClickMode clickMode) override;
 
@@ -250,7 +252,8 @@ struct ContentsChatItemPrivate
     ContentsChatItemPrivate(ClickableList c, ContentsChatItem* parent)
         : contentsItem(parent)
         , clickables(std::move(c))
-    {}
+    {
+    }
 };
 
 class ContentsChatItem::WrapColumnFinder

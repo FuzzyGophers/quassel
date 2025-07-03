@@ -41,7 +41,8 @@ public:
             , type(type_)
             , sender(std::move(sender_))
             , message(std::move(msg_))
-        {}
+        {
+        }
     };
 
     using QObject::QObject;

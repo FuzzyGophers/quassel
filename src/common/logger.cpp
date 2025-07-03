@@ -96,7 +96,8 @@ void Logger::setup(bool keepMessages)
 
     if (mode == Quassel::RunMode::ClientOnly) {
         prgname = info.clientApplicationName;
-    } else if (mode == Quassel::RunMode::CoreOnly) {
+    }
+    else if (mode == Quassel::RunMode::CoreOnly) {
         prgname = info.coreApplicationName;
     }
 
@@ -208,27 +209,26 @@ void Logger::outputMessage(const LogEntry& message)
 #endif
 }
 
-
 QString Logger::LogEntry::toString() const
 {
     QString levelString;
 
     switch (logLevel) {
-        case Logger::LogLevel::Debug:
-            levelString = "[Debug] ";
-            break;
-        case Logger::LogLevel::Info:
-            levelString = "[Info ] ";
-            break;
-        case Logger::LogLevel::Warning:
-            levelString = "[Warn ] ";
-            break;
-        case Logger::LogLevel::Error:
-            levelString = "[Error] ";
-            break;
-        case Logger::LogLevel::Fatal:
-            levelString = "[FATAL] ";
-            break;
+    case Logger::LogLevel::Debug:
+        levelString = "[Debug] ";
+        break;
+    case Logger::LogLevel::Info:
+        levelString = "[Info ] ";
+        break;
+    case Logger::LogLevel::Warning:
+        levelString = "[Warn ] ";
+        break;
+    case Logger::LogLevel::Error:
+        levelString = "[Error] ";
+        break;
+    case Logger::LogLevel::Fatal:
+        levelString = "[FATAL] ";
+        break;
     }
 
     return timeStamp.toString("yyyy-MM-dd hh:mm:ss ") + levelString + message;

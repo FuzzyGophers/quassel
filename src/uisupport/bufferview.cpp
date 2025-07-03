@@ -478,7 +478,8 @@ void BufferView::changeBuffer(Direction direction)
                 newParent = lastNetIndex;
             if (model()->hasChildren(newParent)) {
                 // Treat an invalid QAbstractItemModel as an invalid QModelIndex
-                resultingIndex = (newParent.model() ? newParent.model()->index(model()->rowCount(newParent) - 1, 0, newParent) : QModelIndex());
+                resultingIndex = (newParent.model() ? newParent.model()->index(model()->rowCount(newParent) - 1, 0, newParent)
+                                                    : QModelIndex());
             }
             else
                 resultingIndex = newParent;
@@ -628,12 +629,13 @@ class ColorsChangedEvent : public QEvent
 {
 public:
     ColorsChangedEvent()
-        : QEvent(QEvent::User){};
+        : QEvent(QEvent::User) {};
 };
 
 BufferViewDelegate::BufferViewDelegate(QObject* parent)
     : QStyledItemDelegate(parent)
-{}
+{
+}
 
 void BufferViewDelegate::customEvent(QEvent* event)
 {
@@ -776,46 +778,46 @@ bool BufferViewDock::eventFilter(QObject* object, QEvent* event)
         return false;
     }
 
-   if (event->type() == QEvent::FocusOut) {
-       if (!config()->showSearch() && _filterEdit->text().isEmpty()) {
-           _filterEdit->setVisible(false);
-           return true;
-       }
-   }
-   else if (event->type() == QEvent::KeyRelease) {
-       auto keyEvent = static_cast<QKeyEvent*>(event);
+    if (event->type() == QEvent::FocusOut) {
+        if (!config()->showSearch() && _filterEdit->text().isEmpty()) {
+            _filterEdit->setVisible(false);
+            return true;
+        }
+    }
+    else if (event->type() == QEvent::KeyRelease) {
+        auto keyEvent = static_cast<QKeyEvent*>(event);
 
-       BufferView* view = bufferView();
-       if (!view) {
-           return false;
-       }
+        BufferView* view = bufferView();
+        if (!view) {
+            return false;
+        }
 
-       switch (keyEvent->key()) {
-       case Qt::Key_Escape: {
-           _filterEdit->clear();
+        switch (keyEvent->key()) {
+        case Qt::Key_Escape: {
+            _filterEdit->clear();
 
-           if (!_oldFocusItem) {
-               return false;
-           }
+            if (!_oldFocusItem) {
+                return false;
+            }
 
-           _oldFocusItem->setFocus();
-           _oldFocusItem = nullptr;
-           return true;
-       }
-       case Qt::Key_Down:
-           view->changeHighlight(BufferView::Backward);
-           return true;
-       case Qt::Key_Up:
-           view->changeHighlight(BufferView::Forward);
-           return true;
-       default:
-           break;
-       }
+            _oldFocusItem->setFocus();
+            _oldFocusItem = nullptr;
+            return true;
+        }
+        case Qt::Key_Down:
+            view->changeHighlight(BufferView::Backward);
+            return true;
+        case Qt::Key_Up:
+            view->changeHighlight(BufferView::Forward);
+            return true;
+        default:
+            break;
+        }
 
-       return false;
-   }
+        return false;
+    }
 
-   return false;
+    return false;
 }
 
 void BufferViewDock::bufferViewRenamed(const QString& newName)
@@ -865,8 +867,7 @@ void BufferViewDock::activateFilter()
     _filterEdit->setFocus();
 }
 
-
-void BufferViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void BufferViewDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     QStyleOptionViewItem newOption = option;
     if (index == currentHighlight) {

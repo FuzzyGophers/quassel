@@ -15,8 +15,7 @@
 #include "util.h"
 
 CoreHighlightSettingsPage::CoreHighlightSettingsPage(QWidget* parent)
-    : SettingsPage(tr("Interface"), tr("Highlights"),
-                   parent)
+    : SettingsPage(tr("Interface"), tr("Highlights"), parent)
 {
     ui.setupUi(this);
 
@@ -67,8 +66,7 @@ CoreHighlightSettingsPage::CoreHighlightSettingsPage(QWidget* parent)
     // Set up client/monolithic remote highlights information
     // Local highlights are considered legacy
     ui.highlightImport->setText(tr("Import Legacy"));
-    ui.highlightImport->setToolTip(
-        tr("Import highlight rules configured in <i>%1</i>.").arg(tr("Legacy Highlights").replace(" ", "&nbsp;")));
+    ui.highlightImport->setToolTip(tr("Import highlight rules configured in <i>%1</i>.").arg(tr("Legacy Highlights").replace(" ", "&nbsp;")));
     // Re-use translations of "Legacy Highlights" as this is a word-for-word reference, forcing
     // all spaces to be non-breaking
 }
@@ -722,7 +720,7 @@ void CoreHighlightSettingsPage::importRules()
         clonedManager.setHighlightNick(HighlightRuleManager::HighlightNickType::AllNicks);
     }
     else if (notificationSettings.highlightNick() == NotificationSettings::HighlightNickType::CurrentNick) {
-       clonedManager.setHighlightNick(HighlightRuleManager::HighlightNickType::CurrentNick);
+        clonedManager.setHighlightNick(HighlightRuleManager::HighlightNickType::CurrentNick);
     }
     // else - Don't copy "NoNick", "NoNick" is now default and should be ignored
 
@@ -736,10 +734,11 @@ void CoreHighlightSettingsPage::importRules()
     // This won't matter once client highlights are disabled entirely on newer cores.
     //
     // Remove this once client-side highlights are disabled for newer cores.
-    ret = QMessageBox::question(this, tr("Imported highlights"),
-                                QString("<p>%1</p></br><p>%2</p>").arg(
-                                    tr("%1 highlight rules successfully imported.").arg(QString::number(localHighlightList.count())),
-                                    tr("Clean up old, duplicate highlight rules?")),
+    ret = QMessageBox::question(this,
+                                tr("Imported highlights"),
+                                QString("<p>%1</p></br><p>%2</p>")
+                                    .arg(tr("%1 highlight rules successfully imported.").arg(QString::number(localHighlightList.count())),
+                                         tr("Clean up old, duplicate highlight rules?")),
                                 QMessageBox::Yes | QMessageBox::No,
                                 QMessageBox::Yes);
 

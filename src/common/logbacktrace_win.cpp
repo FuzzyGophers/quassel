@@ -3,11 +3,11 @@
 
 #include <cstdio>
 
-#include <windows.h>
-#include <dbghelp.h>
-
 #include <QFile>
 #include <QTextStream>
+
+#include <dbghelp.h>
+#include <windows.h>
 
 #include "quassel.h"
 
@@ -35,7 +35,8 @@ struct EnumModulesContext
     EnumModulesContext(HANDLE hProcess, QTextStream& stream)
         : hProcess(hProcess)
         , stream(stream)
-    {}
+    {
+    }
 };
 
 BOOL CALLBACK EnumModulesCB(LPCSTR ModuleName, DWORD64 BaseOfDll, PVOID UserContext)

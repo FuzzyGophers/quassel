@@ -14,8 +14,7 @@
 #include "uisettings.h"
 
 HighlightSettingsPage::HighlightSettingsPage(QWidget* parent)
-    : SettingsPage(tr("Interface"), tr("Legacy Highlights"),
-                   parent)
+    : SettingsPage(tr("Interface"), tr("Legacy Highlights"), parent)
 {
     ui.setupUi(this);
     ui.highlightTable->verticalHeader()->hide();
@@ -240,11 +239,10 @@ void HighlightSettingsPage::on_localHighlightsDetails_clicked()
     QMessageBox::information(this,
                              tr("Legacy Highlights vs. Highlights"),
                              QString("<p><b>%1</b></p></br><p>%2</p></br><p>%3</p>")
-                             .arg(tr("Legacy Highlights are replaced by Highlights"),
-                                  tr("These highlights will keep working for now, but you should move to "
-                                     "the improved highlight rules when you can."),
-                                  tr("Configure the new style of highlights in <i>%1</i>.")
-                                  .arg(tr("Highlights"))));
+                                 .arg(tr("Legacy Highlights are replaced by Highlights"),
+                                      tr("These highlights will keep working for now, but you should move to "
+                                         "the improved highlight rules when you can."),
+                                      tr("Configure the new style of highlights in <i>%1</i>.").arg(tr("Highlights"))));
 }
 
 void HighlightSettingsPage::load()

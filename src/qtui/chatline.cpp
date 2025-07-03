@@ -5,8 +5,8 @@
 
 #include <QAbstractItemModel>
 #include <QDateTime>
-#include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneHoverEvent>
+#include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QString>
 #include <QStyleOptionGraphicsItem>
@@ -40,7 +40,7 @@ ChatLine::ChatLine(int row,
                    const QPointF& contentsPos,
                    QGraphicsItem* parent)
     : QGraphicsItem(parent)
-    , _row(row) // needs to be set before the items
+    , _row(row)  // needs to be set before the items
     , _model(model)
     , _contentsItem(contentsPos, contentsWidth, this)
     , _senderItem(QRectF(senderPos, QSizeF(senderWidth, _contentsItem.height())), this)

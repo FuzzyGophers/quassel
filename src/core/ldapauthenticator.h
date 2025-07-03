@@ -22,7 +22,7 @@
 #include <winldap.h>
 #else*/
 #include <ldap.h>
-//#endif
+// #endif
 
 // Default LDAP server port.
 constexpr int DEFAULT_LDAP_PORT = 389;

@@ -7,7 +7,8 @@
 
 IrcListModel::IrcListModel(QObject* parent)
     : QAbstractItemModel(parent)
-{}
+{
+}
 
 QVariant IrcListModel::data(const QModelIndex& index, int role) const
 {

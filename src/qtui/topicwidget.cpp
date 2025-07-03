@@ -136,8 +136,7 @@ void TopicWidget::setTopic(const QModelIndex& index)
     }
 
     QString sanitizedNewTopic = sanitizeTopic(newtopic);
-    if (readonly != _readonly || sanitizedNewTopic != _topic)
-    {
+    if (readonly != _readonly || sanitizedNewTopic != _topic) {
         _topic = sanitizedNewTopic;
         _readonly = readonly;
 

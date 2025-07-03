@@ -50,7 +50,11 @@ signals:
      * @see CoreNetwork::putCmd(const QString &cmd, const QList<QByteArray> &params, const QByteArray &prefix = QByteArray(), const
      * QHash<IrcTagKey, QString>& tags = {}, bool prepend = false)
      */
-    void putCmd(const QString& cmd, const QList<QByteArray>& params, const QByteArray& prefix = {}, const QHash<IrcTagKey, QString>& tags = {}, bool prepend = false);
+    void putCmd(const QString& cmd,
+                const QList<QByteArray>& params,
+                const QByteArray& prefix = {},
+                const QHash<IrcTagKey, QString>& tags = {},
+                bool prepend = false);
 
     /**
      * Sends the command for each set of encoded parameters, with optional prefix or high priority.
@@ -58,7 +62,11 @@ signals:
      * @see CoreNetwork::putCmd(const QString &cmd, const QList<QList<QByteArray>> &params, const QByteArray &prefix = QByteArray(), const
      * QHash<IrcTagKey, QString>& tags = {}, bool prepend = false)
      */
-    void putCmd(const QString& cmd, const QList<QList<QByteArray>>& params, const QByteArray& prefix = {}, const QHash<IrcTagKey, QString>& tags = {}, bool prepend = false);
+    void putCmd(const QString& cmd,
+                const QList<QList<QByteArray>>& params,
+                const QByteArray& prefix = {},
+                const QHash<IrcTagKey, QString>& tags = {},
+                bool prepend = false);
 
 protected:
     /**
@@ -75,7 +83,11 @@ protected:
      * maintain PING/PONG replies, the other side will close the connection.
      * @endparmblock
      */
-    void putCmd(const QString& cmd, const QByteArray& param, const QByteArray& prefix = QByteArray(), const QHash<IrcTagKey, QString>& tags = {}, bool prepend = false);
+    void putCmd(const QString& cmd,
+                const QByteArray& param,
+                const QByteArray& prefix = QByteArray(),
+                const QHash<IrcTagKey, QString>& tags = {},
+                bool prepend = false);
 
     inline CoreNetwork* network() const { return _network; }
     inline CoreSession* coreSession() const { return _network->coreSession(); }

@@ -49,7 +49,7 @@ QUASSEL_SINGLETON_EXPORT T* getOrSetInstance(T* instance = nullptr, bool destroy
     return _instance;
 }
 
-}  // detail
+}  // namespace detail
 
 /**
  * Mixin class for "pseudo" singletons.
@@ -76,10 +76,7 @@ public:
      *
      * @param instance Pointer to the instance being created, i.e. the 'this' pointer of the parent class
      */
-    Singleton(T* instance)
-    {
-        detail::getOrSetInstance<T>(instance);
-    }
+    Singleton(T* instance) { detail::getOrSetInstance<T>(instance); }
 
     // Satisfy Rule of Five
     Singleton(const Singleton&) = delete;
@@ -92,10 +89,7 @@ public:
      *
      * Sets the instance pointer to null and flags the destruction, so a subsequent reinstantiation will fail.
      */
-    ~Singleton()
-    {
-        detail::getOrSetInstance<T>(nullptr, true);
-    }
+    ~Singleton() { detail::getOrSetInstance<T>(nullptr, true); }
 
     /**
      * Accesses the instance pointer.
@@ -105,8 +99,5 @@ public:
      *
      * @returns A pointer to the instance
      */
-    static T* instance()
-    {
-        return detail::getOrSetInstance<T>();
-    }
+    static T* instance() { return detail::getOrSetInstance<T>(); }
 };

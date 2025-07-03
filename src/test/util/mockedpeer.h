@@ -66,23 +66,19 @@ private:
 
 // ---- Matchers for defining protocol message expectations for Dispatches() ---------------------------------------------------------------
 
-TEST_UTIL_EXPORT ::testing::Matcher<const ProtocolMessage&> SyncMessage(
-        ::testing::Matcher<QByteArray> className,
-        ::testing::Matcher<QString> objectName,
-        ::testing::Matcher<QByteArray> slotName,
-        ::testing::Matcher<QVariantList> params);
+TEST_UTIL_EXPORT ::testing::Matcher<const ProtocolMessage&> SyncMessage(::testing::Matcher<QByteArray> className,
+                                                                        ::testing::Matcher<QString> objectName,
+                                                                        ::testing::Matcher<QByteArray> slotName,
+                                                                        ::testing::Matcher<QVariantList> params);
 
-TEST_UTIL_EXPORT ::testing::Matcher<const ProtocolMessage&> RpcCall(
-        ::testing::Matcher<QByteArray> signalName,
-        ::testing::Matcher<QVariantList> params);
+TEST_UTIL_EXPORT ::testing::Matcher<const ProtocolMessage&> RpcCall(::testing::Matcher<QByteArray> signalName,
+                                                                    ::testing::Matcher<QVariantList> params);
 
-TEST_UTIL_EXPORT ::testing::Matcher<const ProtocolMessage&> InitRequest(
-        ::testing::Matcher<QByteArray> className,
-        ::testing::Matcher<QString> objectName);
+TEST_UTIL_EXPORT ::testing::Matcher<const ProtocolMessage&> InitRequest(::testing::Matcher<QByteArray> className,
+                                                                        ::testing::Matcher<QString> objectName);
 
-TEST_UTIL_EXPORT ::testing::Matcher<const ProtocolMessage&> InitData(
-        ::testing::Matcher<QByteArray> className,
-        ::testing::Matcher<QString> objectName,
-        ::testing::Matcher<QVariantMap> initData);
+TEST_UTIL_EXPORT ::testing::Matcher<const ProtocolMessage&> InitData(::testing::Matcher<QByteArray> className,
+                                                                     ::testing::Matcher<QString> objectName,
+                                                                     ::testing::Matcher<QVariantMap> initData);
 
 }  // namespace test

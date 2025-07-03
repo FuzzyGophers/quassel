@@ -3,11 +3,11 @@
 
 #pragma once
 
+#include "common-export.h"
+
 #include <QAbstractSocket>
 #include <QByteArray>
 #include <QHostAddress>
-
-#include "common-export.h"
 
 struct COMMON_EXPORT ProxyLine
 {

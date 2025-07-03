@@ -45,7 +45,8 @@ public:
         : QEvent(QEvent::Type(Core::AddClientEventId))
         , peer(p)
         , userId(uid)
-    {}
+    {
+    }
     RemotePeer* peer;
     UserId userId;
 };
@@ -379,7 +380,7 @@ QString Core::setupCoreForInternalUsage()
     Q_ASSERT(!_registeredStorageBackends.empty());
 
     int pass = 0;
-	for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 10; ++i) {
         pass *= 10;
         pass += Quassel::randomGenerator()->bounded(10);
     }
@@ -614,26 +615,28 @@ bool Core::startListening()
                 case QAbstractSocket::IPv6Protocol:
                     if (_v6server.listen(addr, port)) {
                         qInfo() << qPrintable(tr("Listening for GUI clients on IPv6 %1 port %2 using protocol version %3")
-                                              .arg(addr.toString())
-                                              .arg(_v6server.serverPort())
-                                              .arg(Quassel::buildInfo().protocolVersion));
+                                                  .arg(addr.toString())
+                                                  .arg(_v6server.serverPort())
+                                                  .arg(Quassel::buildInfo().protocolVersion));
                         success = true;
                     }
                     else
-                        qWarning() << qPrintable(tr("Could not open IPv6 interface %1:%2: %3").arg(addr.toString()).arg(port).arg(_v6server.errorString()));
+                        qWarning() << qPrintable(
+                            tr("Could not open IPv6 interface %1:%2: %3").arg(addr.toString()).arg(port).arg(_v6server.errorString()));
                     break;
                 case QAbstractSocket::IPv4Protocol:
                     if (_server.listen(addr, port)) {
                         qInfo() << qPrintable(tr("Listening for GUI clients on IPv4 %1 port %2 using protocol version %3")
-                                              .arg(addr.toString())
-                                              .arg(_server.serverPort())
-                                              .arg(Quassel::buildInfo().protocolVersion));
+                                                  .arg(addr.toString())
+                                                  .arg(_server.serverPort())
+                                                  .arg(Quassel::buildInfo().protocolVersion));
                         success = true;
                     }
                     else {
                         // if v6 succeeded on Any, the port will be already in use - don't display the error then
                         if (!success || _server.serverError() != QAbstractSocket::AddressInUseError)
-                            qWarning() << qPrintable(tr("Could not open IPv4 interface %1:%2: %3").arg(addr.toString()).arg(port).arg(_server.errorString()));
+                            qWarning() << qPrintable(
+                                tr("Could not open IPv4 interface %1:%2: %3").arg(addr.toString()).arg(port).arg(_server.errorString()));
                     }
                     break;
                 default:
@@ -1028,7 +1031,7 @@ bool Core::createUser()
     }
 
     if (_configured && _storage->addUser(username, password).isValid()) {
-			out << "Added user " << username << " successfully!" << Qt::endl;
+        out << "Added user " << username << " successfully!" << Qt::endl;
         return true;
     }
     else {
@@ -1043,12 +1046,12 @@ bool Core::changeUserPass(const QString& username)
     QTextStream in(stdin);
     UserId userId = _storage->getUserId(username);
     if (!userId.isValid()) {
-			out << "User " << username << " does not exist." << Qt::endl;
+        out << "User " << username << " does not exist." << Qt::endl;
         return false;
     }
 
     if (!canChangeUserPassword(userId)) {
-			out << "User " << username << " is configured through an auth provider that has forbidden manual password changing." << Qt::endl;
+        out << "User " << username << " is configured through an auth provider that has forbidden manual password changing." << Qt::endl;
         return false;
     }
 
@@ -1075,7 +1078,7 @@ bool Core::changeUserPass(const QString& username)
     }
 
     if (_configured && _storage->updateUser(userId, password)) {
-			out << "Password changed successfully!" << Qt::endl;
+        out << "Password changed successfully!" << Qt::endl;
         return true;
     }
     else {
@@ -1184,7 +1187,7 @@ QVariantMap Core::promptForSettings(const Backend* backend)
         }
         QString input = in.readLine().trimmed();
         if (noEcho) {
-				out << Qt::endl;
+            out << Qt::endl;
             enableStdInEcho();
         }
 

@@ -27,17 +27,15 @@ namespace detail {
 /**
  * Contains all supported widget changed signals.
  */
-static const auto supportedWidgetChangedSignals = std::make_tuple(
-        &ColorButton::colorChanged,
-        &FontSelector::fontChanged,
-        &QAbstractButton::toggled,
-        selectOverload<int>(&QComboBox::currentIndexChanged),
-        selectOverload<double>(&QDoubleSpinBox::valueChanged),
-        &QGroupBox::toggled,
-        &QLineEdit::textChanged,
-        selectOverload<int>(&QSpinBox::valueChanged),
-        &QTextEdit::textChanged
-);
+static const auto supportedWidgetChangedSignals = std::make_tuple(&ColorButton::colorChanged,
+                                                                  &FontSelector::fontChanged,
+                                                                  &QAbstractButton::toggled,
+                                                                  selectOverload<int>(&QComboBox::currentIndexChanged),
+                                                                  selectOverload<double>(&QDoubleSpinBox::valueChanged),
+                                                                  &QGroupBox::toggled,
+                                                                  &QLineEdit::textChanged,
+                                                                  selectOverload<int>(&QSpinBox::valueChanged),
+                                                                  &QTextEdit::textChanged);
 
 /**
  * Tries to find a changed signal that matches the given widget type, and connects that to the given receiver/slot.

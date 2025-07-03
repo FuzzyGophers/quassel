@@ -15,7 +15,7 @@ class RemoveChildLaterEvent : public QEvent
 public:
     RemoveChildLaterEvent(AbstractTreeItem* child)
         : QEvent(QEvent::User)
-        , _child(child){};
+        , _child(child) {};
     inline AbstractTreeItem* child() { return _child; }
 
 private:
@@ -28,7 +28,8 @@ private:
 AbstractTreeItem::AbstractTreeItem(AbstractTreeItem* parent)
     : QObject(parent)
     , _flags(Qt::ItemIsSelectable | Qt::ItemIsEnabled)
-{}
+{
+}
 
 bool AbstractTreeItem::newChild(AbstractTreeItem* item)
 {
@@ -139,9 +140,9 @@ bool AbstractTreeItem::reParent(AbstractTreeItem* newParent)
     if (oldRow == -1)
         return false;
 
-    emit parent()->beginRemoveChilds(oldRow, oldRow);
+    emit parent() -> beginRemoveChilds(oldRow, oldRow);
     parent()->_childItems.removeAt(oldRow);
-    emit parent()->endRemoveChilds();
+    emit parent() -> endRemoveChilds();
 
     AbstractTreeItem* oldParent = parent();
     setParent(newParent);
@@ -207,7 +208,8 @@ void AbstractTreeItem::dumpChildList()
 SimpleTreeItem::SimpleTreeItem(QList<QVariant> data, AbstractTreeItem* parent)
     : AbstractTreeItem(parent)
     , _itemData(std::move(data))
-{}
+{
+}
 
 QVariant SimpleTreeItem::data(int column, int role) const
 {
@@ -241,7 +243,8 @@ int SimpleTreeItem::columnCount() const
  *****************************************/
 PropertyMapItem::PropertyMapItem(AbstractTreeItem* parent)
     : AbstractTreeItem(parent)
-{}
+{
+}
 
 QVariant PropertyMapItem::data(int column, int role) const
 {

@@ -3,17 +3,17 @@
 
 #include "posixsignalwatcher.h"
 
-#include <sys/resource.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
-
 #include <cerrno>
 #include <csignal>
 
 #include <QDebug>
 #include <QSocketNotifier>
+
+#include <sys/resource.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 int PosixSignalWatcher::_sockpair[2];
 
@@ -84,7 +84,6 @@ void PosixSignalWatcher::onNotify(int sockfd)
     case SIGBUS:
         emit handleSignal(Action::HandleCrash);
         break;
-    default:
-        ;
+    default:;
     }
 }

@@ -16,12 +16,7 @@ EventStringifier::EventStringifier(CoreSession* parent)
     connect(this, &EventStringifier::newMessageEvent, coreSession()->eventManager(), &EventManager::postEvent);
 }
 
-void EventStringifier::displayMsg(NetworkEvent* event,
-                                  Message::Type msgType,
-                                  QString msg,
-                                  QString sender,
-                                  QString target,
-                                  Message::Flags msgFlags)
+void EventStringifier::displayMsg(NetworkEvent* event, Message::Type msgType, QString msg, QString sender, QString target, Message::Flags msgFlags)
 {
     if (event->flags().testFlag(EventManager::Silent))
         return;
@@ -31,14 +26,11 @@ void EventStringifier::displayMsg(NetworkEvent* event,
     emit newMessageEvent(msgEvent);
 }
 
-MessageEvent* EventStringifier::createMessageEvent(NetworkEvent* event,
-                                                   Message::Type msgType,
-                                                   QString msg,
-                                                   QString sender,
-                                                   QString target,
-                                                   Message::Flags msgFlags)
+MessageEvent* EventStringifier::createMessageEvent(
+    NetworkEvent* event, Message::Type msgType, QString msg, QString sender, QString target, Message::Flags msgFlags)
 {
-    MessageEvent* msgEvent = new MessageEvent(msgType, event->network(), std::move(msg), std::move(sender), std::move(target), msgFlags, event->timestamp());
+    MessageEvent* msgEvent
+        = new MessageEvent(msgType, event->network(), std::move(msg), std::move(sender), std::move(target), msgFlags, event->timestamp());
     return msgEvent;
 }
 
@@ -800,11 +792,13 @@ void EventStringifier::processCtcpEvent(CtcpEvent* e)
     }
 
     QString cmd = e->ctcpCmd().toUpper();
-	if (cmd == "ACTION") {
+    if (cmd == "ACTION") {
         handleCtcpAction(e);
-    } else if (cmd == "PING") {
+    }
+    else if (cmd == "PING") {
         handleCtcpPing(e);
-    } else {
+    }
+    else {
         defaultHandler(cmd, e);
     }
 }
@@ -818,11 +812,11 @@ void EventStringifier::defaultHandler(const QString& ctcpCmd, CtcpEvent* e)
             //: Optional "unknown" in "Received unknown CTCP-FOO request by bar"
             unknown = tr("unknown") + ' ';
         displayMsg(e, Message::Server, tr("Received %1CTCP-%2 request by %3").arg(unknown, e->ctcpCmd(), e->prefix()));
-    } else {
+    }
+    else {
         // Ignore echo messages for our own answers
         if (!e->testFlag(EventManager::Self)) {
-            displayMsg(e, Message::Server,
-                       tr("Received CTCP-%1 answer from %2: %3").arg(e->ctcpCmd(), nickFromMask(e->prefix()),e->param()));
+            displayMsg(e, Message::Server, tr("Received CTCP-%1 answer from %2: %3").arg(e->ctcpCmd(), nickFromMask(e->prefix()), e->param()));
         }
     }
 }

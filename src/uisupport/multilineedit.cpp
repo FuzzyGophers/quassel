@@ -333,8 +333,7 @@ void MultiLineEdit::keyPressEvent(QKeyEvent* event)
         event->accept();
         return;
 
-    default:
-        ;
+    default:;
     }
 
     if (_emacsMode) {

@@ -776,7 +776,6 @@ void CoreSessionEventProcessor::processIrcEventError(IrcEvent* e)
     }
 }
 
-
 // IRCv3 SETNAME - ":nick!user@host SETNAME :realname goes here"
 // Example:  :batman!~batman@bat.cave SETNAME :Bruce Wayne <bruce@wayne.enterprises>
 //
@@ -1453,7 +1452,8 @@ void CoreSessionEventProcessor::handleNetsplitQuit(Network* net, const QString& 
     emit newEvent(event);
     for (const QString& user : users) {
         IrcUser* ircUser = net->ircUser(nickFromMask(user));
-        if (ircUser) ircUser->quit();
+        if (ircUser)
+            ircUser->quit();
     }
 }
 
@@ -1520,19 +1520,25 @@ void CoreSessionEventProcessor::processCtcpEvent(CtcpEvent* e)
         return;
 
     QString cmd = e->ctcpCmd().toUpper();
-	if (cmd == "ACTION") {
+    if (cmd == "ACTION") {
         handleCtcpAction(e);
-    } else if (cmd == "CLIENTINFO") {
+    }
+    else if (cmd == "CLIENTINFO") {
         handleCtcpClientinfo(e);
-    } else if (cmd == "DCC") {
+    }
+    else if (cmd == "DCC") {
         handleCtcpDcc(e);
-    } else if (cmd == "PING") {
+    }
+    else if (cmd == "PING") {
         handleCtcpPing(e);
-    } else if (cmd == "TIME") {
+    }
+    else if (cmd == "TIME") {
         handleCtcpTime(e);
-    } else if (cmd == "VERSION") {
+    }
+    else if (cmd == "VERSION") {
         handleCtcpVersion(e);
-    } else {
+    }
+    else {
         defaultHandler(cmd, e);
     }
 }

@@ -29,14 +29,14 @@ public:
     inline QModelIndex currentIndex() const { return _selectionModel->currentIndex(); }
 
 protected slots:
-    virtual void closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint){};
-    virtual void commitData(QWidget*){};
-    virtual void currentChanged(const QModelIndex&, const QModelIndex&){};
-    virtual void dataChanged(const QModelIndex&, const QModelIndex&){};
-    virtual void editorDestroyed(QObject*){};
-    virtual void rowsAboutToBeRemoved(const QModelIndex&, int, int){};
-    virtual void rowsInserted(const QModelIndex&, int, int){};
-    virtual void selectionChanged(const QItemSelection&, const QItemSelection&){};
+    virtual void closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint) {};
+    virtual void commitData(QWidget*) {};
+    virtual void currentChanged(const QModelIndex&, const QModelIndex&) {};
+    virtual void dataChanged(const QModelIndex&, const QModelIndex&) {};
+    virtual void editorDestroyed(QObject*) {};
+    virtual void rowsAboutToBeRemoved(const QModelIndex&, int, int) {};
+    virtual void rowsInserted(const QModelIndex&, int, int) {};
+    virtual void selectionChanged(const QItemSelection&, const QItemSelection&) {};
 
 protected:
     QPointer<QAbstractItemModel> _model;

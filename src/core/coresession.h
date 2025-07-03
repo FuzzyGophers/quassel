@@ -278,7 +278,8 @@ struct NetworkInternalMessage
         , text(std::move(text))
         , sender(std::move(sender))
         , flags(flags)
-    {}
+    {
+    }
 };
 
 struct RawMessage
@@ -308,10 +309,10 @@ struct RawMessage
         , text(std::move(text))
         , sender(std::move(sender))
         , flags(flags)
-    {}
+    {
+    }
 
-    RawMessage(NetworkId networkId,
-               const NetworkInternalMessage& msg)
+    RawMessage(NetworkId networkId, const NetworkInternalMessage& msg)
         : timestamp(QDateTime::currentDateTimeUtc())
         , networkId(networkId)
         , type(msg.type)
@@ -320,5 +321,6 @@ struct RawMessage
         , text(msg.text)
         , sender(msg.sender)
         , flags(msg.flags)
-    {}
+    {
+    }
 };

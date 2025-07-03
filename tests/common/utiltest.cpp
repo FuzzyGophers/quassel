@@ -1,12 +1,13 @@
 // SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include <QDebug>
+#include "util.h"
+
 #include <QDateTime>
+#include <QDebug>
 #include <QTimeZone>
 
 #include "testglobal.h"
-#include "util.h"
 
 TEST(UtilTest, formatDateTimeToOffsetISO)
 {

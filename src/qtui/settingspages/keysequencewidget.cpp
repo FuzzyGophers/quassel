@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include "keysequencewidget.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QHBoxLayout>
@@ -11,13 +13,13 @@
 #include "action.h"
 #include "actioncollection.h"
 #include "icon.h"
-#include "keysequencewidget.h"
 #include "macosutils.h"
 
 KeySequenceButton::KeySequenceButton(KeySequenceWidget* d_, QWidget* parent)
     : QPushButton(parent)
     , d(d_)
-{}
+{
+}
 
 bool KeySequenceButton::event(QEvent* e)
 {

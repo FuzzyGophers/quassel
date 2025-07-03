@@ -93,9 +93,7 @@ void IrcParser::processNetworkIncoming(NetworkDataEvent* e)
     QString prefix;
     QString cmd;
     QList<QByteArray> params;
-    IrcDecoder::parseMessage([&net](const QByteArray& data) {
-        return net->serverDecode(data);
-    }, rawMsg, tags, prefix, cmd, params);
+    IrcDecoder::parseMessage([&net](const QByteArray& data) { return net->serverDecode(data); }, rawMsg, tags, prefix, cmd, params);
 
     // Log the message if enabled and network ID matches or allows all
     if (_debugLogParsedIrc && (_debugLogParsedNetId == -1 || net->networkId().toInt() == _debugLogParsedNetId)) {
@@ -108,7 +106,8 @@ void IrcParser::processNetworkIncoming(NetworkDataEvent* e)
         serverTime.setTimeZone(QTimeZone::utc());
         if (serverTime.isValid()) {
             e->setTimestamp(serverTime);
-        } else {
+        }
+        else {
             qDebug() << "Invalid timestamp from server-time tag:" << tags[IrcTags::SERVER_TIME];
         }
     }
@@ -208,13 +207,8 @@ void IrcParser::processNetworkIncoming(NetworkDataEvent* e)
                 // consider including this within an if (!isSelfMessage) block
                 msg = decrypt(net, target, msg);
 
-                IrcEventRawMessage* rawMessage = new IrcEventRawMessage(EventManager::IrcEventRawPrivmsg,
-                                                                        net,
-                                                                        tags,
-                                                                        msg,
-                                                                        prefix,
-                                                                        target,
-                                                                        e->timestamp());
+                IrcEventRawMessage* rawMessage
+                    = new IrcEventRawMessage(EventManager::IrcEventRawPrivmsg, net, tags, msg, prefix, target, e->timestamp());
                 if (isSelfMessage) {
                     // Self-messages need processed differently, tag as such via flag.
                     rawMessage->setFlag(EventManager::Self);
@@ -248,11 +242,12 @@ void IrcParser::processNetworkIncoming(NetworkDataEvent* e)
                     QString decMsg = net->serverDecode(params.at(1));
                     QRegularExpression welcomeRegExp(R"(^\[([^\]]+)\] )");
                     QRegularExpressionMatch match = welcomeRegExp.match(decMsg);
-                        if (match.hasMatch()) {
-                            QString channelname = match.captured(1);
-							decMsg = decMsg.mid(match.capturedLength());
+                    if (match.hasMatch()) {
+                        QString channelname = match.captured(1);
+                        decMsg = decMsg.mid(match.capturedLength());
                         // we only have CoreIrcChannels in the core, so this cast is safe
-                        CoreIrcChannel* chan = static_cast<CoreIrcChannel*>(net->ircChannel(channelname)); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+                        CoreIrcChannel* chan = static_cast<CoreIrcChannel*>(
+                            net->ircChannel(channelname));  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
                         if (chan && !chan->receivedWelcomeMsg()) {
                             chan->setReceivedWelcomeMsg();
                             events << new MessageEvent(Message::Notice, net, decMsg, prefix, channelname, Message::None, e->timestamp());
@@ -312,13 +307,8 @@ void IrcParser::processNetworkIncoming(NetworkDataEvent* e)
                 else
 #endif
                 {
-                    IrcEventRawMessage* rawMessage = new IrcEventRawMessage(EventManager::IrcEventRawNotice,
-                                                                            net,
-                                                                            tags,
-                                                                            params[1],
-                                                                            prefix,
-                                                                            target,
-                                                                            e->timestamp());
+                    IrcEventRawMessage* rawMessage
+                        = new IrcEventRawMessage(EventManager::IrcEventRawNotice, net, tags, params[1], prefix, target, e->timestamp());
                     if (isSelfMessage) {
                         // Self-messages need processed differently, tag as such via flag.
                         rawMessage->setFlag(EventManager::Self);
@@ -389,17 +379,15 @@ void IrcParser::processNetworkIncoming(NetworkDataEvent* e)
         }
         break;
 
-    case EventManager::IrcEventAway:
-        {
-            // Update hostmask info first.  This will create the nick if it doesn't exist, e.g.
-            // away-notify data being sent before JOIN messages.
-            net->updateNickFromMask(prefix);
-            // Separate nick in order to separate server and user decoding
-            QString nick = nickFromMask(prefix);
-            decParams << nick;
-            decParams << (params.count() >= 1 ? net->userDecode(nick, params.at(0)) : QString());
-        }
-        break;
+    case EventManager::IrcEventAway: {
+        // Update hostmask info first.  This will create the nick if it doesn't exist, e.g.
+        // away-notify data being sent before JOIN messages.
+        net->updateNickFromMask(prefix);
+        // Separate nick in order to separate server and user decoding
+        QString nick = nickFromMask(prefix);
+        decParams << nick;
+        decParams << (params.count() >= 1 ? net->userDecode(nick, params.at(0)) : QString());
+    } break;
 
     case EventManager::IrcEventNumeric:
         switch (num) {

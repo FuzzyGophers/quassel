@@ -29,7 +29,7 @@ bool TreeViewTouch::event(QEvent* event)
             // After the first movement of a Touch-Point, calculate the distance in both axis
             // and if the point moved more horizontally abort scroll.
             double dx = qAbs(p.lastPosition().x() - p.position().x());
-			double dy = qAbs(p.lastPosition().y() - p.position().y());
+            double dy = qAbs(p.lastPosition().y() - p.position().y());
             if (dx > dy) {
                 _touchScrollInProgress = false;
             }

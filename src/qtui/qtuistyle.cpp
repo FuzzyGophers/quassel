@@ -180,7 +180,9 @@ QString QtUiStyle::fontDescription(const QFont& font) const
     int weight = font.weight();
 
     return QString("font: %1 %2 %3pt \"%4\"")
-        .arg(style == QFont::StyleItalic ? "italic" : style == QFont::StyleOblique ? "oblique" : "normal")
+        .arg(style == QFont::StyleItalic    ? "italic"
+             : style == QFont::StyleOblique ? "oblique"
+                                            : "normal")
         .arg(100 * qBound(1, (weight * 8 + 50) / 100, 9))
         .arg(font.pointSize())
         .arg(font.family());

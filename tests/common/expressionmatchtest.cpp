@@ -1,19 +1,19 @@
 // SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include "expressionmatch.h"
+
 #include <vector>
 
 #include <QString>
 #include <QStringList>
 
 #include "testglobal.h"
-#include "expressionmatch.h"
 
 TEST(ExpressionMatchTest, emptyPattern)
 {
     // Empty pattern
-    ExpressionMatch emptyMatch =
-            ExpressionMatch("", ExpressionMatch::MatchMode::MatchPhrase, false);
+    ExpressionMatch emptyMatch = ExpressionMatch("", ExpressionMatch::MatchMode::MatchPhrase, false);
 
     // Assert empty is valid
     ASSERT_TRUE(emptyMatch.isValid());
@@ -28,20 +28,16 @@ TEST(ExpressionMatchTest, emptyPattern)
 TEST(ExpressionMatchTest, matchPhrase)
 {
     // Simple phrase, case-insensitive
-    ExpressionMatch simpleMatch =
-            ExpressionMatch("test", ExpressionMatch::MatchMode::MatchPhrase, false);
+    ExpressionMatch simpleMatch = ExpressionMatch("test", ExpressionMatch::MatchMode::MatchPhrase, false);
     // Simple phrase, case-sensitive
-    ExpressionMatch simpleMatchCS =
-            ExpressionMatch("test", ExpressionMatch::MatchMode::MatchPhrase, true);
+    ExpressionMatch simpleMatchCS = ExpressionMatch("test", ExpressionMatch::MatchMode::MatchPhrase, true);
     // Phrase with space, case-insensitive
-    ExpressionMatch simpleMatchSpace =
-            ExpressionMatch(" space ", ExpressionMatch::MatchMode::MatchPhrase, true);
+    ExpressionMatch simpleMatchSpace = ExpressionMatch(" space ", ExpressionMatch::MatchMode::MatchPhrase, true);
     // Complex phrase
     QString complexMatchFull(R"(^(?:norm|norm\-space|\!norm\-escaped|\\\!slash\-invert|\\\\double"
                               "|escape\;sep|slash\-end\-split\\|quad\\\\\!noninvert|newline\-split"
                               "|newline\-split\-slash\\|slash\-at\-end\\)$)");
-    ExpressionMatch complexMatch =
-            ExpressionMatch(complexMatchFull, ExpressionMatch::MatchMode::MatchPhrase, false);
+    ExpressionMatch complexMatch = ExpressionMatch(complexMatchFull, ExpressionMatch::MatchMode::MatchPhrase, false);
 
     // Assert valid and not empty
     ASSERT_TRUE(simpleMatch.isValid());
@@ -74,23 +70,20 @@ TEST(ExpressionMatchTest, matchPhrase)
     EXPECT_FALSE(complexMatch.match("norm"));
 }
 
-
 TEST(ExpressionMatchTest, matchMultiPhrase)
 {
     // Simple phrases, case-insensitive
-    ExpressionMatch simpleMatch =
-            ExpressionMatch("test\nOther ", ExpressionMatch::MatchMode::MatchMultiPhrase, false);
+    ExpressionMatch simpleMatch = ExpressionMatch("test\nOther ", ExpressionMatch::MatchMode::MatchMultiPhrase, false);
     // Simple phrases, case-sensitive
-    ExpressionMatch simpleMatchCS =
-            ExpressionMatch("test\nOther ", ExpressionMatch::MatchMode::MatchMultiPhrase, true);
+    ExpressionMatch simpleMatchCS = ExpressionMatch("test\nOther ", ExpressionMatch::MatchMode::MatchMultiPhrase, true);
     // Complex phrases
     QString complexMatchFullA(R"(^(?:norm|norm\-space|\!norm\-escaped|\\\!slash\-invert|\\\\double)"
                               R"(|escape\;sep|slash\-end\-split\\|quad\\\\\!noninvert)"
                               R"(|newline\-split|newline\-split\-slash\\|slash\-at\-end\\)$)");
     QString complexMatchFullB(R"(^(?:invert|invert\-space)$)$)");
-    ExpressionMatch complexMatch =
-            ExpressionMatch(complexMatchFullA + "\n" + complexMatchFullB,
-                            ExpressionMatch::MatchMode::MatchMultiPhrase, false);
+    ExpressionMatch complexMatch = ExpressionMatch(complexMatchFullA + "\n" + complexMatchFullB,
+                                                   ExpressionMatch::MatchMode::MatchMultiPhrase,
+                                                   false);
 
     // Assert valid and not empty
     ASSERT_TRUE(simpleMatch.isValid());
@@ -125,31 +118,24 @@ TEST(ExpressionMatchTest, matchMultiPhrase)
     EXPECT_FALSE(complexMatch.match("invert"));
 }
 
-
 TEST(ExpressionMatchTest, matchWildcard)
 {
     // Simple wildcard, case-insensitive
-    ExpressionMatch simpleMatch =
-            ExpressionMatch("?test*", ExpressionMatch::MatchMode::MatchWildcard, false);
+    ExpressionMatch simpleMatch = ExpressionMatch("?test*", ExpressionMatch::MatchMode::MatchWildcard, false);
     // Simple wildcard, case-sensitive
-    ExpressionMatch simpleMatchCS =
-            ExpressionMatch("?test*", ExpressionMatch::MatchMode::MatchWildcard, true);
+    ExpressionMatch simpleMatchCS = ExpressionMatch("?test*", ExpressionMatch::MatchMode::MatchWildcard, true);
     // Escaped wildcard, case-insensitive
-    ExpressionMatch simpleMatchEscape =
-            ExpressionMatch(R"(\?test\*)", ExpressionMatch::MatchMode::MatchWildcard, false);
+    ExpressionMatch simpleMatchEscape = ExpressionMatch(R"(\?test\*)", ExpressionMatch::MatchMode::MatchWildcard, false);
     // Inverted wildcard, case-insensitive
-    ExpressionMatch simpleMatchInvert =
-            ExpressionMatch("!test*", ExpressionMatch::MatchMode::MatchWildcard, false);
+    ExpressionMatch simpleMatchInvert = ExpressionMatch("!test*", ExpressionMatch::MatchMode::MatchWildcard, false);
     // Not inverted wildcard, case-insensitive
-    ExpressionMatch simpleMatchNoInvert =
-            ExpressionMatch(R"(\!test*)", ExpressionMatch::MatchMode::MatchWildcard, false);
+    ExpressionMatch simpleMatchNoInvert = ExpressionMatch(R"(\!test*)", ExpressionMatch::MatchMode::MatchWildcard, false);
     // Not inverted wildcard literal slash, case-insensitive
-    ExpressionMatch simpleMatchNoInvertSlash =
-            ExpressionMatch(R"(\\!test*)", ExpressionMatch::MatchMode::MatchWildcard, false);
+    ExpressionMatch simpleMatchNoInvertSlash = ExpressionMatch(R"(\\!test*)", ExpressionMatch::MatchMode::MatchWildcard, false);
     // Complex wildcard
-    ExpressionMatch complexMatch =
-            ExpressionMatch(R"(never?gonna*give\*you\?up\\test|y\yeah\\1\\\\2\\\1inval)",
-                            ExpressionMatch::MatchMode::MatchWildcard, false);
+    ExpressionMatch complexMatch = ExpressionMatch(R"(never?gonna*give\*you\?up\\test|y\yeah\\1\\\\2\\\1inval)",
+                                                   ExpressionMatch::MatchMode::MatchWildcard,
+                                                   false);
 
     // Assert valid and not empty
     ASSERT_TRUE(simpleMatch.isValid());
@@ -203,57 +189,41 @@ TEST(ExpressionMatchTest, matchWildcard)
     EXPECT_FALSE(complexMatch.match("other"));
 }
 
-
 TEST(ExpressionMatchTest, matchMultiWildcard)
 {
     // Simple wildcards, case-insensitive
-    ExpressionMatch simpleMatch =
-            ExpressionMatch("?test*;another?",
-                            ExpressionMatch::MatchMode::MatchMultiWildcard, false);
+    ExpressionMatch simpleMatch = ExpressionMatch("?test*;another?", ExpressionMatch::MatchMode::MatchMultiWildcard, false);
     // Simple wildcards, case-sensitive
-    ExpressionMatch simpleMatchCS =
-            ExpressionMatch("?test*;another?",
-                            ExpressionMatch::MatchMode::MatchMultiWildcard, true);
+    ExpressionMatch simpleMatchCS = ExpressionMatch("?test*;another?", ExpressionMatch::MatchMode::MatchMultiWildcard, true);
     // Escaped wildcards, case-insensitive
-    ExpressionMatch simpleMatchEscape =
-            ExpressionMatch(R"(\?test\*\;*thing\*)",
-                            ExpressionMatch::MatchMode::MatchMultiWildcard, false);
+    ExpressionMatch simpleMatchEscape = ExpressionMatch(R"(\?test\*\;*thing\*)", ExpressionMatch::MatchMode::MatchMultiWildcard, false);
     // Inverted wildcards, case-insensitive
-    ExpressionMatch simpleMatchInvert =
-            ExpressionMatch(R"(test*;!testing)",
-                            ExpressionMatch::MatchMode::MatchMultiWildcard, false);
+    ExpressionMatch simpleMatchInvert = ExpressionMatch(R"(test*;!testing)", ExpressionMatch::MatchMode::MatchMultiWildcard, false);
     // Implicit wildcards, case-insensitive
-    ExpressionMatch simpleMatchImplicit =
-            ExpressionMatch(R"(!testing*)",
-                            ExpressionMatch::MatchMode::MatchMultiWildcard, false);
+    ExpressionMatch simpleMatchImplicit = ExpressionMatch(R"(!testing*)", ExpressionMatch::MatchMode::MatchMultiWildcard, false);
     // Complex wildcard
     QString complexMatchFull(R"(norm;!invert; norm-space ; !invert-space ;;!;\!norm-escaped;)"
                              R"(\\!slash-invert;\\\\double; escape\;sep;slash-end-split\\;)"
-                             R"(quad\\\\!noninvert;newline-split)""\n"
-                             R"(newline-split-slash\\)""\n"
+                             R"(quad\\\\!noninvert;newline-split)"
+                             "\n"
+                             R"(newline-split-slash\\)"
+                             "\n"
                              R"(slash-at-end\\)");
     // Match normal components
-    QStringList complexMatchNormal = {
-        R"(norm)",
-        R"(norm-space)",
-        R"(!norm-escaped)",
-        R"(\!slash-invert)",
-        R"(\\double)",
-        R"(escape;sep)",
-        R"(slash-end-split\)",
-        R"(quad\\!noninvert)",
-        R"(newline-split)",
-        R"(newline-split-slash\)",
-        R"(slash-at-end\)"
-    };
+    QStringList complexMatchNormal = {R"(norm)",
+                                      R"(norm-space)",
+                                      R"(!norm-escaped)",
+                                      R"(\!slash-invert)",
+                                      R"(\\double)",
+                                      R"(escape;sep)",
+                                      R"(slash-end-split\)",
+                                      R"(quad\\!noninvert)",
+                                      R"(newline-split)",
+                                      R"(newline-split-slash\)",
+                                      R"(slash-at-end\)"};
     // Match negating components
-    QStringList complexMatchInvert = {
-        R"(invert)",
-        R"(invert-space)"
-    };
-    ExpressionMatch complexMatch =
-            ExpressionMatch(complexMatchFull, ExpressionMatch::MatchMode::MatchMultiWildcard,
-                            false);
+    QStringList complexMatchInvert = {R"(invert)", R"(invert-space)"};
+    ExpressionMatch complexMatch = ExpressionMatch(complexMatchFull, ExpressionMatch::MatchMode::MatchMultiWildcard, false);
 
     // Assert valid and not empty
     ASSERT_TRUE(simpleMatch.isValid());
@@ -315,29 +285,18 @@ TEST(ExpressionMatchTest, matchMultiWildcard)
     EXPECT_FALSE(complexMatch.match("other"));
 }
 
-
 TEST(ExpressionMatchTest, matchRegEx)
 {
     // Simple regex, case-insensitive
-    ExpressionMatch simpleMatch =
-            ExpressionMatch(R"(simple.\*escape-match.*)",
-                            ExpressionMatch::MatchMode::MatchRegEx, false);
+    ExpressionMatch simpleMatch = ExpressionMatch(R"(simple.\*escape-match.*)", ExpressionMatch::MatchMode::MatchRegEx, false);
     // Simple regex, case-sensitive
-    ExpressionMatch simpleMatchCS =
-            ExpressionMatch(R"(simple.\*escape-match.*)",
-                            ExpressionMatch::MatchMode::MatchRegEx, true);
+    ExpressionMatch simpleMatchCS = ExpressionMatch(R"(simple.\*escape-match.*)", ExpressionMatch::MatchMode::MatchRegEx, true);
     // Inverted regex, case-insensitive
-    ExpressionMatch simpleMatchInvert =
-            ExpressionMatch(R"(!invert.\*escape-match.*)",
-                            ExpressionMatch::MatchMode::MatchRegEx, false);
+    ExpressionMatch simpleMatchInvert = ExpressionMatch(R"(!invert.\*escape-match.*)", ExpressionMatch::MatchMode::MatchRegEx, false);
     // Non-inverted regex, case-insensitive
-    ExpressionMatch simpleMatchNoInvert =
-            ExpressionMatch(R"(\!simple.\*escape-match.*)",
-                            ExpressionMatch::MatchMode::MatchRegEx, false);
+    ExpressionMatch simpleMatchNoInvert = ExpressionMatch(R"(\!simple.\*escape-match.*)", ExpressionMatch::MatchMode::MatchRegEx, false);
     // Non-inverted regex literal slash, case-insensitive
-    ExpressionMatch simpleMatchNoInvertSlash =
-            ExpressionMatch(R"(\\!simple.\*escape-match.*)",
-                            ExpressionMatch::MatchMode::MatchRegEx, false);
+    ExpressionMatch simpleMatchNoInvertSlash = ExpressionMatch(R"(\\!simple.\*escape-match.*)", ExpressionMatch::MatchMode::MatchRegEx, false);
 
     // Assert valid and not empty
     ASSERT_TRUE(simpleMatch.isValid());
@@ -379,30 +338,28 @@ TEST(ExpressionMatchTest, matchRegEx)
     EXPECT_FALSE(simpleMatchCS.match("SiMpLEA*escape-MATCH"));
 }
 
-
 TEST(ExpressionMatchTest, trimMultiWildcardWhitespace)
 {
     // Patterns
     static constexpr uint PATTERN_SOURCE = 0;
     static constexpr uint PATTERN_RESULT = 1;
-    std::vector<std::vector<QString>> patterns = {
-        // Literal
-        {"literal",
-         "literal"},
-        // Simple semicolon cleanup
-        {"simple1  ;simple2; simple3 ",
-         "simple1; simple2; simple3"},
-        // Simple newline cleanup
-        {"simple1  \nsimple2\n simple3 ",
-         "simple1\nsimple2\nsimple3"},
-        // Complex cleanup
-        {R"(norm; norm-space ; newline-space )""\n"
-         R"( ;escape \; sep ; slash-end-split\\; quad\\\\norm; newline-split-slash\\)""\n"
-         R"(slash-at-end\\)",
-         R"(norm; norm-space; newline-space)""\n"
-         R"(escape \; sep; slash-end-split\\; quad\\\\norm; newline-split-slash\\)""\n"
-         R"(slash-at-end\\)"}
-    };
+    std::vector<std::vector<QString>> patterns = {// Literal
+                                                  {"literal", "literal"},
+                                                  // Simple semicolon cleanup
+                                                  {"simple1  ;simple2; simple3 ", "simple1; simple2; simple3"},
+                                                  // Simple newline cleanup
+                                                  {"simple1  \nsimple2\n simple3 ", "simple1\nsimple2\nsimple3"},
+                                                  // Complex cleanup
+                                                  {R"(norm; norm-space ; newline-space )"
+                                                   "\n"
+                                                   R"( ;escape \; sep ; slash-end-split\\; quad\\\\norm; newline-split-slash\\)"
+                                                   "\n"
+                                                   R"(slash-at-end\\)",
+                                                   R"(norm; norm-space; newline-space)"
+                                                   "\n"
+                                                   R"(escape \; sep; slash-end-split\\; quad\\\\norm; newline-split-slash\\)"
+                                                   "\n"
+                                                   R"(slash-at-end\\)"}};
 
     // Check every source string...
     QString result;
@@ -418,12 +375,10 @@ TEST(ExpressionMatchTest, trimMultiWildcardWhitespace)
     }
 }
 
-
 TEST(ExpressionMatchTest, testInvalidRegEx)
 {
     // Invalid regular expression pattern
-    ExpressionMatch invalidRegExMatch =
-            ExpressionMatch("*network", ExpressionMatch::MatchMode::MatchRegEx, false);
+    ExpressionMatch invalidRegExMatch = ExpressionMatch("*network", ExpressionMatch::MatchMode::MatchRegEx, false);
 
     // Assert not valid
     ASSERT_FALSE(invalidRegExMatch.isValid());
@@ -437,7 +392,6 @@ TEST(ExpressionMatchTest, testInvalidRegEx)
     EXPECT_FALSE(invalidRegExMatch.match("*network"));
 }
 
-
 TEST(ExpressionMatchTest, matchPhraseUnicode)
 {
     // Escape Unicode color emoji as a workaround for bug with libXft, otherwise, color emoji may
@@ -449,17 +403,13 @@ TEST(ExpressionMatchTest, matchPhraseUnicode)
     const QString UnicodeEmojiFox("\xf0\x9f\xa6\x8a");
 
     // Simple phrase, case-insensitive, ASCII
-    ExpressionMatch simpleMatchASCII =
-            ExpressionMatch("V", ExpressionMatch::MatchMode::MatchPhrase, false);
+    ExpressionMatch simpleMatchASCII = ExpressionMatch("V", ExpressionMatch::MatchMode::MatchPhrase, false);
     // Simple phrase, case-insensitive, ASCII Unicode mix
-    ExpressionMatch simpleMatchUniASCII =
-            ExpressionMatch("räv", ExpressionMatch::MatchMode::MatchPhrase, false);
+    ExpressionMatch simpleMatchUniASCII = ExpressionMatch("räv", ExpressionMatch::MatchMode::MatchPhrase, false);
     // Simple phrase, case-insensitive, full Unicode
-    ExpressionMatch simpleMatchUnicode =
-            ExpressionMatch("狐", ExpressionMatch::MatchMode::MatchPhrase, false);
+    ExpressionMatch simpleMatchUnicode = ExpressionMatch("狐", ExpressionMatch::MatchMode::MatchPhrase, false);
     // Simple phrase, case-insensitive, emoji
-    ExpressionMatch simpleMatchEmoji =
-            ExpressionMatch(UnicodeEmojiFox, ExpressionMatch::MatchMode::MatchPhrase, false);
+    ExpressionMatch simpleMatchEmoji = ExpressionMatch(UnicodeEmojiFox, ExpressionMatch::MatchMode::MatchPhrase, false);
 
     // Assert valid and not empty
     ASSERT_TRUE(simpleMatchASCII.isValid());
@@ -481,7 +431,7 @@ TEST(ExpressionMatchTest, matchPhraseUnicode)
     EXPECT_TRUE(simpleMatchASCII.match("V: hello"));
     EXPECT_TRUE(simpleMatchUniASCII.match("\"räv\""));
     EXPECT_TRUE(simpleMatchUnicode.match("狐."));
-    EXPECT_TRUE(simpleMatchEmoji.match("(" + UnicodeEmojiFox  + ")"));
+    EXPECT_TRUE(simpleMatchEmoji.match("(" + UnicodeEmojiFox + ")"));
 
     // Assert non-word-boundary Unicode is NOT treated as a word boundary
     // > ASCII nickname (most common case with spam)
@@ -499,20 +449,13 @@ TEST(ExpressionMatchTest, matchPhraseUnicode)
     EXPECT_FALSE(simpleMatchUniASCII.match("rav"));
 }
 
-
 TEST(ExpressionMatchTest, matchRegExUnicode)
 {
     // Word character (letter and digit) regex, case-insensitive
-    ExpressionMatch simpleMatchSixWordChar =
-            ExpressionMatch(R"(\w{6})",
-                            ExpressionMatch::MatchMode::MatchRegEx, false);
+    ExpressionMatch simpleMatchSixWordChar = ExpressionMatch(R"(\w{6})", ExpressionMatch::MatchMode::MatchRegEx, false);
     // Digit regex, case-insensitive
-    ExpressionMatch simpleMatchThreeDigit =
-            ExpressionMatch(R"(\d{3})",
-                            ExpressionMatch::MatchMode::MatchRegEx, false);
-    ExpressionMatch simpleMatchAnyDigit =
-            ExpressionMatch(R"(\d+)",
-                            ExpressionMatch::MatchMode::MatchRegEx, false);
+    ExpressionMatch simpleMatchThreeDigit = ExpressionMatch(R"(\d{3})", ExpressionMatch::MatchMode::MatchRegEx, false);
+    ExpressionMatch simpleMatchAnyDigit = ExpressionMatch(R"(\d+)", ExpressionMatch::MatchMode::MatchRegEx, false);
 
     // Assert valid and not empty
     ASSERT_TRUE(simpleMatchSixWordChar.isValid());

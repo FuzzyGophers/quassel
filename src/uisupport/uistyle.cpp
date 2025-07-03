@@ -125,7 +125,7 @@ void UiStyle::loadStyleSheet()
         if (customSheet.isEmpty()) {
             // MIGRATION: changed default install path for data from /usr/share/apps to /usr/share
             if (customSheetPath.startsWith("/usr/share/apps/quassel")) {
-					customSheetPath.replace(QRegularExpression("^/usr/share/apps"), "/usr/share");
+                customSheetPath.replace(QRegularExpression("^/usr/share/apps"), "/usr/share");
                 customSheet = loadStyleSheet("file:///" + customSheetPath, true);
                 if (!customSheet.isEmpty()) {
                     s.setValue("CustomStyleSheetPath", customSheetPath);
@@ -201,7 +201,7 @@ void UiStyle::updateSystemTimestampFormat()
     const QRegularExpression regExpMatchAMPM(".*(\\b|_)(A|AP)(\\b|_).*", QRegularExpression::CaseInsensitiveOption);
 
     auto match = regExpMatchAMPM.match(QLocale().timeFormat(QLocale::ShortFormat));
-	if (match.hasMatch() && match.capturedStart() == 0 && match.capturedLength() == QLocale().timeFormat(QLocale::ShortFormat).length()) {
+    if (match.hasMatch() && match.capturedStart() == 0 && match.capturedLength() == QLocale().timeFormat(QLocale::ShortFormat).length()) {
         // AM/PM style used
         _systemTimestampFormatString = " h:mm:ss ap";
     }
@@ -806,7 +806,8 @@ QString UiStyle::mircToInternal(const QString& mirc_)
             if (!num.isEmpty() && rx.match(num).hasMatch() && rx.match(num).capturedLength() == num.length()) {
                 ins = "%Dhf#" + num.toLower();
                 i += 6;
-                if (i < mirc.length() && mirc[i] == ',' && !(num = mirc.mid(i + 1, 6)).isEmpty() && rx.match(num).hasMatch() && rx.match(num).capturedLength() == num.length()) {
+                if (i < mirc.length() && mirc[i] == ',' && !(num = mirc.mid(i + 1, 6)).isEmpty() && rx.match(num).hasMatch()
+                    && rx.match(num).capturedLength() == num.length()) {
                     ins += "%Dhb#" + num.toLower();
                     i += 7;
                 }

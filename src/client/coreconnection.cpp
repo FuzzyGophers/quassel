@@ -3,6 +3,8 @@
 
 #include "coreconnection.h"
 
+#include <QNetworkInformation>
+
 #include "client.h"
 #include "clientauthhandler.h"
 #include "clientsettings.h"
@@ -11,7 +13,6 @@
 #include "internalpeer.h"
 #include "network.h"
 #include "networkmodel.h"
-#include <QNetworkInformation>
 #include "quassel.h"
 #include "signalproxy.h"
 #include "util.h"
@@ -114,7 +115,8 @@ void CoreConnection::networkDetectionModeChanged(const QVariant& vmode)
     auto mode = static_cast<CoreConnectionSettings::NetworkDetectionMode>(vmode.toInt());
     if (mode == CoreConnectionSettings::UsePingTimeout) {
         Client::signalProxy()->setMaxHeartBeatCount(s.pingTimeoutInterval() / 30);
-    } else {
+    }
+    else {
         Client::signalProxy()->setMaxHeartBeatCount(-1);
     }
 }
@@ -143,7 +145,8 @@ void CoreConnection::onlineStateChanged(QNetworkInformation::Reachability reacha
         if (state() == Disconnected && _wantReconnect && s.autoReconnect()) {
             reconnectToCore();
         }
-    } else if (reachability == QNetworkInformation::Reachability::Disconnected) {
+    }
+    else if (reachability == QNetworkInformation::Reachability::Disconnected) {
         if (state() != Disconnected && !isLocalConnection()) {
             disconnectFromCore(tr("Network is down"), true);
         }

@@ -14,12 +14,7 @@ namespace test {
 struct ProtocolMessage
 {
     // Supported protocol message types. If extended, the various visitors in this file need to be extended too.
-    boost::variant<
-        QuasselProtocol::SyncMessage,
-        QuasselProtocol::RpcCall,
-        QuasselProtocol::InitRequest,
-        QuasselProtocol::InitData
-    > message;
+    boost::variant<QuasselProtocol::SyncMessage, QuasselProtocol::RpcCall, QuasselProtocol::InitRequest, QuasselProtocol::InitData> message;
 };
 
 void PrintTo(const ProtocolMessage& msg, std::ostream* os)
@@ -28,37 +23,31 @@ void PrintTo(const ProtocolMessage& msg, std::ostream* os)
     {
         PrintToVisitor(std::ostream* os)
             : _os{os}
-        {}
+        {
+        }
 
         void operator()(const QuasselProtocol::SyncMessage& syncMessage) const
         {
             *_os << "SyncMessage{className = " << PrintToString(syncMessage.className)
-                 << ", objectName = " << PrintToString(syncMessage.objectName)
-                 << ", slotName = " << PrintToString(syncMessage.slotName)
-                 << ", params = " << PrintToString(syncMessage.params)
-                 << "}";
+                 << ", objectName = " << PrintToString(syncMessage.objectName) << ", slotName = " << PrintToString(syncMessage.slotName)
+                 << ", params = " << PrintToString(syncMessage.params) << "}";
         }
 
         void operator()(const QuasselProtocol::RpcCall& rpcCall) const
         {
-            *_os << "RpcCall{signalName = " << PrintToString(rpcCall.signalName)
-                 << ", params = " << PrintToString(rpcCall.params)
-                 << "}";
+            *_os << "RpcCall{signalName = " << PrintToString(rpcCall.signalName) << ", params = " << PrintToString(rpcCall.params) << "}";
         }
 
         void operator()(const QuasselProtocol::InitRequest& initRequest) const
         {
             *_os << "InitRequest{className = " << PrintToString(initRequest.className)
-                 << ", objectName = " << PrintToString(initRequest.objectName)
-                 << "}";
+                 << ", objectName = " << PrintToString(initRequest.objectName) << "}";
         }
 
         void operator()(const QuasselProtocol::InitData& initData) const
         {
-            *_os << "InitData{className = " << PrintToString(initData.className)
-                 << ", objectName = " << PrintToString(initData.objectName)
-                 << ", initData = " << PrintToString(initData.initData)
-                 << "}";
+            *_os << "InitData{className = " << PrintToString(initData.className) << ", objectName = " << PrintToString(initData.objectName)
+                 << ", initData = " << PrintToString(initData.initData) << "}";
         }
 
     private:
@@ -104,7 +93,8 @@ struct DispatchVisitor : public boost::static_visitor<void>
 {
     DispatchVisitor(MockedPeer* mock)
         : _mock{mock}
-    {}
+    {
+    }
 
     template<typename T>
     void operator()(const T& message) const
@@ -170,7 +160,8 @@ public:
     template<typename T>
     ProtocolMessageMatcher(T expectation)
         : _expectation{std::move(expectation)}
-    {}
+    {
+    }
 
     /**
      * Visitor used for matching a particular type of protocol message.
@@ -181,7 +172,8 @@ public:
     {
         MatchVisitor(const boost::any& expectation)
             : _expectation{expectation}
-        {}
+        {
+        }
 
         bool operator()(const QuasselProtocol::SyncMessage& syncMessage) const
         {
@@ -253,13 +245,17 @@ private:
     boost::any _expectation;
 };
 
-}  // anon
+}  // namespace
 
 // Create matcher instances
 
-Matcher<const ProtocolMessage&> SyncMessage(Matcher<QByteArray> className, Matcher<QString> objectName, Matcher<QByteArray> slotName, Matcher<QVariantList> params)
+Matcher<const ProtocolMessage&> SyncMessage(Matcher<QByteArray> className,
+                                            Matcher<QString> objectName,
+                                            Matcher<QByteArray> slotName,
+                                            Matcher<QVariantList> params)
 {
-    return MakeMatcher(new ProtocolMessageMatcher{SyncMessageExpectation{std::move(className), std::move(objectName), std::move(slotName), std::move(params)}});
+    return MakeMatcher(new ProtocolMessageMatcher{
+        SyncMessageExpectation{std::move(className), std::move(objectName), std::move(slotName), std::move(params)}});
 }
 
 Matcher<const ProtocolMessage&> RpcCall(Matcher<QByteArray> signalName, Matcher<QVariantList> params)

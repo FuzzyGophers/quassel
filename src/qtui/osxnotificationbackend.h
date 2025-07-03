@@ -15,7 +15,7 @@ class OSXNotificationBackend : public AbstractNotificationBackend
 
 public:
     OSXNotificationBackend(QObject* parent = nullptr);
-    virtual ~OSXNotificationBackend(); // Declare the destructor
+    virtual ~OSXNotificationBackend();  // Declare the destructor
 
     void notify(const Notification&) override;
     void close(uint notificationId) override;
@@ -49,4 +49,4 @@ private:
     bool _enabled;
 };
 
-#endif // OSXNOTIFICATIONBACKEND_H
+#endif  // OSXNOTIFICATIONBACKEND_H

@@ -21,7 +21,12 @@ public:
      * @param command[out] Parsed command
      * @param parameters[out] Parsed list of parameters
      */
-    static void parseMessage(const std::function<QString(const QByteArray&)>& decode, const QByteArray& raw, QHash<IrcTagKey, QString>& tags, QString& prefix, QString& command, QList<QByteArray>& parameters);
+    static void parseMessage(const std::function<QString(const QByteArray&)>& decode,
+                             const QByteArray& raw,
+                             QHash<IrcTagKey, QString>& tags,
+                             QString& prefix,
+                             QString& command,
+                             QList<QByteArray>& parameters);
 
     /**
      * Extracts a space-delimited fragment from an IRC message
@@ -40,6 +45,7 @@ public:
      * @param start Current index into the message, will be advanced  automatically
      */
     static void skipEmptyParts(const QByteArray& raw, int& start);
+
 private:
     /**
      * Parses an encoded IRCv3 message tag value

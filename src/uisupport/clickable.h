@@ -29,7 +29,8 @@ public:
         : _type(type)
         , _start(start)
         , _length(length)
-    {}
+    {
+    }
 
     inline Type type() const { return _type; }
     inline quint16 start() const { return _start; }

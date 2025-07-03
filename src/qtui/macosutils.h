@@ -16,11 +16,23 @@ quint32 getMacShiftUnicode();
 #else
 
 // Define dummy values for non-macOS platforms
-inline quint32 getMacCommandUnicode() { return 0; }
-inline quint32 getMacControlUnicode() { return 0; }
-inline quint32 getMacOptionUnicode() { return 0; }
-inline quint32 getMacShiftUnicode() { return 0; }
+inline quint32 getMacCommandUnicode()
+{
+    return 0;
+}
+inline quint32 getMacControlUnicode()
+{
+    return 0;
+}
+inline quint32 getMacOptionUnicode()
+{
+    return 0;
+}
+inline quint32 getMacShiftUnicode()
+{
+    return 0;
+}
 
 #endif
 
-#endif // MACOSUTILS_H
+#endif  // MACOSUTILS_H

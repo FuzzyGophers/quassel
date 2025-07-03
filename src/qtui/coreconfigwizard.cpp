@@ -176,11 +176,11 @@ void CoreConfigWizard::prepareCoreSetup(const QString& backend,
     }
     else {
         coreConnection()->setupCore(QuasselProtocol::SetupData(field("adminUser.user").toString(),
-                                                        field("adminUser.password").toString(),
-                                                        backend,
-                                                        properties,
-                                                        authenticator,
-                                                        authProperties));
+                                                               field("adminUser.password").toString(),
+                                                               backend,
+                                                               properties,
+                                                               authenticator,
+                                                               authProperties));
     }
 }
 

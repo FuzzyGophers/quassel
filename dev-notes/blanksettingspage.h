@@ -7,25 +7,27 @@
 #include <QHash>
 
 #include "settingspage.h"
+
 #include "ui_blanksettingspage.h"
 
-class BlankSettingsPage : public SettingsPage {
-  Q_OBJECT
+class BlankSettingsPage : public SettingsPage
+{
+    Q_OBJECT
 
-  public:
-    BlankSettingsPage(QWidget *parent = 0);
+public:
+    BlankSettingsPage(QWidget* parent = 0);
 
     bool hasDefaults() const;
 
-  public slots:
+public slots:
     void save();
     void load();
     void defaults();
 
-  private slots:
+private slots:
     void widgetHasChanged();
 
-  private:
+private:
     Ui::BlankSettingsPage ui;
     QHash<QString, QVariant> settings;
 

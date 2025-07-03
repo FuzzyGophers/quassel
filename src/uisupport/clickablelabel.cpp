@@ -8,7 +8,8 @@
 
 ClickableLabel::ClickableLabel(QWidget* parent)
     : QLabel(parent)
-{}
+{
+}
 
 void ClickableLabel::mouseReleaseEvent(QMouseEvent* event)
 {

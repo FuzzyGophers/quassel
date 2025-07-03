@@ -55,19 +55,17 @@ NetworksSettingsPage::NetworksSettingsPage(QWidget* parent)
     unavailableIcon = icon::get({"emblem-unavailable", "dialog-warning"});
     questionIcon = icon::get({"emblem-question", "dialog-question", "dialog-information"});
 
-	// List of supported encodings
-	static const QMap<QStringConverter::Encoding, QString> encodingNames = {
-        {QStringConverter::Utf8, "UTF-8"},
-        {QStringConverter::Latin1, "Latin1 (ISO-8859-1)"},
-        {QStringConverter::Utf16, "UTF-16"},
-        {QStringConverter::Utf16LE, "UTF-16LE"},
-        {QStringConverter::Utf16BE, "UTF-16BE"},
-        {QStringConverter::Utf32, "UTF-32"},
-        {QStringConverter::Utf32LE, "UTF-32LE"},
-        {QStringConverter::Utf32BE, "UTF-32BE"},
-        {QStringConverter::System, "System"}
-    };
-	
+    // List of supported encodings
+    static const QMap<QStringConverter::Encoding, QString> encodingNames = {{QStringConverter::Utf8, "UTF-8"},
+                                                                            {QStringConverter::Latin1, "Latin1 (ISO-8859-1)"},
+                                                                            {QStringConverter::Utf16, "UTF-16"},
+                                                                            {QStringConverter::Utf16LE, "UTF-16LE"},
+                                                                            {QStringConverter::Utf16BE, "UTF-16BE"},
+                                                                            {QStringConverter::Utf32, "UTF-32"},
+                                                                            {QStringConverter::Utf32LE, "UTF-32LE"},
+                                                                            {QStringConverter::Utf32BE, "UTF-32BE"},
+                                                                            {QStringConverter::System, "System"}};
+
     for (const QString& codecName : encodingNames.values()) {
         ui.sendEncoding->addItem(codecName);
         ui.recvEncoding->addItem(codecName);
@@ -371,7 +369,7 @@ void NetworksSettingsPage::setNetworkCapStates(NetworkId id)
             // SSL certificate on the identity - check EXTERNAL if CertID exists, PLAIN if not
             bool usingSASLExternal = displayedNetworkHasCertId();
             if ((usingSASLExternal && net->saslMaybeSupports(IrcCap::SaslMech::EXTERNAL))
-                    || (!usingSASLExternal && net->saslMaybeSupports(IrcCap::SaslMech::PLAIN))) {
+                || (!usingSASLExternal && net->saslMaybeSupports(IrcCap::SaslMech::PLAIN))) {
                 setCapSASLStatus(CapSupportStatus::MaybeSupported, usingSASLExternal);
             }
             else {
@@ -594,7 +592,7 @@ void NetworksSettingsPage::displayNetwork(NetworkId id)
                 delete _cid;
                 _cid = nullptr;
             }
-            auto *identity = Client::identity(info.identity);
+            auto* identity = Client::identity(info.identity);
             if (identity) {
                 // Connect new CertIdentity
                 _cid = new CertIdentity(*identity, this);
@@ -708,7 +706,8 @@ void NetworksSettingsPage::saveToNetworkInfo(NetworkInfo& info)
     if (ui.enableCapServerTime->isChecked()) {
         // Capability enabled, remove it from the skip list
         info.skipCaps.removeAll(IrcCap::SERVER_TIME);
-    } else if (!info.skipCaps.contains(IrcCap::SERVER_TIME)) {
+    }
+    else if (!info.skipCaps.contains(IrcCap::SERVER_TIME)) {
         // Capability disabled and not in the skip list, add it
         info.skipCaps.append(IrcCap::SERVER_TIME);
     }
@@ -1003,14 +1002,14 @@ void NetworksSettingsPage::on_saslStatusDetails_clicked()
                 saslStatusExplanation = tr("The network \"%1\" does not currently support SASL "
                                            "EXTERNAL for SSL certificate authentication.  However, "
                                            "support might be added later on.")
-                                           .arg(netName);
+                                            .arg(netName);
             }
             else {
                 // SASL PLAIN is used
                 saslStatusHeader = tr("SASL not currently supported by network");
                 saslStatusExplanation = tr("The network \"%1\" does not currently support SASL.  "
                                            "However, support might be added later on.")
-                                           .arg(netName);
+                                            .arg(netName);
             }
             useWarningIcon = true;
             break;
@@ -1079,32 +1078,33 @@ void NetworksSettingsPage::on_enableCapsStatusDetails_clicked()
         // Try to explain IRCv3 network features in a friendly way, including showing the currently
         // enabled features if available
         auto messageText = QString("<p>%1</p></br><p>%2</p>")
-                .arg(tr("Quassel makes use of newer IRC features when supported by the IRC network."
-                        "  If desired, you can disable unwanted or problematic features here."),
-                     tr("The <a href=\"https://ircv3.net/irc/\">IRCv3 website</a> provides more "
-                        "technical details on the IRCv3 capabilities powering these features."));
+                               .arg(tr("Quassel makes use of newer IRC features when supported by the IRC network."
+                                       "  If desired, you can disable unwanted or problematic features here."),
+                                    tr("The <a href=\"https://ircv3.net/irc/\">IRCv3 website</a> provides more "
+                                       "technical details on the IRCv3 capabilities powering these features."));
 
         if (!sortedCapsEnabled.isEmpty()) {
             // Format the capabilities within <code></code> blocks
-            auto formattedCaps = QString("<code>%1</code>")
-                    .arg(sortedCapsEnabled.join("</code>, <code>"));
+            auto formattedCaps = QString("<code>%1</code>").arg(sortedCapsEnabled.join("</code>, <code>"));
 
             // Add the currently enabled capabilities to the list
             // This creates a new QString, but this code is not performance-critical.
-            messageText = messageText.append(QString("<p><i>%1</i></p>").arg(
-                                                 tr("Currently enabled IRCv3 capabilities for this "
-                                                    "network: %1").arg(formattedCaps)));
+            messageText = messageText.append(QString("<p><i>%1</i></p>")
+                                                 .arg(tr("Currently enabled IRCv3 capabilities for this "
+                                                         "network: %1")
+                                                          .arg(formattedCaps)));
         }
 
         QMessageBox::information(this, tr("Configuring network features"), messageText);
     }
     else {
         // Core does not IRCv3 capability skipping, show warning
-        QMessageBox::warning(this, tr("Configuring network features unsupported"),
+        QMessageBox::warning(this,
+                             tr("Configuring network features unsupported"),
                              QString("<p><b>%1</b></p></br><p>%2</p>")
-                             .arg(tr("Your Quassel core is too old to configure IRCv3 network features"),
-                                  tr("You need a Quassel core v0.14.0 or newer to control what network "
-                                     "features Quassel will use.")));
+                                 .arg(tr("Your Quassel core is too old to configure IRCv3 network features"),
+                                      tr("You need a Quassel core v0.14.0 or newer to control what network "
+                                         "features Quassel will use.")));
     }
 }
 
@@ -1382,7 +1382,6 @@ CapsEditDlg::CapsEditDlg(const QString& oldSkipCapsString, QWidget* parent)
         ui.skipCapsEdit->setText(oldSkipCapsString);
     }
 }
-
 
 QString CapsEditDlg::skipCapsString() const
 {

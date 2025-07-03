@@ -114,7 +114,11 @@ public:
     QVariant data(int column, int role) const override;
     bool setData(int column, const QVariant& value, int role) override;
 
-    virtual QString toolTip(int column) const { Q_UNUSED(column) return QString(); }
+    virtual QString toolTip(int column) const
+    {
+        Q_UNUSED(column)
+        return QString();
+    }
     int columnCount() const override;
 };
 
@@ -178,7 +182,7 @@ private:
             : parent(parent_)
             , childCount(cc_)
             , start(s_)
-            , end(e_){};
+            , end(e_) {};
     };
     ChildStatus _childStatus;
     int _aboutToRemoveOrInsert;

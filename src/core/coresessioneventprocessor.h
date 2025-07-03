@@ -46,8 +46,8 @@ public:
     Q_INVOKABLE void processIrcEventQuit(IrcEvent* event);
     Q_INVOKABLE void lateProcessIrcEventQuit(IrcEvent* event);
     Q_INVOKABLE void processIrcEventTopic(IrcEvent* event);
-    Q_INVOKABLE void processIrcEventError(IrcEvent* event);  /// ERROR message from server
-    Q_INVOKABLE void processIrcEventSetname(IrcEvent* event); ///< Updated realname information
+    Q_INVOKABLE void processIrcEventError(IrcEvent* event);    /// ERROR message from server
+    Q_INVOKABLE void processIrcEventSetname(IrcEvent* event);  ///< Updated realname information
 #ifdef HAVE_QCA2
     Q_INVOKABLE void processKeyEvent(KeyEvent* event);
 #endif

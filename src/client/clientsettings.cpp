@@ -15,14 +15,16 @@
 
 ClientSettings::ClientSettings(QString g)
     : Settings(g, Quassel::buildInfo().clientApplicationName)
-{}
+{
+}
 
 /***********************************************************************************************/
 
 CoreAccountSettings::CoreAccountSettings(QString subgroup)
     : ClientSettings("CoreAccounts")
     , _subgroup(std::move(subgroup))
-{}
+{
+}
 
 QString CoreAccountSettings::keyForNotify(const QString& key) const
 {
@@ -196,7 +198,8 @@ void CoreAccountSettings::clearAccounts()
 
 CoreConnectionSettings::CoreConnectionSettings()
     : ClientSettings("CoreConnection")
-{}
+{
+}
 
 void CoreConnectionSettings::setNetworkDetectionMode(NetworkDetectionMode mode)
 {
@@ -246,7 +249,8 @@ int CoreConnectionSettings::reconnectInterval() const
 
 NotificationSettings::NotificationSettings()
     : ClientSettings("Notification")
-{}
+{
+}
 
 void NotificationSettings::setValue(const QString& key, const QVariant& data)
 {
@@ -299,7 +303,8 @@ bool NotificationSettings::nicksCaseSensitive() const
 
 TabCompletionSettings::TabCompletionSettings()
     : ClientSettings("TabCompletion")
-{}
+{
+}
 
 void TabCompletionSettings::setCompletionSuffix(const QString& suffix)
 {
@@ -357,7 +362,8 @@ bool TabCompletionSettings::useLastSpokenTo() const
 
 ItemViewSettings::ItemViewSettings(const QString& group)
     : ClientSettings(group)
-{}
+{
+}
 
 bool ItemViewSettings::displayTopicInTooltip() const
 {

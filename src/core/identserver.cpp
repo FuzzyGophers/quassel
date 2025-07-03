@@ -22,63 +22,46 @@ bool IdentServer::startListening()
 
     const QString listen = Quassel::optionValue("ident-listen");
     const QStringList listen_list = listen.split(",", Qt::SkipEmptyParts);
-    for (const QString &listen_term : listen_list) { // TODO: handle multiple interfaces for same TCP version gracefully
+    for (const QString& listen_term : listen_list) {  // TODO: handle multiple interfaces for same TCP version gracefully
         QHostAddress addr;
         if (!addr.setAddress(listen_term)) {
-            qCritical() << qPrintable(
-                    tr("Invalid listen address %1")
-                            .arg(listen_term)
-            );
+            qCritical() << qPrintable(tr("Invalid listen address %1").arg(listen_term));
         }
         else {
             switch (addr.protocol()) {
-                case QAbstractSocket::IPv6Protocol:
-                    if (_v6server.listen(addr, port)) {
-                        qInfo() << qPrintable(
-                                tr("Listening for identd requests on IPv6 %1 port %2")
-                                        .arg(addr.toString())
-                                        .arg(_v6server.serverPort())
-                        );
-                        success = true;
-                    }
-                    else
+            case QAbstractSocket::IPv6Protocol:
+                if (_v6server.listen(addr, port)) {
+                    qInfo() << qPrintable(
+                        tr("Listening for identd requests on IPv6 %1 port %2").arg(addr.toString()).arg(_v6server.serverPort()));
+                    success = true;
+                }
+                else
+                    qWarning() << qPrintable(
+                        tr("Could not open IPv6 interface %1:%2: %3").arg(addr.toString()).arg(port).arg(_v6server.errorString()));
+                break;
+            case QAbstractSocket::IPv4Protocol:
+                if (_server.listen(addr, port)) {
+                    qInfo() << qPrintable(
+                        tr("Listening for identd requests on IPv4 %1 port %2").arg(addr.toString()).arg(_server.serverPort()));
+                    success = true;
+                }
+                else {
+                    // if v6 succeeded on Any, the port will be already in use - don't display the error then
+                    if (!success || _server.serverError() != QAbstractSocket::AddressInUseError)
                         qWarning() << qPrintable(
-                                tr("Could not open IPv6 interface %1:%2: %3")
-                                        .arg(addr.toString())
-                                        .arg(port)
-                                        .arg(_v6server.errorString()));
-                    break;
-                case QAbstractSocket::IPv4Protocol:
-                    if (_server.listen(addr, port)) {
-                        qInfo() << qPrintable(
-                                tr("Listening for identd requests on IPv4 %1 port %2")
-                                        .arg(addr.toString())
-                                        .arg(_server.serverPort())
-                        );
-                        success = true;
-                    }
-                    else {
-                        // if v6 succeeded on Any, the port will be already in use - don't display the error then
-                        if (!success || _server.serverError() != QAbstractSocket::AddressInUseError)
-                            qWarning() << qPrintable(
-                                    tr("Could not open IPv4 interface %1:%2: %3")
-                                            .arg(addr.toString())
-                                            .arg(port)
-                                            .arg(_server.errorString()));
-                    }
-                    break;
-                default:
-                    qCritical() << qPrintable(
-                            tr("Invalid listen address %1, unknown network protocol")
-                                    .arg(listen_term)
-                    );
-                    break;
+                            tr("Could not open IPv4 interface %1:%2: %3").arg(addr.toString()).arg(port).arg(_server.errorString()));
+                }
+                break;
+            default:
+                qCritical() << qPrintable(tr("Invalid listen address %1, unknown network protocol").arg(listen_term));
+                break;
             }
         }
     }
 
     if (!success) {
-        qWarning() << qPrintable(tr("Identd could not open any network interfaces to listen on! No identd functionality will be available"));
+        qWarning() << qPrintable(
+            tr("Identd could not open any network interfaces to listen on! No identd functionality will be available"));
     }
 
     return success;
@@ -165,10 +148,7 @@ void IdentServer::respond()
 void Request::respondSuccess(const QString& user)
 {
     if (socket) {
-        QString data = QString("%1, %2 : USERID : Quassel : %3\r\n")
-            .arg(QString::number(localPort))
-            .arg(QString::number(remotePort))
-            .arg(user);
+        QString data = QString("%1, %2 : USERID : Quassel : %3\r\n").arg(QString::number(localPort)).arg(QString::number(remotePort)).arg(user);
         qDebug() << "answering identd request from" << socket->peerAddress() << "with" << data;
         socket->write(data.toUtf8());
         socket->flush();
@@ -179,10 +159,7 @@ void Request::respondSuccess(const QString& user)
 void Request::respondError(const QString& error)
 {
     if (socket) {
-        QString data = QString("%1, %2 : ERROR : %3\r\n")
-            .arg(QString::number(localPort))
-            .arg(QString::number(remotePort))
-            .arg(error);
+        QString data = QString("%1, %2 : ERROR : %3\r\n").arg(QString::number(localPort)).arg(QString::number(remotePort)).arg(error);
         qDebug() << "answering identd request from" << socket->peerAddress() << "with" << data;
         socket->write(data.toUtf8());
         socket->flush();

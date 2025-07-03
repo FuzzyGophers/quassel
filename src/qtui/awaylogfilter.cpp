@@ -7,7 +7,8 @@
 
 AwayLogFilter::AwayLogFilter(MessageModel* model, QObject* parent)
     : ChatMonitorFilter(model, parent)
-{}
+{
+}
 
 bool AwayLogFilter::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {

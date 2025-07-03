@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include "signalproxy.h"
+
 #include <algorithm>
 #include <cstdarg>
 #include <utility>
@@ -14,7 +16,6 @@
 
 #include "peer.h"
 #include "protocol.h"
-#include "signalproxy.h"
 #include "syncableobject.h"
 #include "types.h"
 #include "util.h"
@@ -27,7 +28,8 @@ public:
     RemovePeerEvent(Peer* peer)
         : QEvent(QEvent::Type(SignalProxy::RemovePeerEvent))
         , peer(peer)
-    {}
+    {
+    }
     Peer* peer;
 };
 
@@ -273,9 +275,9 @@ void SignalProxy::attachSlotObject(const QByteArray& signalName, std::unique_ptr
     _attachedSlots.emplace(QMetaObject::normalizedSignature(signalName.constData()), std::move(slotObject));
 }
 
-void SignalProxy::detachSlotObjects(const QObject *context)
+void SignalProxy::detachSlotObjects(const QObject* context)
 {
-    for (auto&& it = _attachedSlots.begin(); it != _attachedSlots.end(); ) {
+    for (auto&& it = _attachedSlots.begin(); it != _attachedSlots.end();) {
         if (it->second->context() == context) {
             it = _attachedSlots.erase(it);
         }
@@ -698,7 +700,8 @@ void SignalProxy::setTargetPeer(Peer* targetPeer)
 
 SignalProxy::SlotObjectBase::SlotObjectBase(const QObject* context)
     : _context{context}
-{}
+{
+}
 
 const QObject* SignalProxy::SlotObjectBase::context() const
 {

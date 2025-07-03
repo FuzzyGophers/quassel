@@ -1,16 +1,16 @@
 // SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include <utility>
+#include "remotepeer.h"
 
-#include <QtEndian>
+#include <utility>
 
 #include <QHostAddress>
 #include <QSslSocket>
 #include <QTimer>
+#include <QtEndian>
 
 #include "proxyline.h"
-#include "remotepeer.h"
 #include "util.h"
 
 using namespace QuasselProtocol;
@@ -166,8 +166,7 @@ bool RemotePeer::isSecure() const
 
 bool RemotePeer::isLocal() const
 {
-    return hostAddress() == QHostAddress::LocalHost ||
-           hostAddress() == QHostAddress::LocalHostIPv6;
+    return hostAddress() == QHostAddress::LocalHost || hostAddress() == QHostAddress::LocalHostIPv6;
 }
 
 bool RemotePeer::isOpen() const
@@ -205,7 +204,7 @@ bool RemotePeer::readMessage(QByteArray& msg)
     if (_msgSize == 0) {
         if (_compressor->bytesAvailable() < 4)
             return false;
-        _compressor->read((char*) &_msgSize, 4);
+        _compressor->read((char*)&_msgSize, 4);
         _msgSize = qFromBigEndian<quint32>(_msgSize);
 
         if (_msgSize > maxMessageSize) {

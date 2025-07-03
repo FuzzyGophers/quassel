@@ -34,7 +34,8 @@ ChatItem::ChatItem(const QRectF& boundingRect, ChatLine* parent)
     , _selectionMode(NoSelection)
     , _selectionStart(-1)
     , _cachedLayout(nullptr)
-{}
+{
+}
 
 ChatItem::~ChatItem()
 {
@@ -125,11 +126,9 @@ void ChatItem::initLayoutHelper(QTextLayout* layout, QTextOption::WrapMode wrapM
     option.setAlignment(alignment);
     layout->setTextOption(option);
 
-    UiStyle::FormatContainer formatRanges = QtUi::style()->toTextLayoutList(
-        formatList(),
-        layout->text().length(),
-        data(ChatLineModel::MsgLabelRole).value<UiStyle::MessageLabel>()
-    );
+    UiStyle::FormatContainer formatRanges = QtUi::style()->toTextLayoutList(formatList(),
+                                                                            layout->text().length(),
+                                                                            data(ChatLineModel::MsgLabelRole).value<UiStyle::MessageLabel>());
     UiStyle::setTextLayoutFormats(*layout, formatRanges);
 }
 
@@ -335,8 +334,8 @@ QVector<QTextLayout::FormatRange> ChatItem::additionalFormats() const
     for (size_t i = 0; i < labelFmtList.size() - 1; ++i) {
         if (labelFmtList[i].label != itemLabel) {
             additionalFormats << QtUi::style()->toTextLayoutList({std::make_pair(labelFmtList[i].offset, labelFmtList[i].format)},
-                                                                   labelFmtList[i + 1].offset,
-                                                                   labelFmtList[i].label);
+                                                                 labelFmtList[i + 1].offset,
+                                                                 labelFmtList[i].label);
         }
     }
 
@@ -881,7 +880,8 @@ ContentsChatItem::WrapColumnFinder::WrapColumnFinder(const ChatItem* _item)
     , wordidx(0)
     , lineCount(0)
     , choppedTrailing(0)
-{}
+{
+}
 
 qint16 ContentsChatItem::WrapColumnFinder::nextWrapColumn(qreal width)
 {

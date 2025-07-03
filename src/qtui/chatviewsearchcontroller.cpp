@@ -16,7 +16,8 @@
 
 ChatViewSearchController::ChatViewSearchController(QObject* parent)
     : QObject(parent)
-{}
+{
+}
 
 void ChatViewSearchController::setSearchString(const QString& searchString)
 {

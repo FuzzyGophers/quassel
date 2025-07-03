@@ -17,7 +17,8 @@ public:
     explicit NetworkEvent(EventManager::EventType type, Network* network)
         : Event(type)
         , _network(network)
-    {}
+    {
+    }
 
     inline NetworkId networkId() const { return network() ? network()->networkId() : NetworkId(); }
     inline Network* network() const { return _network; }
@@ -43,7 +44,8 @@ public:
     explicit NetworkConnectionEvent(EventManager::EventType type, Network* network, Network::ConnectionState state)
         : NetworkEvent(type, network)
         , _state(state)
-    {}
+    {
+    }
 
     inline Network::ConnectionState connectionState() const { return _state; }
     inline void setConnectionState(Network::ConnectionState state) { _state = state; }
@@ -71,7 +73,8 @@ public:
     explicit NetworkDataEvent(EventManager::EventType type, Network* network, QByteArray data)
         : NetworkEvent(type, network)
         , _data(std::move(data))
-    {}
+    {
+    }
 
     inline QByteArray data() const { return _data; }
     inline void setData(const QByteArray& data) { _data = data; }
@@ -101,7 +104,8 @@ public:
         , _channel(std::move(channel))
         , _users(std::move(users))
         , _quitMsg(std::move(quitMsg))
-    {}
+    {
+    }
 
     inline QString channel() const { return _channel; }
     inline QStringList users() const { return _users; }

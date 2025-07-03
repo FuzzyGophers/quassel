@@ -6,10 +6,10 @@
 #include "common-export.h"
 
 #include <QList>
+#include <QRegularExpression>
 #include <QSet>
 #include <QString>
 #include <QStringConverter>
-#include <QRegularExpression>
 #include <QVariant>
 
 COMMON_EXPORT QString nickFromMask(const QString& mask);
@@ -56,8 +56,8 @@ QList<T> fromVariantList(const QVariantList& variants)
 COMMON_EXPORT QByteArray prettyDigest(const QByteArray& digest);
 COMMON_EXPORT QString formatCurrentDateTimeInString(const QString& formatStr);
 COMMON_EXPORT QString tryFormatUnixEpoch(const QString& possibleEpochDate,
-                                        Qt::DateFormat dateFormat = Qt::DateFormat::TextDate,
-                                        bool useUTC = false);
+                                         Qt::DateFormat dateFormat = Qt::DateFormat::TextDate,
+                                         bool useUTC = false);
 COMMON_EXPORT QString formatDateTimeToOffsetISO(const QDateTime& dateTime);
 
 namespace detail {
@@ -70,7 +70,7 @@ struct SelectOverloadHelper
         return func;
     }
 };
-}
+}  // namespace detail
 
 template<typename... Args>
 constexpr detail::SelectOverloadHelper<Args...> selectOverload = {};

@@ -5,10 +5,10 @@
 
 #include "core-export.h"
 
-#include "identity.h"
-
 #include <QSslCertificate>
 #include <QSslKey>
+
+#include "identity.h"
 
 class SignalProxy;
 

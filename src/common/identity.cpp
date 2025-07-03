@@ -17,8 +17,8 @@
 #endif
 
 #ifdef Q_OS_WIN
-#    include <windows.h>
 #    include <Winbase.h>
+#    include <windows.h>
 #    define SECURITY_WIN32
 #    include <Security.h>
 #endif

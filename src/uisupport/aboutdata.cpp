@@ -15,7 +15,8 @@ AboutPerson::AboutPerson(QString name, QString nick, QString task, QString email
     , _task(std::move(task))
     , _emailAddress(std::move(emailAddress))
     , _language(translatedLanguage)
-{}
+{
+}
 
 QString AboutPerson::name() const
 {
@@ -57,7 +58,8 @@ QString AboutPerson::prettyName() const
 
 AboutData::AboutData(QObject* parent)
     : QObject(parent)
-{}
+{
+}
 
 QList<AboutPerson> AboutData::authors() const
 {

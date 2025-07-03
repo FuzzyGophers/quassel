@@ -17,13 +17,19 @@ struct COMMON_EXPORT IrcTagKey
     QString key;
     bool clientTag;
 
-    explicit IrcTagKey(QString vendor, QString key, bool clientTag = false) :
-        vendor(std::move(vendor)), key(std::move(key)), clientTag(clientTag)
-    {}
+    explicit IrcTagKey(QString vendor, QString key, bool clientTag = false)
+        : vendor(std::move(vendor))
+        , key(std::move(key))
+        , clientTag(clientTag)
+    {
+    }
 
-    explicit IrcTagKey(QString key = {}) :
-        vendor(QString{}), key(std::move(key)), clientTag(false)
-    {}
+    explicit IrcTagKey(QString key = {})
+        : vendor(QString{})
+        , key(std::move(key))
+        , clientTag(false)
+    {
+    }
 
     friend COMMON_EXPORT uint qHash(const IrcTagKey& key);
     friend COMMON_EXPORT bool operator==(const IrcTagKey& a, const IrcTagKey& b);

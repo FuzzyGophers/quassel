@@ -7,4 +7,5 @@
 
 AbstractMessageProcessor::AbstractMessageProcessor(QObject* parent)
     : QObject(parent)
-{}
+{
+}

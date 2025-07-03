@@ -13,13 +13,8 @@ Event* MessageEvent::create(EventManager::EventType type, QVariantMap& map, Netw
     return nullptr;
 }
 
-MessageEvent::MessageEvent(Message::Type msgType,
-                           Network* net,
-                           QString msg,
-                           QString sender,
-                           QString target,
-                           Message::Flags flags,
-                           const QDateTime& timestamp)
+MessageEvent::MessageEvent(
+    Message::Type msgType, Network* net, QString msg, QString sender, QString target, Message::Flags flags, const QDateTime& timestamp)
     : NetworkEvent(EventManager::MessageEvent, net)
     , _msgType(msgType)
     , _text(std::move(msg))
@@ -59,7 +54,7 @@ void MessageEvent::toVariantMap(QVariantMap& map) const
 {
     NetworkEvent::toVariantMap(map);
     map["messageType"] = msgType();
-    map["messageFlags"] = (int) msgFlags();
+    map["messageFlags"] = (int)msgFlags();
     map["bufferType"] = bufferType();
     map["text"] = text();
     map["sender"] = sender();

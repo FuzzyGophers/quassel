@@ -10,7 +10,8 @@
 TitleSetter::TitleSetter(MainWin* parent)
     : AbstractItemView(parent)
     , _mainWin(parent)
-{}
+{
+}
 
 void TitleSetter::currentChanged(const QModelIndex& current, const QModelIndex& previous)
 {

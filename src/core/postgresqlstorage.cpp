@@ -3,6 +3,8 @@
 
 #include "postgresqlstorage.h"
 
+#include <vector>
+
 #include <QByteArray>
 #include <QDataStream>
 #include <QMetaType>
@@ -13,11 +15,10 @@
 #include "network.h"
 #include "quassel.h"
 
-#include <vector>
-
 PostgreSqlStorage::PostgreSqlStorage(QObject* parent)
     : AbstractSqlStorage(parent)
-{}
+{
+}
 
 std::unique_ptr<AbstractSqlMigrationWriter> PostgreSqlStorage::createMigrationWriter()
 {
@@ -73,8 +74,8 @@ bool PostgreSqlStorage::initDbSession(QSqlDatabase& db)
     QSqlField testField("", QMetaType(QMetaType::QString));
     testField.setValue("\\");
     QString formattedString = db.driver()->formatValue(testField);
-	QSqlQuery query1(db);
-	QSqlQuery query2(db);
+    QSqlQuery query1(db);
+    QSqlQuery query2(db);
     switch (formattedString.count('\\')) {
     case 2:
         // yes it does... and we cannot do anything to change the behavior of Qt.
@@ -87,7 +88,7 @@ bool PostgreSqlStorage::initDbSession(QSqlDatabase& db)
         // and no need to check the outcome.
         query1.prepare("set standard_conforming_strings = off");
         query1.exec();
-        
+
         query2.prepare("set escape_string_warning = off");
         query2.exec();
         break;
@@ -96,8 +97,8 @@ bool PostgreSqlStorage::initDbSession(QSqlDatabase& db)
         // That means we have to ensure that postgres uses standard conforming strings...
         {
             QSqlQuery query(db);
-			query.prepare("set standard_conforming_strings = on");
-			query.exec();
+            query.prepare("set standard_conforming_strings = on");
+            query.exec();
             if (query.lastError().isValid()) {
                 // We cannot enable standard conforming strings...
                 // since Quassel does no escaping by itself, this would yield a major vulnerability.
@@ -116,8 +117,8 @@ bool PostgreSqlStorage::initDbSession(QSqlDatabase& db)
 
     // Set the PostgreSQL session timezone to UTC, since we want timestamps stored in UTC
     QSqlQuery tzQuery(db);
-	tzQuery.prepare("SET timezone = 'UTC'");
-	tzQuery.exec();
+    tzQuery.prepare("SET timezone = 'UTC'");
+    tzQuery.exec();
     if (tzQuery.lastError().isValid()) {
         qCritical() << "Failed to set timezone to UTC!";
         return false;
@@ -1137,7 +1138,7 @@ BufferInfo PostgreSqlStorage::bufferInfo(UserId user, const NetworkId& networkId
             qCritical() << "         Query:" << query.lastQuery();
             qCritical() << "  bound Values:";
             QVariantList boundValues = query.boundValues();
-			for (int i = 0; i < boundValues.size(); ++i)
+            for (int i = 0; i < boundValues.size(); ++i)
                 qCritical() << i << ":" << boundValues[i].toString().toLatin1().data();
             Q_ASSERT(false);
         }
@@ -1805,7 +1806,7 @@ std::vector<Message> PostgreSqlStorage::requestMsgs(UserId user, BufferId buffer
     if (limit != -1)
         params << limit;
     else
-        params << QVariant(QMetaType(QMetaType::Int)); // Replaced QVariant(QVariant::Int)
+        params << QVariant(QMetaType(QMetaType::Int));  // Replaced QVariant(QVariant::Int)
 
     QSqlQuery query = executePreparedQuery(queryName, params, db);
 
@@ -1929,13 +1930,15 @@ std::vector<Message> PostgreSqlStorage::requestMsgsForward(
 
     if (first == -1) {
         params << std::numeric_limits<qint64>::min();
-    } else {
+    }
+    else {
         params << first.toQint64();
     }
 
     if (last == -1) {
         params << std::numeric_limits<qint64>::max();
-    } else {
+    }
+    else {
         params << last.toQint64();
     }
 
@@ -1949,7 +1952,7 @@ std::vector<Message> PostgreSqlStorage::requestMsgsForward(
     if (limit != -1)
         params << limit;
     else
-        params << QVariant(QMetaType(QMetaType::Int)); // Replaced QVariant(QVariant::Int)
+        params << QVariant(QMetaType(QMetaType::Int));  // Replaced QVariant(QVariant::Int)
 
     QSqlQuery query = executePreparedQuery("select_messagesForward", params, db);
 
@@ -2152,12 +2155,12 @@ bool PostgreSqlStorage::beginTransaction(QSqlDatabase& db)
 bool PostgreSqlStorage::beginReadOnlyTransaction(QSqlDatabase& db)
 {
     QSqlQuery query(db);
-	query.prepare("BEGIN TRANSACTION READ ONLY");
-	query.exec();
+    query.prepare("BEGIN TRANSACTION READ ONLY");
+    query.exec();
     if (!db.isOpen()) {
         db = logDb();
         query.prepare("BEGIN TRANSACTION READ ONLY");
-		query.exec();
+        query.exec();
     }
     return !query.lastError().isValid();
 }
@@ -2173,11 +2176,11 @@ QSqlQuery PostgreSqlStorage::prepareAndExecuteQuery(const QString& queryname, co
     saveQuery.exec();
     if (paramstring.isNull()) {
         query.prepare(QString("EXECUTE quassel_%1").arg(queryname));
-		query.exec();
+        query.exec();
     }
     else {
         query.prepare(QString("EXECUTE quassel_%1 (%2)").arg(queryname).arg(paramstring));
-		query.exec();
+        query.exec();
     }
 
     if (!db.isOpen() || db.lastError().isValid()) {
@@ -2191,8 +2194,8 @@ QSqlQuery PostgreSqlStorage::prepareAndExecuteQuery(const QString& queryname, co
                 return query;
             }
             QSqlQuery saveQuery2(db);
-			saveQuery2.prepare("SAVEPOINT quassel_prepare_query");
-			saveQuery2.exec();
+            saveQuery2.prepare("SAVEPOINT quassel_prepare_query");
+            saveQuery2.exec();
         }
         else {
             QSqlQuery rollbackQuery(db);
@@ -2203,10 +2206,10 @@ QSqlQuery PostgreSqlStorage::prepareAndExecuteQuery(const QString& queryname, co
         // and once again: Qt leaves us without error codes so we either parse (language dependent(!)) strings
         // or we just guess the error. As we're only interested in unprepared queries, this will be our guess. :)
         QSqlQuery checkQuery(db);
-		checkQuery.prepare(
+        checkQuery.prepare(
             QString("SELECT count(name) FROM pg_prepared_statements WHERE name = 'quassel_%1' AND from_sql = TRUE").arg(queryname.toLower()));
         checkQuery.exec();
-		checkQuery.first();
+        checkQuery.first();
         if (checkQuery.value(0).toInt() == 0) {
             QSqlQuery prepareQuery(db);
             prepareQuery.prepare(QString("PREPARE quassel_%1 AS %2").arg(queryname).arg(queryString(queryname)));
@@ -2223,7 +2226,7 @@ QSqlQuery PostgreSqlStorage::prepareAndExecuteQuery(const QString& queryname, co
         // which always gives a proper result and the error would be lost)
         if (paramstring.isNull()) {
             query.prepare(QString("EXECUTE quassel_%1").arg(queryname));
-			query.exec();
+            query.exec();
         }
         else {
             query.prepare(QString("EXECUTE quassel_%1 (%2)").arg(queryname).arg(paramstring));
@@ -2293,7 +2296,7 @@ void PostgreSqlStorage::safeExec(QSqlQuery& query)
         QSqlQuery retryQuery(db);
         retryQuery.prepare(query.lastQuery());
         QVariantList boundValues = query.boundValues();
-		for (int i = 0; i < boundValues.size(); ++i) {
+        for (int i = 0; i < boundValues.size(); ++i) {
             QVariant value = boundValues[i];
             retryQuery.bindValue(i, boundValues[i]);
         }
@@ -2307,7 +2310,8 @@ void PostgreSqlStorage::safeExec(QSqlQuery& query)
 // ========================================
 PostgreSqlMigrationWriter::PostgreSqlMigrationWriter()
     : PostgreSqlStorage()
-{}
+{
+}
 
 bool PostgreSqlMigrationWriter::prepareQuery(MigrationObject mo)
 {

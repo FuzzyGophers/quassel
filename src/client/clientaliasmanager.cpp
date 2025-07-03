@@ -7,7 +7,8 @@
 
 ClientAliasManager::ClientAliasManager(QObject* parent)
     : AliasManager(parent)
-{}
+{
+}
 
 const Network* ClientAliasManager::network(NetworkId id) const
 {

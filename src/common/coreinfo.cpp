@@ -5,7 +5,8 @@
 
 CoreInfo::CoreInfo(QObject* parent)
     : SyncableObject(parent)
-{}
+{
+}
 
 QVariantMap CoreInfo::coreData() const
 {

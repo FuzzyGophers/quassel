@@ -6,9 +6,10 @@
 #include <QTextDocument>
 #include <QVBoxLayout>
 
+#include <knotifications_version.h>
+
 #include <KNotifications/KNotification>
 #include <KNotifyConfig/KNotifyConfigWidget>
-#include <knotifications_version.h>
 
 #include "client.h"
 #include "icon.h"
@@ -57,7 +58,7 @@ void KNotificationBackend::notify(const Notification& n)
             selectOverload<uint>(&KNotification::activated),
             this,
             selectOverload<>(&KNotificationBackend::notificationActivated));
-#if KNOTIFICATIONS_VERSION >= QT_VERSION_CHECK(5,31,0)
+#if KNOTIFICATIONS_VERSION >= QT_VERSION_CHECK(5, 31, 0)
     notification->setDefaultAction(tr("View"));
 #else
     notification->setActions(QStringList{tr("View")});

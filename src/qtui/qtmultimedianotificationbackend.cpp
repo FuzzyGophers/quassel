@@ -7,8 +7,8 @@
 
 #include <QFileDialog>
 #include <QUrl>
-#include <QtMultimedia/QMediaPlayer>
 #include <QtMultimedia/QAudioOutput>
+#include <QtMultimedia/QMediaPlayer>
 
 #include "clientsettings.h"
 #include "icon.h"
@@ -84,7 +84,7 @@ QtMultimediaNotificationBackend::ConfigWidget::ConfigWidget(QWidget* parent)
     ui.play->setIcon(icon::get("media-playback-start"));
     ui.open->setIcon(icon::get("document-open"));
 
-    _audioAvailable = true; // Assume available; adjust if needed based on runtime checks
+    _audioAvailable = true;  // Assume available; adjust if needed based on runtime checks
 
     connect(ui.enabled, &QAbstractButton::toggled, this, &ConfigWidget::widgetChanged);
     connect(ui.filename, &QLineEdit::textChanged, this, &ConfigWidget::widgetChanged);

@@ -16,7 +16,8 @@ public:
     CoreEventManager(CoreSession* session)
         : EventManager(session)
         , _coreSession(session)
-    {}
+    {
+    }
 
 protected:
     inline Network* networkById(NetworkId id) const override { return _coreSession->network(id); }

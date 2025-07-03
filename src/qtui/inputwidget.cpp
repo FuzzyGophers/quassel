@@ -684,7 +684,8 @@ QIcon InputWidget::createColorToolButtonIcon(const QIcon& icon, const QColor& co
 // MOUSE WHEEL FILTER
 MouseWheelFilter::MouseWheelFilter(QObject* parent)
     : QObject(parent)
-{}
+{
+}
 
 bool MouseWheelFilter::eventFilter(QObject* obj, QEvent* event)
 {

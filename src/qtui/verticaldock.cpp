@@ -10,7 +10,8 @@
 
 VerticalDockTitle::VerticalDockTitle(QDockWidget* parent)
     : QWidget(parent)
-{}
+{
+}
 
 QSize VerticalDockTitle::sizeHint() const
 {

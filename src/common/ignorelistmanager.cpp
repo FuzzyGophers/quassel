@@ -119,7 +119,8 @@ IgnoreListManager::StrictnessType IgnoreListManager::_match(
             if (item.type() == MessageIgnore) {
                 // TODO: Make this configurable?  Pre-0.14, format codes were not removed
                 str = stripFormatCodes(msgContents);
-            } else {
+            }
+            else {
                 str = msgSender;
             }
 

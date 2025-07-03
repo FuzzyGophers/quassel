@@ -16,7 +16,7 @@ bool toVariant(QDataStream& stream, Quassel::Features features, QVariant& data)
     return true;
 }
 
-}  // anon
+}  // namespace
 
 bool checkStreamValid(QDataStream& stream)
 {

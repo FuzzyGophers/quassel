@@ -146,7 +146,8 @@ void GraphicalUi::minimizeRestore(bool show)
         _mainWidget->showNormal();
         _mainWidget->raise();
         _mainWidget->activateWindow();
-    } else if (instance()->isHidingMainWidgetAllowed()) {
+    }
+    else if (instance()->isHidingMainWidgetAllowed()) {
         _mainWidget->hide();
     }
 }

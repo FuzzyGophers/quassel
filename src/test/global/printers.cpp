@@ -17,7 +17,7 @@ void debugOut(const T& value, ::std::ostream* os)
     *os << out.toStdString();
 }
 
-}  // anon
+}  // namespace
 
 void PrintTo(const QByteArray& value, std::ostream* os)
 {

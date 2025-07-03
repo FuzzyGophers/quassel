@@ -20,7 +20,8 @@ SettingsPage::SettingsPage(QString category, QString title, QWidget* parent)
     , _title(std::move(title))
     , _changed(false)
     , _autoWidgetsChanged(false)
-{}
+{
+}
 
 void SettingsPage::setChangedState(bool hasChanged_)
 {

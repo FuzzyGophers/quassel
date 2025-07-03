@@ -3,10 +3,10 @@
 
 #include "windowssignalwatcher.h"
 
+#include <QDebug>
+
 #include <signal.h>
 #include <windows.h>
-
-#include <QDebug>
 
 // This handler is called by Windows in a different thread when a console event happens
 // FIXME: When the console window is closed, the application is supposedly terminated as soon as
@@ -37,7 +37,7 @@ WindowsSignalWatcher::WindowsSignalWatcher(QObject* parent)
     // Use POSIX-style API to register standard signals.
     // Not sure if this is safe to use, but it has worked so far...
     signal(SIGTERM, signalHandler);
-    signal(SIGINT,  signalHandler);
+    signal(SIGINT, signalHandler);
     signal(SIGABRT, signalHandler);
     signal(SIGSEGV, signalHandler);
 
@@ -52,13 +52,12 @@ void WindowsSignalWatcher::signalHandler(int signal)
     switch (signal) {
     case SIGINT:
     case SIGTERM:
-        emit instance()->handleSignal(Action::Terminate);
+        emit instance() -> handleSignal(Action::Terminate);
         break;
     case SIGABRT:
     case SIGSEGV:
-        emit instance()->handleSignal(Action::HandleCrash);
+        emit instance() -> handleSignal(Action::HandleCrash);
         break;
-    default:
-        ;
+    default:;
     }
 }

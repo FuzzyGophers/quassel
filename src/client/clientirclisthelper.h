@@ -13,7 +13,7 @@ class CLIENT_EXPORT ClientIrcListHelper : public IrcListHelper
 
 public:
     inline ClientIrcListHelper(QObject* object = nullptr)
-        : IrcListHelper(object){};
+        : IrcListHelper(object) {};
 
 public slots:
     QVariantList requestChannelList(const NetworkId& netId, const QStringList& channelFilters) override;

@@ -5,11 +5,13 @@
 
 BufferSettings::BufferSettings(BufferId bufferId)
     : ClientSettings(QString("Buffer/%1").arg(bufferId.toInt()))
-{}
+{
+}
 
 BufferSettings::BufferSettings(const QString& idString)
     : ClientSettings(QString("Buffer/%1").arg(idString))
-{}
+{
+}
 
 void BufferSettings::setValue(const QString& key, const QVariant& data)
 {

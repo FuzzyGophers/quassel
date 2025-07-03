@@ -19,6 +19,6 @@ private:
     QRectF _boundingRect;
 };
 
-#endif  //#ifdef HAVE_WEBKIT || HAVE_WEBENGINE
+#endif  // #ifdef HAVE_WEBKIT || HAVE_WEBENGINE
 
 #endif  // WEBPREVIEWITEM_H

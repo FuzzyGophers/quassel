@@ -26,7 +26,8 @@ class IgnoreListDelegate : public QStyledItemDelegate
 public:
     IgnoreListDelegate(QWidget* parent = nullptr)
         : QStyledItemDelegate(parent)
-    {}
+    {
+    }
     void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     bool editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option, const QModelIndex& index) override;
 };

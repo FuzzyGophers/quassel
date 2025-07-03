@@ -16,7 +16,8 @@ const int BufferViewOverlay::_updateEventId = QEvent::registerEventType();
 
 BufferViewOverlay::BufferViewOverlay(QObject* parent)
     : QObject(parent)
-{}
+{
+}
 
 void BufferViewOverlay::reset()
 {

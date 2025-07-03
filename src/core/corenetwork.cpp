@@ -15,8 +15,8 @@
 #include "corenetworkconfig.h"
 #include "coresession.h"
 #include "coreuserinputhandler.h"
-#include "ircencoder.h"
 #include "irccap.h"
+#include "ircencoder.h"
 #include "irctag.h"
 #include "networkevent.h"
 
@@ -104,9 +104,9 @@ CoreNetwork::~CoreNetwork()
     disconnect(&socket, nullptr, this, nullptr);
     if (!forceDisconnect()) {
         qWarning() << QString{"Could not disconnect from network %1 (network ID: %2, user ID: %3)"}
-            .arg(networkName())
-            .arg(networkId().toInt())
-            .arg(userId().toInt());
+                          .arg(networkName())
+                          .arg(networkId().toInt())
+                          .arg(userId().toInt());
     }
 }
 
@@ -208,12 +208,7 @@ void CoreNetwork::connectToIrc(bool reconnecting)
     else if (_previousConnectionAttemptFailed) {
         // cycle to next server if previous connection attempt failed
         _previousConnectionAttemptFailed = false;
-        showMessage(NetworkInternalMessage(
-            Message::Server,
-            BufferInfo::StatusBuffer,
-            "",
-            tr("Connection failed. Cycling to next server...")
-        ));
+        showMessage(NetworkInternalMessage(Message::Server, BufferInfo::StatusBuffer, "", tr("Connection failed. Cycling to next server...")));
         if (++_lastUsedServerIndex >= serverList().size()) {
             _lastUsedServerIndex = 0;
         }
@@ -225,15 +220,11 @@ void CoreNetwork::connectToIrc(bool reconnecting)
 
     Server server = usedServer();
     displayStatusMsg(tr("Connecting to %1:%2...").arg(server.host).arg(server.port));
-    showMessage(NetworkInternalMessage(
-        Message::Server,
-        BufferInfo::StatusBuffer,
-        "",
-        tr("Connecting to %1:%2...").arg(server.host).arg(server.port)
-    ));
+    showMessage(
+        NetworkInternalMessage(Message::Server, BufferInfo::StatusBuffer, "", tr("Connecting to %1:%2...").arg(server.host).arg(server.port)));
 
     if (server.useProxy) {
-        QNetworkProxy proxy((QNetworkProxy::ProxyType) server.proxyType, server.proxyHost, server.proxyPort, server.proxyUser, server.proxyPass);
+        QNetworkProxy proxy((QNetworkProxy::ProxyType)server.proxyType, server.proxyHost, server.proxyPort, server.proxyUser, server.proxyPass);
         socket.setProxy(proxy);
     }
     else {
@@ -293,12 +284,10 @@ void CoreNetwork::disconnectFromIrc(bool requested, const QString& reason, bool 
     else
         _quitReason = reason;
 
-    showMessage(NetworkInternalMessage(
-        Message::Server,
-        BufferInfo::StatusBuffer,
-        "",
-        tr("Disconnecting. (%1)").arg((!requested && !withReconnect) ? tr("Core Shutdown") : _quitReason)
-    ));
+    showMessage(NetworkInternalMessage(Message::Server,
+                                       BufferInfo::StatusBuffer,
+                                       "",
+                                       tr("Disconnecting. (%1)").arg((!requested && !withReconnect) ? tr("Core Shutdown") : _quitReason)));
     if (socket.state() == QAbstractSocket::UnconnectedState) {
         onSocketDisconnected();
     }
@@ -320,9 +309,9 @@ void CoreNetwork::disconnectFromIrc(bool requested, const QString& reason, bool 
 void CoreNetwork::onSocketCloseTimeout()
 {
     qWarning() << QString{"Timed out quitting network %1 (network ID: %2, user ID: %3)"}
-        .arg(networkName())
-        .arg(networkId().toInt())
-        .arg(userId().toInt());
+                      .arg(networkName())
+                      .arg(networkId().toInt())
+                      .arg(userId().toInt());
     socket.abort();
 }
 
@@ -361,12 +350,17 @@ void CoreNetwork::putRawLine(const QByteArray& s, bool prepend)
     }
 }
 
-void CoreNetwork::putCmd(const QString& cmd, const QList<QByteArray>& params, const QByteArray& prefix, const QHash<IrcTagKey, QString>& tags, bool prepend)
+void CoreNetwork::putCmd(
+    const QString& cmd, const QList<QByteArray>& params, const QByteArray& prefix, const QHash<IrcTagKey, QString>& tags, bool prepend)
 {
     putRawLine(IrcEncoder::writeMessage(tags, prefix, cmd, params), prepend);
 }
 
-void CoreNetwork::putCmd(const QString& cmd, const QList<QList<QByteArray>>& params, const QByteArray& prefix, const QHash<IrcTagKey, QString>& tags, bool prependAll)
+void CoreNetwork::putCmd(const QString& cmd,
+                         const QList<QList<QByteArray>>& params,
+                         const QByteArray& prefix,
+                         const QHash<IrcTagKey, QString>& tags,
+                         bool prependAll)
 {
     QListIterator<QList<QByteArray>> i(params);
     while (i.hasNext()) {
@@ -520,12 +514,7 @@ void CoreNetwork::onSocketError(QAbstractSocket::SocketError error)
     _previousConnectionAttemptFailed = true;
     qWarning() << qPrintable(tr("Could not connect to %1 (%2)").arg(networkName(), socket.errorString()));
     emit connectionError(socket.errorString());
-    showMessage(NetworkInternalMessage(
-        Message::Error,
-        BufferInfo::StatusBuffer,
-        "",
-        tr("Connection failure: %1").arg(socket.errorString())
-    ));
+    showMessage(NetworkInternalMessage(Message::Error, BufferInfo::StatusBuffer, "", tr("Connection failure: %1").arg(socket.errorString())));
     emitConnectionError(socket.errorString());
     if (socket.state() < QAbstractSocket::ConnectedState) {
         onSocketDisconnected();
@@ -568,12 +557,7 @@ void CoreNetwork::onSocketInitialized()
 
     // Request capabilities as per IRCv3.2 specifications
     // Older servers should ignore this; newer servers won't downgrade to RFC1459
-    showMessage(NetworkInternalMessage(
-        Message::Server,
-        BufferInfo::StatusBuffer,
-        "",
-        tr("Requesting capability list...")
-    ));
+    showMessage(NetworkInternalMessage(Message::Server, BufferInfo::StatusBuffer, "", tr("Requesting capability list...")));
     putRawLine(serverEncode(QString("CAP LS 302")));
 
     if (!server.password.isEmpty()) {
@@ -612,12 +596,7 @@ void CoreNetwork::onSocketDisconnected()
     IrcUser* me_ = me();
     if (me_) {
         for (const QString& channel : me_->channels()) {
-            showMessage(NetworkInternalMessage(
-                Message::Quit,
-                BufferInfo::ChannelBuffer,
-                channel,
-                _quitReason, me_->hostmask()
-            ));
+            showMessage(NetworkInternalMessage(Message::Quit, BufferInfo::ChannelBuffer, channel, _quitReason, me_->hostmask()));
         }
     }
 
@@ -920,7 +899,7 @@ void CoreNetwork::sendPing()
         qDebug() << "UserId:" << userId() << "Network:" << networkName() << "missed" << _pingCount << "pings."
                  << "BA:" << socket.bytesAvailable() << "BTW:" << socket.bytesToWrite();
     }
-    if ((int) _pingCount >= networkConfig()->maxPingCount() && (now - _lastPingTime) <= (_pingTimer.interval() + (1 * 1000))) {
+    if ((int)_pingCount >= networkConfig()->maxPingCount() && (now - _lastPingTime) <= (_pingTimer.interval() + (1 * 1000))) {
         // In transitioning to 64-bit time, the interval no longer needs converted down to seconds.
         // However, to reduce the risk of breaking things by changing past behavior, we still allow
         // up to 1 second missed instead of enforcing a stricter 1 millisecond allowance.
@@ -1102,12 +1081,8 @@ void CoreNetwork::serverCapAcknowledged(const QString& capability)
                 putRawLine(serverEncode("AUTHENTICATE EXTERNAL"));
             }
             else {
-                showMessage(NetworkInternalMessage(
-                    Message::Error,
-                    BufferInfo::StatusBuffer,
-                    "",
-                    tr("SASL EXTERNAL authentication not supported")
-                ));
+                showMessage(
+                    NetworkInternalMessage(Message::Error, BufferInfo::StatusBuffer, "", tr("SASL EXTERNAL authentication not supported")));
                 sendNextCap();
             }
         }
@@ -1118,12 +1093,8 @@ void CoreNetwork::serverCapAcknowledged(const QString& capability)
                 putRawLine(serverEncode("AUTHENTICATE PLAIN"));
             }
             else {
-                showMessage(NetworkInternalMessage(
-                    Message::Error,
-                    BufferInfo::StatusBuffer,
-                    "",
-                    tr("SASL PLAIN authentication not supported")
-                ));
+                showMessage(
+                    NetworkInternalMessage(Message::Error, BufferInfo::StatusBuffer, "", tr("SASL PLAIN authentication not supported")));
                 sendNextCap();
             }
         }
@@ -1230,12 +1201,11 @@ void CoreNetwork::retryCapsIndividually()
     // Add most recently tried capability set to individual list, re-requesting them one at a time
     _capsQueuedIndividual.append(_capsQueuedLastBundle);
     // Warn of this issue to explain the slower login.  Servers usually shouldn't trigger this.
-    showMessage(NetworkInternalMessage(
-        Message::Server,
-        BufferInfo::StatusBuffer,
-        "",
-        tr("Could not negotiate some capabilities, retrying individually (%1)...").arg(_capsQueuedLastBundle.join(", "))
-    ));
+    showMessage(NetworkInternalMessage(Message::Server,
+                                       BufferInfo::StatusBuffer,
+                                       "",
+                                       tr("Could not negotiate some capabilities, retrying individually (%1)...")
+                                           .arg(_capsQueuedLastBundle.join(", "))));
     // Capabilities are already removed from the capability bundle queue via takeQueuedCaps(), no
     // need to remove them here.
     // Clear the most recently tried set to reduce risk that mistakes elsewhere causes retrying
@@ -1260,9 +1230,7 @@ void CoreNetwork::beginCapNegotiation()
         sortedCaps.sort();
 
         // Find the intersection between skipped caps and server-supplied caps
-        std::set_intersection(skipCaps().cbegin(), skipCaps().cend(),
-                              sortedCaps.cbegin(), sortedCaps.cend(),
-                              std::back_inserter(capsSkipped));
+        std::set_intersection(skipCaps().cbegin(), skipCaps().cend(), sortedCaps.cbegin(), sortedCaps.cend(), std::back_inserter(capsSkipped));
     }
 
     if (!capsPendingNegotiation()) {
@@ -1275,34 +1243,25 @@ void CoreNetwork::beginCapNegotiation()
         else if (capsEnabled().empty()) {
             // The server supports capabilities (caps() is not empty) but Quassel doesn't support
             // anything offered.  This should be uncommon.
-            capStatusMsg =
-                    tr("None of the capabilities provided by the server are supported (found: %1)")
-                    .arg(caps().join(", "));
+            capStatusMsg = tr("None of the capabilities provided by the server are supported (found: %1)").arg(caps().join(", "));
         }
         else {
             // Quassel has enabled some capabilities, but there are no further capabilities that can
             // be negotiated.
             // (E.g. the user has manually run "/cap ls 302" after initial negotiation.)
-            capStatusMsg =
-                    tr("No additional capabilities are supported (found: %1; currently enabled: %2)")
-                    .arg(caps().join(", "), capsEnabled().join(", "));
+            capStatusMsg = tr("No additional capabilities are supported (found: %1; currently enabled: %2)")
+                               .arg(caps().join(", "), capsEnabled().join(", "));
         }
         // Inform the user of the situation
-        showMessage(NetworkInternalMessage(
-            Message::Server,
-            BufferInfo::StatusBuffer,
-            "",
-            capStatusMsg
-        ));
+        showMessage(NetworkInternalMessage(Message::Server, BufferInfo::StatusBuffer, "", capStatusMsg));
 
         if (!capsSkipped.isEmpty()) {
             // Mention that some capabilities are skipped
-            showMessage(NetworkInternalMessage(
-                Message::Server,
-                BufferInfo::StatusBuffer,
-                "",
-                tr("Quassel is configured to ignore some capabilities (skipped: %1)").arg(capsSkipped.join(", "))
-            ));
+            showMessage(
+                NetworkInternalMessage(Message::Server,
+                                       BufferInfo::StatusBuffer,
+                                       "",
+                                       tr("Quassel is configured to ignore some capabilities (skipped: %1)").arg(capsSkipped.join(", "))));
         }
 
         // End any ongoing capability negotiation, allowing connection to continue
@@ -1311,21 +1270,15 @@ void CoreNetwork::beginCapNegotiation()
     }
 
     _capNegotiationActive = true;
-    showMessage(NetworkInternalMessage(
-        Message::Server,
-        BufferInfo::StatusBuffer,
-        "",
-        tr("Ready to negotiate (found: %1)").arg(caps().join(", "))
-    ));
+    showMessage(
+        NetworkInternalMessage(Message::Server, BufferInfo::StatusBuffer, "", tr("Ready to negotiate (found: %1)").arg(caps().join(", "))));
 
     if (!capsSkipped.isEmpty()) {
         // Mention that some capabilities are skipped
-        showMessage(NetworkInternalMessage(
-            Message::Server,
-            BufferInfo::StatusBuffer,
-            "",
-            tr("Quassel is configured to ignore some capabilities (skipped: %1)").arg(capsSkipped.join(", "))
-        ));
+        showMessage(NetworkInternalMessage(Message::Server,
+                                           BufferInfo::StatusBuffer,
+                                           "",
+                                           tr("Quassel is configured to ignore some capabilities (skipped: %1)").arg(capsSkipped.join(", "))));
     }
 
     // Build a list of queued capabilities, starting with individual, then bundled, only adding the
@@ -1333,12 +1286,10 @@ void CoreNetwork::beginCapNegotiation()
     QString queuedCapsDisplay = _capsQueuedIndividual.join(", ")
                                 + ((!_capsQueuedIndividual.empty() && !_capsQueuedBundled.empty()) ? ", " : "")
                                 + _capsQueuedBundled.join(", ");
-    showMessage(NetworkInternalMessage(
-        Message::Server,
-        BufferInfo::StatusBuffer,
-        "",
-        tr("Negotiating capabilities (requesting: %1)...").arg(queuedCapsDisplay)
-    ));
+    showMessage(NetworkInternalMessage(Message::Server,
+                                       BufferInfo::StatusBuffer,
+                                       "",
+                                       tr("Negotiating capabilities (requesting: %1)...").arg(queuedCapsDisplay)));
 
     sendNextCap();
 }
@@ -1353,20 +1304,16 @@ void CoreNetwork::sendNextCap()
         // No pending desired capabilities, capability negotiation finished
         // If SASL requested but not available, print a warning
         if (useSasl() && !capEnabled(IrcCap::SASL))
-            showMessage(NetworkInternalMessage(
-                Message::Error,
-                BufferInfo::StatusBuffer,
-                "",
-                tr("SASL authentication currently not supported by server")
-            ));
+            showMessage(NetworkInternalMessage(Message::Error,
+                                               BufferInfo::StatusBuffer,
+                                               "",
+                                               tr("SASL authentication currently not supported by server")));
 
         if (_capNegotiationActive) {
-            showMessage(NetworkInternalMessage(
-                Message::Server,
-                BufferInfo::StatusBuffer,
-                "",
-                tr("Capability negotiation finished (enabled: %1)").arg(capsEnabled().join(", "))
-            ));
+            showMessage(NetworkInternalMessage(Message::Server,
+                                               BufferInfo::StatusBuffer,
+                                               "",
+                                               tr("Capability negotiation finished (enabled: %1)").arg(capsEnabled().join(", "))));
             _capNegotiationActive = false;
         }
 
@@ -1465,10 +1412,7 @@ void CoreNetwork::sendAutoWho()
             // See http://faerion.sourceforge.net/doc/irc/whox.var
             // And https://github.com/quakenet/snircd/blob/master/doc/readme.who
             // And https://github.com/hexchat/hexchat/blob/57478b65758e6b697b1d82ce21075e74aa475efc/src/common/proto-irc.c#L752
-            putRawLine(serverEncode(
-                QString("WHO %1 n%chtsunfra,%2")
-                    .arg(chanOrNick, QString::number(IrcCap::ACCOUNT_NOTIFY_WHOX_NUM))
-            ));
+            putRawLine(serverEncode(QString("WHO %1 n%chtsunfra,%2").arg(chanOrNick, QString::number(IrcCap::ACCOUNT_NOTIFY_WHOX_NUM))));
         }
         else {
             // Fall back to normal WHO
@@ -1505,12 +1449,7 @@ void CoreNetwork::onSslErrors(const QList<QSslError>& sslErrors)
             // Add the error reason if known
             sslErrorMessage.append(tr(" (Reason: %1)").arg(sslErrors.first().errorString()));
         }
-        showMessage(NetworkInternalMessage(
-            Message::Error,
-            BufferInfo::StatusBuffer,
-            "",
-            sslErrorMessage
-        ));
+        showMessage(NetworkInternalMessage(Message::Error, BufferInfo::StatusBuffer, "", sslErrorMessage));
 
         // Disconnect, triggering a reconnect in case it's a temporary issue with certificate
         // validity, network trouble, etc.
@@ -1524,12 +1463,7 @@ void CoreNetwork::onSslErrors(const QList<QSslError>& sslErrors)
             // Add the error reason if known
             sslErrorMessage.append(tr(" (Reason: %1)").arg(sslErrors.first().errorString()));
         }
-        showMessage(NetworkInternalMessage(
-            Message::Info,
-            BufferInfo::StatusBuffer,
-            "",
-            sslErrorMessage
-        ));
+        showMessage(NetworkInternalMessage(Message::Info, BufferInfo::StatusBuffer, "", sslErrorMessage));
 
         // Proceed with the connection
         socket.ignoreSslErrors();

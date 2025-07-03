@@ -7,7 +7,8 @@ AbstractItemView::AbstractItemView(QWidget* parent)
     : QWidget(parent)
     , _model(nullptr)
     , _selectionModel(nullptr)
-{}
+{
+}
 
 void AbstractItemView::setModel(QAbstractItemModel* model)
 {

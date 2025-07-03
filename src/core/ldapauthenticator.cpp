@@ -22,12 +22,13 @@
 #include <winldap.h>
 #else*/
 #include <ldap.h>
-//#endif
+// #endif
 
 LdapAuthenticator::LdapAuthenticator(QObject* parent)
     : Authenticator(parent)
     , _connection(nullptr)
-{}
+{
+}
 
 LdapAuthenticator::~LdapAuthenticator()
 {
@@ -225,7 +226,8 @@ bool LdapAuthenticator::ldapAuth(const QString& username, const QString& passwor
 
     LDAPMessage *msg = nullptr, *entry = nullptr;
 
-    const QByteArray ldapQuery = "(&(" + uidAttribute + '=' + LdapEscaper::escapeQuery(username).toLatin1() + ")" + _filter.toLocal8Bit() + ")";
+    const QByteArray ldapQuery = "(&(" + uidAttribute + '=' + LdapEscaper::escapeQuery(username).toLatin1() + ")" + _filter.toLocal8Bit()
+                                 + ")";
 
     res = ldap_search_ext_s(_connection,
                             baseDN.constData(),

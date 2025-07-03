@@ -14,13 +14,12 @@
 #include <QNetworkProxy>
 #include <QPointer>
 #include <QString>
-#include <QStringList>
 #include <QStringConverter>
+#include <QStringList>
 #include <QVariantMap>
 
 // IRCv3 capabilities
 #include "irccap.h"
-
 #include "ircchannel.h"
 #include "ircuser.h"
 #include "signalproxy.h"
@@ -114,7 +113,8 @@ public:
 
         Server()
             : proxyHost("localhost")
-        {}
+        {
+        }
 
         Server(QString host, uint port, QString password, bool useSsl, bool sslVerify)
             : host(std::move(host))
@@ -125,7 +125,8 @@ public:
             , proxyType(QNetworkProxy::Socks5Proxy)
             , proxyHost("localhost")
             , proxyPort(8080)
-        {}
+        {
+        }
 
         bool operator==(const Server& other) const;
         bool operator!=(const Server& other) const;
@@ -765,7 +766,7 @@ struct COMMON_EXPORT NetworkInfo
 
     Network::ServerList serverList;
     QStringList perform;
-    QStringList skipCaps;           ///< Capabilities to skip during negotiation
+    QStringList skipCaps;  ///< Capabilities to skip during negotiation
 
     QString autoIdentifyService{"NickServ"};
     QString autoIdentifyPassword;

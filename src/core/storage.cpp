@@ -10,7 +10,8 @@
 
 Storage::Storage(QObject* parent)
     : QObject(parent)
-{}
+{
+}
 
 QString Storage::hashPassword(const QString& password)
 {

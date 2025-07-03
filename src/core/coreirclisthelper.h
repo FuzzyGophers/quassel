@@ -18,7 +18,7 @@ class CoreIrcListHelper : public IrcListHelper
 public:
     inline CoreIrcListHelper(CoreSession* coreSession)
         : IrcListHelper(coreSession)
-        , _coreSession(coreSession){};
+        , _coreSession(coreSession) {};
 
     inline CoreSession* coreSession() const { return _coreSession; }
 

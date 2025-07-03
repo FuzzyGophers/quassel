@@ -18,7 +18,8 @@ class PurgeEvent : public QEvent
 public:
     PurgeEvent()
         : QEvent(QEvent::User)
-    {}
+    {
+    }
 };
 
 CoreBufferSyncer::CoreBufferSyncer(CoreSession* parent)
@@ -175,8 +176,9 @@ void CoreBufferSyncer::purgeBufferIds()
     _purgeBuffers = false;
     auto bufferInfos = Core::requestBuffers(_coreSession->user());
     std::set<BufferId> actualBuffers;
-    std::transform(bufferInfos.cbegin(), bufferInfos.cend(), std::inserter(actualBuffers, actualBuffers.end()),
-                   [](auto&& bufferInfo) { return bufferInfo.bufferId(); });
+    std::transform(bufferInfos.cbegin(), bufferInfos.cend(), std::inserter(actualBuffers, actualBuffers.end()), [](auto&& bufferInfo) {
+        return bufferInfo.bufferId();
+    });
 
     QSet<BufferId> storedIds = toQSet(lastSeenBufferIds()) + toQSet(markerLineBufferIds());
     foreach (BufferId bufferId, storedIds) {

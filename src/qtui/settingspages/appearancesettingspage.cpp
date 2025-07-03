@@ -7,12 +7,12 @@
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
+#include <QRegularExpressionMatch>
 #include <QStyleFactory>
 
 #include "buffersettings.h"
 #include "qtui.h"
 #include "qtuistyle.h"
-#include <QRegularExpressionMatch>
 
 AppearanceSettingsPage::AppearanceSettingsPage(QWidget* parent)
     : SettingsPage(tr("Interface"), QString(), parent)

@@ -138,19 +138,13 @@ bool CoreAccount::operator!=(const CoreAccount& other) const
 
 QDebug operator<<(QDebug dbg, const CoreAccount& acc)
 {
-    dbg.nospace() << qPrintable(QString("CoreAccount(AccountId:")) << acc.accountId()
-                  << qPrintable(QString(", AccountName:")) << acc.accountName()
-                  << qPrintable(QString(", Uuid:")) << acc.uuid()
-                  << qPrintable(QString(", Internal:")) << acc.isInternal()
-                  << qPrintable(QString(", User:")) << acc.user()
-                  << qPrintable(QString(", Password:")) << acc.password()
-                  << qPrintable(QString(", StorePassword:")) << acc.storePassword()
-                  << qPrintable(QString(", HostName:")) << acc.hostName()
-                  << qPrintable(QString(", Port:")) << acc.port()
-                  << qPrintable(QString(", ProxyType:")) << acc.proxyType()
-                  << qPrintable(QString(", ProxyUser:")) << acc.proxyUser()
-                  << qPrintable(QString(", ProxyPassword:")) << acc.proxyPassword()
-                  << qPrintable(QString(", ProxyHostName:")) << acc.proxyHostName()
+    dbg.nospace() << qPrintable(QString("CoreAccount(AccountId:")) << acc.accountId() << qPrintable(QString(", AccountName:"))
+                  << acc.accountName() << qPrintable(QString(", Uuid:")) << acc.uuid() << qPrintable(QString(", Internal:"))
+                  << acc.isInternal() << qPrintable(QString(", User:")) << acc.user() << qPrintable(QString(", Password:"))
+                  << acc.password() << qPrintable(QString(", StorePassword:")) << acc.storePassword() << qPrintable(QString(", HostName:"))
+                  << acc.hostName() << qPrintable(QString(", Port:")) << acc.port() << qPrintable(QString(", ProxyType:"))
+                  << acc.proxyType() << qPrintable(QString(", ProxyUser:")) << acc.proxyUser() << qPrintable(QString(", ProxyPassword:"))
+                  << acc.proxyPassword() << qPrintable(QString(", ProxyHostName:")) << acc.proxyHostName()
                   << qPrintable(QString(", ProxyPort:")) << acc.proxyPort();
     return dbg.space();
 }

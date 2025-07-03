@@ -33,7 +33,8 @@ public:
         Alias(QString name_, QString expansion_)
             : name(std::move(name_))
             , expansion(std::move(expansion_))
-        {}
+        {
+        }
     };
     using AliasList = QList<Alias>;
 

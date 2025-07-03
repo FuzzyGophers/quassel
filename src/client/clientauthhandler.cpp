@@ -3,8 +3,8 @@
 
 #include "clientauthhandler.h"
 
-#include <QtEndian>
 #include <QSslSocket>
+#include <QtEndian>
 
 #include "client.h"
 #include "clientsettings.h"
@@ -18,7 +18,8 @@ ClientAuthHandler::ClientAuthHandler(CoreAccount account, QObject* parent)
     , _probing(false)
     , _legacy(false)
     , _connectionFeatures(0)
-{}
+{
+}
 
 Peer* ClientAuthHandler::peer() const
 {
@@ -246,7 +247,8 @@ void ClientAuthHandler::startRegistration()
 {
     emit statusMessage(tr("Synchronizing to core..."));
 
-    _peer->dispatch(QuasselProtocol::RegisterClient(Quassel::Features{}, Quassel::buildInfo().fancyVersionString, Quassel::buildInfo().commitDate));
+    _peer->dispatch(
+        QuasselProtocol::RegisterClient(Quassel::Features{}, Quassel::buildInfo().fancyVersionString, Quassel::buildInfo().commitDate));
 }
 
 void ClientAuthHandler::handle(const QuasselProtocol::ClientDenied& msg)
@@ -378,7 +380,7 @@ void ClientAuthHandler::checkAndEnableSsl(bool coreSupportsSsl)
             }
             s.setAccountValue("ShowNoCoreSslWarning", false);
             s.setAccountValue("SslCert", QString());
-			// TODO: this defaults to MD5 which has known collisions. Fix.
+            // TODO: this defaults to MD5 which has known collisions. Fix.
             s.setAccountValue("SslCertDigestVersion", 0);
         }
         if (_legacy)
@@ -387,7 +389,6 @@ void ClientAuthHandler::checkAndEnableSsl(bool coreSupportsSsl)
             startRegistration();
     }
 }
-
 
 void ClientAuthHandler::onSslSocketEncrypted()
 {
@@ -403,7 +404,7 @@ void ClientAuthHandler::onSslSocketEncrypted()
         // That way, a warning will appear in case it becomes invalid at some point
         CoreAccountSettings s;
         s.setAccountValue("SSLCert", QString());
-		// TODO: Fix MD5 usage
+        // TODO: Fix MD5 usage
         s.setAccountValue("SslCertDigestVersion", 0);
     }
 
@@ -452,7 +453,7 @@ void ClientAuthHandler::onSslErrors()
         }
         else {
             s.setAccountValue("SslCert", QString());
-			// TODO: MD5 usage
+            // TODO: MD5 usage
             s.setAccountValue("SslCertDigestVersion", 0);
         }
     }

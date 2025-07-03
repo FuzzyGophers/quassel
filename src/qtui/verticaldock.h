@@ -32,7 +32,8 @@ class EmptyDockTitle : public QWidget
 public:
     inline EmptyDockTitle(QDockWidget* parent)
         : QWidget(parent)
-    {}
+    {
+    }
 
     inline QSize sizeHint() const override { return {0, 0}; }
 };

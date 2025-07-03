@@ -4,15 +4,16 @@
 #include "syncableobject.h"
 
 #include <QDebug>
-#include <QMetaType>
 #include <QMetaProperty>
+#include <QMetaType>
 
 #include "signalproxy.h"
 #include "util.h"
 
 SyncableObject::SyncableObject(QObject* parent)
     : SyncableObject(QString{}, parent)
-{}
+{
+}
 
 SyncableObject::SyncableObject(const QString& objectName, QObject* parent)
     : QObject(parent)

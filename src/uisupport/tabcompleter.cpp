@@ -63,7 +63,8 @@ void TabCompleter::buildCompletionList()
         return;
 
     QString tabAbbrev = _lineEdit->text().left(_lineEdit->cursorPosition()).section(QRegularExpression(R"([^#\w\d-_\[\]{}|`^.\\])"), -1, -1);
-    QRegularExpression regex(QString(R"(^[-_\[\]{}|`^.\\]*)").append(QRegularExpression::escape(tabAbbrev)), QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression regex(QString(R"(^[-_\[\]{}|`^.\\]*)").append(QRegularExpression::escape(tabAbbrev)),
+                             QRegularExpression::CaseInsensitiveOption);
 
     // channel completion - add all channels of the current network to the map
     if (tabAbbrev.startsWith('#')) {

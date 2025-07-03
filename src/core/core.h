@@ -118,10 +118,7 @@ public:
      * \param userName The user's name as a QString.
      * \return userId  The user's ID.
      */
-    static inline UserId getUserId(const QString& userName)
-    {
-        return instance()->_storage->getUserId(userName);
-    }
+    static inline UserId getUserId(const QString& userName) { return instance()->_storage->getUserId(userName); }
 
     //! Change a user's password
     /**
@@ -398,12 +395,12 @@ public:
      *  \return The requested list of messages
      */
     static inline std::vector<Message> requestMsgsFiltered(UserId user,
-                                                     BufferId bufferId,
-                                                     MsgId first = -1,
-                                                     MsgId last = -1,
-                                                     int limit = -1,
-                                                     Message::Types type = Message::Types{-1},
-                                                     Message::Flags flags = Message::Flags{-1})
+                                                           BufferId bufferId,
+                                                           MsgId first = -1,
+                                                           MsgId last = -1,
+                                                           int limit = -1,
+                                                           Message::Types type = Message::Types{-1},
+                                                           Message::Flags flags = Message::Flags{-1})
     {
         return instance()->_storage->requestMsgsFiltered(user, bufferId, first, last, limit, type, flags);
     }
@@ -418,12 +415,12 @@ public:
      *  \return The requested list of messages
      */
     static inline std::vector<Message> requestMsgsForward(UserId user,
-                                                           BufferId bufferId,
-                                                           MsgId first = -1,
-                                                           MsgId last = -1,
-                                                           int limit = -1,
-                                                           Message::Types type = Message::Types{-1},
-                                                           Message::Flags flags = Message::Flags{-1})
+                                                          BufferId bufferId,
+                                                          MsgId first = -1,
+                                                          MsgId last = -1,
+                                                          int limit = -1,
+                                                          Message::Types type = Message::Types{-1},
+                                                          Message::Flags flags = Message::Flags{-1})
     {
         return instance()->_storage->requestMsgsForward(user, bufferId, first, last, limit, type, flags);
     }
@@ -447,11 +444,11 @@ public:
      *  \return The requested list of messages
      */
     static inline std::vector<Message> requestAllMsgsFiltered(UserId user,
-                                                        MsgId first = -1,
-                                                        MsgId last = -1,
-                                                        int limit = -1,
-                                                        Message::Types type = Message::Types{-1},
-                                                        Message::Flags flags = Message::Flags{-1})
+                                                              MsgId first = -1,
+                                                              MsgId last = -1,
+                                                              int limit = -1,
+                                                              Message::Types type = Message::Types{-1},
+                                                              Message::Flags flags = Message::Flags{-1})
     {
         return instance()->_storage->requestAllMsgsFiltered(user, first, last, limit, type, flags);
     }

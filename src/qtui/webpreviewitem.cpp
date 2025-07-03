@@ -78,4 +78,4 @@ void WebPreviewItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
     painter->drawRoundedRect(boundingRect(), 10, 10);
 }
 
-#endif  //#ifdef HAVE_WEBKIT || HAVE_WEBENGINE
+#endif  // #ifdef HAVE_WEBKIT || HAVE_WEBENGINE

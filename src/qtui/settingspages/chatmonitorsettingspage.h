@@ -44,6 +44,7 @@ private slots:
      * Event handler for Show Backlog Unavailable Details button
      */
     void on_showBacklogUnavailableDetails_clicked();
+
 private:
     Ui::ChatMonitorSettingsPage ui;
     QHash<QString, QVariant> settings;

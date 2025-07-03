@@ -23,7 +23,8 @@ public:
         : _userId{userId}
         , _restoreState{restoreState}
         , _strictIdentEnabled{strictIdentEnabled}
-    {}
+    {
+    }
 
 public slots:
     void initialize()

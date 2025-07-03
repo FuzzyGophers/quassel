@@ -29,7 +29,8 @@ Event* NetworkEvent::create(EventManager::EventType type, QVariantMap& map, Netw
 NetworkEvent::NetworkEvent(EventManager::EventType type, QVariantMap& map, Network* network)
     : Event(type, map)
     , _network(network)
-{}
+{
+}
 
 void NetworkEvent::toVariantMap(QVariantMap& map) const
 {

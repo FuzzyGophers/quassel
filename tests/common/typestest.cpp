@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include "types.h"
+
 #include <cstdint>
 
 #include <QByteArray>
@@ -8,7 +10,6 @@
 #include <QObject>
 
 #include "testglobal.h"
-#include "types.h"
 
 using namespace ::testing;
 
@@ -17,12 +18,20 @@ class EnumHolder
     Q_GADGET
 
 public:
-    enum class Enum16 : uint16_t {};
-    enum class Enum32 : uint32_t {};
+    enum class Enum16 : uint16_t
+    {
+    };
+    enum class Enum32 : uint32_t
+    {
+    };
 
-    enum class EnumQt16 : uint16_t {};
+    enum class EnumQt16 : uint16_t
+    {
+    };
     Q_ENUM(EnumQt16)
-    enum class EnumQt32 : uint32_t {};
+    enum class EnumQt32 : uint32_t
+    {
+    };
     Q_ENUM(EnumQt32)
 };
 
@@ -49,7 +58,7 @@ TEST(TypesTest, enumSerialization)
     EnumHolder::Enum32 enum32;
     EnumHolder::EnumQt16 enumQt16;
     EnumHolder::EnumQt32 enumQt32;
-    in >> enum16  >> enum32 >> enumQt16 >> enumQt32;
+    in >> enum16 >> enum32 >> enumQt16 >> enumQt32;
     ASSERT_THAT(in.status(), Eq(QDataStream::Status::Ok));
     EXPECT_TRUE(in.atEnd());
 

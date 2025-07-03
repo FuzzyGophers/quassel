@@ -11,12 +11,14 @@
 BasicHandler::BasicHandler(QObject* parent)
     : QObject(parent)
     , _methodPrefix("handle")
-{}
+{
+}
 
 BasicHandler::BasicHandler(QString methodPrefix, QObject* parent)
     : QObject(parent)
     , _methodPrefix(std::move(methodPrefix))
-{}
+{
+}
 
 QStringList BasicHandler::providesHandlers()
 {
@@ -37,8 +39,8 @@ const QHash<QString, int>& BasicHandler::handlerHash()
             if (!methodSignature.startsWith(_methodPrefix))
                 continue;
 
-            QString methodName = methodSignature.section('(', 0, 0);           // chop the parameter list
-            QString handlerName = methodName.mid(_methodPrefix.length());       // strip "handle" or other prefix
+            QString methodName = methodSignature.section('(', 0, 0);       // chop the parameter list
+            QString handlerName = methodName.mid(_methodPrefix.length());  // strip "handle" or other prefix
             _handlerHash[handlerName.toLower()] = i;
         }
         _initDone = true;
@@ -62,7 +64,7 @@ void BasicHandler::handle(const QString& member,
     }
 
     QString handler = member;
-    handler[0] = handler[0].toUpper(); // Capitalize first letter to match method name (e.g., "Ping" -> "handleCtcpPing")
+    handler[0] = handler[0].toUpper();  // Capitalize first letter to match method name (e.g., "Ping" -> "handleCtcpPing")
 
     int methodIndex = _handlerHash.value(handler.toLower(), -1);
     if (methodIndex != -1) {
@@ -74,7 +76,8 @@ void BasicHandler::handle(const QString& member,
     if (_defaultHandler != -1) {
         QMetaMethod defaultMethod = metaObject()->method(_defaultHandler);
         defaultMethod.invoke(this, Qt::DirectConnection, Q_ARG(QString, member), val0);
-    } else {
+    }
+    else {
         qWarning() << QString("No such Handler: %1::%2%3").arg(metaObject()->className(), _methodPrefix, handler);
     }
 }

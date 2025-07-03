@@ -5,6 +5,8 @@
 
 #include <utility>
 
+#include <QRegularExpressionMatch>
+
 #include "core.h"
 #include "corebacklogmanager.h"
 #include "corebuffersyncer.h"
@@ -31,14 +33,14 @@
 #include "remotepeer.h"
 #include "storage.h"
 #include "util.h"
-#include <QRegularExpressionMatch>
 
 class ProcessMessagesEvent : public QEvent
 {
 public:
     ProcessMessagesEvent()
         : QEvent(QEvent::User)
-    {}
+    {
+    }
 };
 
 CoreSession::CoreSession(UserId uid, bool restoreState, bool strictIdentEnabled, QObject* parent)
@@ -74,21 +76,23 @@ CoreSession::CoreSession(UserId uid, bool restoreState, bool strictIdentEnabled,
     connect(p, &SignalProxy::connected, this, &CoreSession::clientsConnected);
     connect(p, &SignalProxy::disconnected, this, &CoreSession::clientsDisconnected);
 
-    p->attachSlot(SIGNAL(sendInput(BufferInfo,QString)), this, &CoreSession::msgFromClient);
+    p->attachSlot(SIGNAL(sendInput(BufferInfo, QString)), this, &CoreSession::msgFromClient);
     p->attachSignal(this, &CoreSession::displayMsg);
     p->attachSignal(this, &CoreSession::displayStatusMsg);
 
     p->attachSignal(this, &CoreSession::identityCreated);
     p->attachSignal(this, &CoreSession::identityRemoved);
-    p->attachSlot(SIGNAL(createIdentity(Identity,QVariantMap)), this, selectOverload<const Identity&, const QVariantMap&>(&CoreSession::createIdentity));
+    p->attachSlot(SIGNAL(createIdentity(Identity, QVariantMap)),
+                  this,
+                  selectOverload<const Identity&, const QVariantMap&>(&CoreSession::createIdentity));
     p->attachSlot(SIGNAL(removeIdentity(IdentityId)), this, &CoreSession::removeIdentity);
 
     p->attachSignal(this, &CoreSession::networkCreated);
     p->attachSignal(this, &CoreSession::networkRemoved);
-    p->attachSlot(SIGNAL(createNetwork(NetworkInfo,QStringList)), this,&CoreSession::createNetwork);
+    p->attachSlot(SIGNAL(createNetwork(NetworkInfo, QStringList)), this, &CoreSession::createNetwork);
     p->attachSlot(SIGNAL(removeNetwork(NetworkId)), this, &CoreSession::removeNetwork);
 
-    p->attachSlot(SIGNAL(changePassword(PeerPtr,QString,QString,QString)), this, &CoreSession::changePassword);
+    p->attachSlot(SIGNAL(changePassword(PeerPtr, QString, QString, QString)), this, &CoreSession::changePassword);
     p->attachSignal(this, &CoreSession::passwordChanged);
 
     p->attachSlot(SIGNAL(kickClient(int)), this, &CoreSession::kickClient);
@@ -339,16 +343,14 @@ void CoreSession::recvStatusMsgFromServer(QString msg)
 
 void CoreSession::processMessageEvent(MessageEvent* event)
 {
-    recvMessageFromServer(RawMessage{
-        event->timestamp(),
-        event->networkId(),
-        event->msgType(),
-        event->bufferType(),
-        event->target().isNull() ? "" : event->target(),
-        event->text().isNull() ? "" : event->text(),
-        event->sender().isNull() ? "" : event->sender(),
-        event->msgFlags()
-    });
+    recvMessageFromServer(RawMessage{event->timestamp(),
+                                     event->networkId(),
+                                     event->msgType(),
+                                     event->bufferType(),
+                                     event->target().isNull() ? "" : event->target(),
+                                     event->text().isNull() ? "" : event->text(),
+                                     event->sender().isNull() ? "" : event->sender(),
+                                     event->msgFlags()});
 }
 
 std::vector<BufferInfo> CoreSession::buffers() const

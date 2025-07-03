@@ -118,8 +118,8 @@ bool ChatView::event(QEvent* event)
             // After the first movement of a Touch-Point, calculate the distance in both axis
             // and if the point moved more horizontally abort scroll.
             QTouchEvent::TouchPoint p = ((QTouchEvent*)event)->points().at(0);
-			double dx = qAbs(p.lastPosition().x() - p.position().x());
-			double dy = qAbs(p.lastPosition().y() - p.position().y());
+            double dx = qAbs(p.lastPosition().x() - p.position().x());
+            double dy = qAbs(p.lastPosition().y() - p.position().y());
             if (dx > dy) {
                 setDragMode(QGraphicsView::NoDrag);
                 setInteractive(true);

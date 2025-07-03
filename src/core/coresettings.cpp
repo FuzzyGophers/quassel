@@ -7,7 +7,8 @@
 
 CoreSettings::CoreSettings(QString group)
     : Settings(std::move(group), Quassel::buildInfo().coreApplicationName)
-{}
+{
+}
 
 void CoreSettings::setStorageSettings(const QVariant& data)
 {

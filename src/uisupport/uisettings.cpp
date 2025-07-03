@@ -10,7 +10,8 @@
 
 UiSettings::UiSettings(QString group)
     : ClientSettings(std::move(group))
-{}
+{
+}
 
 void UiSettings::setValue(const QString& key, const QVariant& data)
 {
@@ -36,11 +37,13 @@ void UiSettings::remove(const QString& key)
 
 UiStyleSettings::UiStyleSettings()
     : UiSettings("UiStyle")
-{}
+{
+}
 
 UiStyleSettings::UiStyleSettings(const QString& subGroup)
     : UiSettings(QString("UiStyle/%1").arg(subGroup))
-{}
+{
+}
 
 void UiStyleSettings::setCustomFormat(UiStyle::FormatType ftype, const QTextCharFormat& format)
 {
@@ -74,7 +77,8 @@ QList<UiStyle::FormatType> UiStyleSettings::availableFormats() const
 SessionSettings::SessionSettings(QString sessionId, QString group)
     : UiSettings(std::move(group))
     , _sessionId(std::move(sessionId))
-{}
+{
+}
 
 void SessionSettings::setValue(const QString& key, const QVariant& data)
 {
@@ -162,7 +166,8 @@ void SessionSettings::sessionAging()
 
 ShortcutSettings::ShortcutSettings()
     : UiSettings("Shortcuts")
-{}
+{
+}
 
 void ShortcutSettings::clear()
 {

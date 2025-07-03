@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include <QtMultimedia/QMediaPlayer>
 #include <QtMultimedia/QAudioOutput>
+#include <QtMultimedia/QMediaPlayer>
 
 #include "abstractnotificationbackend.h"
 #include "settingspage.h"
@@ -65,4 +65,4 @@ private:
     std::unique_ptr<QAudioOutput> _audioPreviewOutput;
 };
 
-#endif // QTMULTIMEDIANOTIFICATIONBACKEND_H
+#endif  // QTMULTIMEDIANOTIFICATIONBACKEND_H

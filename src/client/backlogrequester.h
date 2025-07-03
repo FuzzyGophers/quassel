@@ -22,7 +22,7 @@ public:
         InvalidRequester = 0,
         PerBufferFixed,
         PerBufferUnread,
-        AsNeeded,              ///< Only request backlog on cores without Feature::BufferActivitySync
+        AsNeeded,  ///< Only request backlog on cores without Feature::BufferActivitySync
         GlobalUnread
     };
 

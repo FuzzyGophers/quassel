@@ -26,9 +26,7 @@ ItemViewSettingsPage::ItemViewSettingsPage(QWidget* parent)
     ui.bufferViewPreview->expandAll();
 
     for (ColorButton* button : findChildren<ColorButton*>()) {
-        connect(button, &ColorButton::colorChanged, button, [this, button]() {
-            updateBufferViewPreview(button);
-        });
+        connect(button, &ColorButton::colorChanged, button, [this, button]() { updateBufferViewPreview(button); });
     }
 
     initAutoWidgets();

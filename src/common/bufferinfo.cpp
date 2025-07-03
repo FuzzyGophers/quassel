@@ -16,7 +16,8 @@ BufferInfo::BufferInfo()
     : _bufferId(0)
     , _netid(0)
     , _bufferName(QString())
-{}
+{
+}
 
 BufferInfo::BufferInfo(BufferId id, NetworkId networkid, Type type, uint gid, QString buf)
     : _bufferId(id)
@@ -24,7 +25,8 @@ BufferInfo::BufferInfo(BufferId id, NetworkId networkid, Type type, uint gid, QS
     , _type(type)
     , _groupId(gid)
     , _bufferName(std::move(buf))
-{}
+{
+}
 
 BufferInfo BufferInfo::fakeStatusBuffer(NetworkId networkId)
 {

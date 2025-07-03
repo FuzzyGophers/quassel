@@ -63,5 +63,5 @@ private:
 
     bool _autoMarkerLine;
     bool _autoMarkerLineOnLostFocus;
-    bool _ensureBacklogOnBufferShow; ///< If a buffer fetches backlog upon show until scrollable
+    bool _ensureBacklogOnBufferShow;  ///< If a buffer fetches backlog upon show until scrollable
 };

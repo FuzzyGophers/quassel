@@ -42,7 +42,8 @@ public:
     NickHighlightMatcher(HighlightNickType highlightMode, bool isCaseSensitive)
         : _highlightMode(highlightMode)
         , _isCaseSensitive(isCaseSensitive)
-    {}
+    {
+    }
 
     /**
      * Gets the nickname highlighting policy

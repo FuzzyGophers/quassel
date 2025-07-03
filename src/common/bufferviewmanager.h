@@ -34,7 +34,7 @@ public slots:
     virtual inline void requestCreateBufferView(const QVariantMap& properties) { REQUEST(ARG(properties)) }
     virtual inline void requestCreateBufferViews(const QVariantList& properties) { REQUEST(ARG(properties)) }
     virtual inline void requestDeleteBufferView(int bufferViewId) { REQUEST(ARG(bufferViewId)) }
-    virtual inline void requestDeleteBufferViews(const QVariantList& bufferViews) { REQUEST(ARG(bufferViews)) }
+    virtual inline void requestDeleteBufferViews(const QVariantList& bufferViews){REQUEST(ARG(bufferViews))}
 
     signals : void bufferViewConfigAdded(int bufferViewConfigId);
     void bufferViewConfigDeleted(int bufferViewConfigId);

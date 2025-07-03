@@ -55,7 +55,8 @@ public:
     ClientCertManager(IdentityId id, CertIdentity* parent)
         : CertManager(id, parent)
         , _certIdentity(parent)
-    {}
+    {
+    }
 
     inline const QSslKey& sslKey() const override { return _certIdentity->sslKey(); }
     inline const QSslCertificate& sslCert() const override { return _certIdentity->sslCert(); }
@@ -67,4 +68,3 @@ public slots:
 private:
     CertIdentity* _certIdentity;
 };
-

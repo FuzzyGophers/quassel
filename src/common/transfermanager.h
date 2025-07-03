@@ -7,8 +7,8 @@
 
 #include <QHash>
 #include <QList>
-#include <QUuid>
 #include <QMetaType>
+#include <QUuid>
 
 #include "syncableobject.h"
 

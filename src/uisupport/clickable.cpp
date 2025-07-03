@@ -44,15 +44,12 @@ ClickableList ClickableList::fromString(const QString& str)
 
     static QRegularExpression regExp[] = {
         // URL
-        QRegularExpression(
-            QString("\\b(%1%2(?:/%3*)?)%4").arg(scheme, authority, urlChars, urlEnd),
-            QRegularExpression::CaseInsensitiveOption),
+        QRegularExpression(QString("\\b(%1%2(?:/%3*)?)%4").arg(scheme, authority, urlChars, urlEnd),
+                           QRegularExpression::CaseInsensitiveOption),
 
         // Channel name
         // We don't match for channel names starting with + or &, because that gives us a lot of false positives.
-        QRegularExpression(
-            R"(((?:#|![A-Z0-9]{5})[^,:\s]+(?::[^,:\s]+)?)\b)",
-            QRegularExpression::CaseInsensitiveOption)
+        QRegularExpression(R"(((?:#|![A-Z0-9]{5})[^,:\s]+(?::[^,:\s]+)?)\b)", QRegularExpression::CaseInsensitiveOption)
 
         // TODO: Nicks, we'll need a filtering for only matching known nicknames further down if we do this
     };

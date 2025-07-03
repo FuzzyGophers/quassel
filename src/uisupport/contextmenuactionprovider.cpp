@@ -427,8 +427,8 @@ void ContextMenuActionProvider::addIgnoreMenu(QMenu* menu, const QString& hostma
     QString domain = host;
     QRegularExpression domainRx = QRegularExpression(R"((\.[^.]+\.\w+\D)$)");
     QRegularExpressionMatch match = domainRx.match(host);
-	if (match.hasMatch())
-			domain = match.captured(1);
+    if (match.hasMatch())
+        domain = match.captured(1);
     // we can't rely on who-data
     // if we don't have the data, we skip actions where we would need it
     bool haveWhoData = !ident.isEmpty() && !host.isEmpty();

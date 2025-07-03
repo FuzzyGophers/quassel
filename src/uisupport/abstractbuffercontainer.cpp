@@ -10,7 +10,8 @@
 AbstractBufferContainer::AbstractBufferContainer(QWidget* parent)
     : AbstractItemView(parent)
     , _currentBuffer(0)
-{}
+{
+}
 
 void AbstractBufferContainer::rowsAboutToBeRemoved(const QModelIndex& parent, int start, int end)
 {

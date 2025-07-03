@@ -16,7 +16,8 @@ int SqliteStorage::_maxRetryCount = 150;
 
 SqliteStorage::SqliteStorage(QObject* parent)
     : AbstractSqlStorage(parent)
-{}
+{
+}
 
 bool SqliteStorage::isAvailable() const
 {
@@ -66,8 +67,9 @@ int SqliteStorage::installedSchemaVersion()
     safeExec(query);
     if (query.first()) {
         return query.value(0).toInt();
-    } else {
-        watchQuery(query); // Log errors only if table exists
+    }
+    else {
+        watchQuery(query);  // Log errors only if table exists
     }
 
     // Fallback for older schema (version 0)
@@ -75,8 +77,9 @@ int SqliteStorage::installedSchemaVersion()
     safeExec(query);
     if (query.first()) {
         return query.value(0).toInt();
-    } else {
-        watchQuery(query); // Log errors only if table exists
+    }
+    else {
+        watchQuery(query);  // Log errors only if table exists
     }
 
     return AbstractSqlStorage::installedSchemaVersion();
@@ -199,7 +202,8 @@ UserId SqliteStorage::addUser(const QString& user, const QString& password, cons
         lockForWrite();
         safeExec(query);
         if (query.lastError().isValid()
-            && query.lastError().nativeErrorCode() == QLatin1String{"19"}) {  // user already exists - sadly 19 seems to be the general constraint violation error...
+            && query.lastError().nativeErrorCode()
+                   == QLatin1String{"19"}) {  // user already exists - sadly 19 seems to be the general constraint violation error...
             db.rollback();
         }
         else {
@@ -1231,8 +1235,8 @@ BufferInfo SqliteStorage::bufferInfo(UserId user, const NetworkId& networkId, Bu
                 qCritical() << "         Query:" << query.lastQuery();
                 qCritical() << "  bound Values:";
                 QVariantList boundValues = query.boundValues();
-				for (int i = 0; i < boundValues.size(); ++i)
-						qCritical() << i << ":" << boundValues[i].toString().toLatin1().data();
+                for (int i = 0; i < boundValues.size(); ++i)
+                    qCritical() << i << ":" << boundValues[i].toString().toLatin1().data();
                 Q_ASSERT(false);
             }
         }
@@ -1788,7 +1792,7 @@ int SqliteStorage::highlightCount(BufferId bufferId, MsgId lastSeenMsgId)
     return result;
 }
 
-#include <QStringConverter> // For QStringEncoder and QStringDecoder
+#include <QStringConverter>  // For QStringEncoder and QStringDecoder
 
 bool SqliteStorage::logMessage(Message& msg)
 {
@@ -1808,7 +1812,7 @@ bool SqliteStorage::logMessage(Message& msg)
         QByteArray utf8Data = encoder(input);
         QString result = decoder(utf8Data);
         if (result == input && !utf8Data.isEmpty()) {
-            return input; // Valid UTF-8
+            return input;  // Valid UTF-8
         }
         // Fallback to Latin1
         qWarning() << "UTF-8 decoding failed for input:" << qPrintable(input);
@@ -1825,9 +1829,7 @@ bool SqliteStorage::logMessage(Message& msg)
     // Log warning for empty sender
     if (msg.sender().isEmpty()) {
         qWarning() << "Empty sender for message, using default 'Server'. Message details:"
-                   << "type=" << msg.type()
-                   << "buffer=" << msg.bufferInfo().bufferName()
-                   << "content=" << msg.contents();
+                   << "type=" << msg.type() << "buffer=" << msg.bufferInfo().bufferName() << "content=" << msg.contents();
     }
 
     // Step 1: Ensure the sender exists
@@ -1840,8 +1842,7 @@ bool SqliteStorage::logMessage(Message& msg)
         lockForWrite();
         safeExec(addSenderQuery);
         if (addSenderQuery.lastError().isValid() && addSenderQuery.lastError().nativeErrorCode() != QLatin1String{"19"}) {
-            qCritical() << "Failed to insert sender:" << qPrintable(sender)
-                        << "Error:" << qPrintable(addSenderQuery.lastError().text());
+            qCritical() << "Failed to insert sender:" << qPrintable(sender) << "Error:" << qPrintable(addSenderQuery.lastError().text());
             error = true;
         }
     }
@@ -1861,15 +1862,16 @@ bool SqliteStorage::logMessage(Message& msg)
         logMessageQuery.bindValue(":message", QVariant(message));
         safeExec(logMessageQuery);
         if (logMessageQuery.lastError().isValid()) {
-            qCritical() << "Failed to insert backlog message. Bound values:"
-                        << logMessageQuery.boundValues()
+            qCritical() << "Failed to insert backlog message. Bound values:" << logMessageQuery.boundValues()
                         << "Error:" << qPrintable(logMessageQuery.lastError().text());
             error = true;
-        } else {
+        }
+        else {
             MsgId msgId = logMessageQuery.lastInsertId().toLongLong();
             if (msgId.isValid()) {
                 msg.setMsgId(msgId);
-            } else {
+            }
+            else {
                 qCritical() << "Invalid message ID after backlog insert";
                 error = true;
             }
@@ -1878,7 +1880,8 @@ bool SqliteStorage::logMessage(Message& msg)
 
     if (error) {
         db.rollback();
-    } else {
+    }
+    else {
         db.commit();
     }
     unlock();
@@ -2157,13 +2160,15 @@ std::vector<Message> SqliteStorage::requestMsgsForward(
 
         if (first == -1) {
             query.bindValue(":firstmsg", std::numeric_limits<qint64>::min());
-        } else {
+        }
+        else {
             query.bindValue(":firstmsg", first.toQint64());
         }
 
         if (last == -1) {
             query.bindValue(":lastmsg", std::numeric_limits<qint64>::max());
-        } else {
+        }
+        else {
             query.bindValue(":lastmsg", last.toQint64());
         }
 
@@ -2265,7 +2270,8 @@ std::vector<Message> SqliteStorage::requestAllMsgs(UserId user, MsgId first, Msg
     return messagelist;
 }
 
-std::vector<Message> SqliteStorage::requestAllMsgsFiltered(UserId user, MsgId first, MsgId last, int limit, Message::Types type, Message::Flags flags)
+std::vector<Message> SqliteStorage::requestAllMsgsFiltered(
+    UserId user, MsgId first, MsgId last, int limit, Message::Types type, Message::Flags flags)
 {
     std::vector<Message> messagelist;
 
@@ -2382,7 +2388,8 @@ bool SqliteStorage::safeExec(QSqlQuery& query, int retryCount)
 // ========================================
 SqliteMigrationReader::SqliteMigrationReader()
     : SqliteStorage()
-{}
+{
+}
 
 void SqliteMigrationReader::setMaxId(MigrationObject mo)
 {
@@ -2399,8 +2406,8 @@ void SqliteMigrationReader::setMaxId(MigrationObject mo)
         return;
     }
     QSqlQuery query(logDb());
-	query.prepare(queryString);
-	query.exec();
+    query.prepare(queryString);
+    query.exec();
     query.first();
     _maxId = query.value(0).toLongLong();
 }

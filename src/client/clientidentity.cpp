@@ -8,18 +8,21 @@
 
 CertIdentity::CertIdentity(IdentityId id, QObject* parent)
     : Identity(id, parent)
-{}
+{
+}
 
 CertIdentity::CertIdentity(const Identity& other, QObject* parent)
     : Identity(other, parent)
-{}
+{
+}
 
 CertIdentity::CertIdentity(const CertIdentity& other, QObject* parent)
     : Identity(other, parent)
     , _isDirty(other._isDirty)
     , _sslKey(other._sslKey)
     , _sslCert(other._sslCert)
-{}
+{
+}
 
 void CertIdentity::enableEditSsl(bool enable)
 {

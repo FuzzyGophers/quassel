@@ -118,7 +118,8 @@ private:
         Command(BufferInfo info, QString command)
             : bufferInfo(std::move(info))
             , command(std::move(command))
-        {}
+        {
+        }
         Command() = default;
     };
 

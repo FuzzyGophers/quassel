@@ -33,13 +33,16 @@ public:
     /**
      * An SQL query with associated resource filename
      */
-    struct SqlQueryResource {
-        QString queryString;   ///< SQL query string
-        QString queryFilename; ///< Path to the resource file providing this query
+    struct SqlQueryResource
+    {
+        QString queryString;    ///< SQL query string
+        QString queryFilename;  ///< Path to the resource file providing this query
 
         SqlQueryResource(const QString& queryString, const QString& queryFilename)
-            : queryString(std::move(queryString)),
-              queryFilename(std::move(queryFilename)) {}
+            : queryString(std::move(queryString))
+            , queryFilename(std::move(queryFilename))
+        {
+        }
     };
 
 public slots:
@@ -51,7 +54,7 @@ public slots:
                bool loadFromEnvironment = false) override;
 
 protected:
-    inline void sync() override{};
+    inline void sync() override {};
 
     QSqlDatabase logDb();
 

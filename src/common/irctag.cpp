@@ -22,11 +22,13 @@ bool operator<(const IrcTagKey& a, const IrcTagKey& b)
     return a.vendor < b.vendor || a.key < b.key || a.clientTag < b.clientTag;
 }
 
-QDebug operator<<(QDebug dbg, const IrcTagKey& i) {
+QDebug operator<<(QDebug dbg, const IrcTagKey& i)
+{
     return dbg << QString(("(clientTag = %1, vendor = %2,key = %3")).arg(i.clientTag).arg(i.vendor).arg(i.key);
 }
 
-std::ostream& operator<<(std::ostream& o, const IrcTagKey& i) {
+std::ostream& operator<<(std::ostream& o, const IrcTagKey& i)
+{
     std::string result;
     if (i.clientTag)
         result += "+";

@@ -17,9 +17,11 @@ ProxyLine ProxyLine::parseProxyLine(const QByteArray& line)
     QByteArray protocol = IrcDecoder::extractFragment(line, start);
     if (protocol == "TCP4") {
         result.protocol = QAbstractSocket::IPv4Protocol;
-    } else if (protocol == "TCP6") {
+    }
+    else if (protocol == "TCP6") {
         result.protocol = QAbstractSocket::IPv6Protocol;
-    } else {
+    }
+    else {
         result.protocol = QAbstractSocket::UnknownNetworkLayerProtocol;
     }
 
@@ -29,25 +31,29 @@ ProxyLine ProxyLine::parseProxyLine(const QByteArray& line)
         result.sourceHost = QHostAddress(QString::fromLatin1(IrcDecoder::extractFragment(line, start)));
         IrcDecoder::skipEmptyParts(line, start);
         result.sourcePort = QString::fromLatin1(IrcDecoder::extractFragment(line, start)).toUShort(&ok);
-        if (!ok) result.sourcePort = 0;
+        if (!ok)
+            result.sourcePort = 0;
         IrcDecoder::skipEmptyParts(line, start);
         result.targetHost = QHostAddress(QString::fromLatin1(IrcDecoder::extractFragment(line, start)));
         IrcDecoder::skipEmptyParts(line, start);
         result.targetPort = QString::fromLatin1(IrcDecoder::extractFragment(line, start)).toUShort(&ok);
-        if (!ok) result.targetPort = 0;
+        if (!ok)
+            result.targetPort = 0;
     }
 
     return result;
 }
 
-
-QDebug operator<<(QDebug dbg, const ProxyLine& p) {
+QDebug operator<<(QDebug dbg, const ProxyLine& p)
+{
     dbg.nospace();
     dbg << "(protocol = " << p.protocol;
     if (p.protocol == QAbstractSocket::UnknownNetworkLayerProtocol) {
         dbg << ")";
-    } else {
-        dbg << ", sourceHost = " << p.sourceHost << ", sourcePort = " << p.sourcePort << ", targetHost = " << p.targetHost << ", targetPort = " << p.targetPort << ")";
+    }
+    else {
+        dbg << ", sourceHost = " << p.sourceHost << ", sourcePort = " << p.sourcePort << ", targetHost = " << p.targetHost
+            << ", targetPort = " << p.targetPort << ")";
     }
     return dbg.space();
 }

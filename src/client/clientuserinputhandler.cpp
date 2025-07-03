@@ -33,7 +33,7 @@ void ClientUserInputHandler::completionSuffixChanged(const QVariant& v)
     QString suffix = v.toString();
     QString letter = "A-Za-z";
     QString special = "\x5b-\x60\x7b-\x7d";  // NOLINT(modernize-raw-string-literal)
-	_nickRx = QRegularExpression(QString("^([%1%2][%1%2\\d-]*)%3").arg(letter, special, suffix).trimmed());
+    _nickRx = QRegularExpression(QString("^([%1%2][%1%2\\d-]*)%3").arg(letter, special, suffix).trimmed());
 }
 
 // this would be the place for a client-side hook
@@ -79,7 +79,8 @@ void ClientUserInputHandler::handleJoin(const BufferInfo& bufferInfo, const QStr
     if (channelName.isEmpty()) {
         if (bufferInfo.type() == BufferInfo::ChannelBuffer) {
             channelName = bufferInfo.bufferName();
-        } else {
+        }
+        else {
             Client::messageModel()->insertErrorMessage(bufferInfo, tr("/JOIN expects a channel"));
             return;
         }
@@ -103,7 +104,7 @@ void ClientUserInputHandler::handleQuery(const BufferInfo& bufferInfo, const QSt
 void ClientUserInputHandler::handleIgnore(const BufferInfo& bufferInfo, const QString& text)
 {
     if (text.isEmpty()) {
-        emit Client::instance()->displayIgnoreList("");
+        emit Client::instance() -> displayIgnoreList("");
         return;
     }
     // If rule contains no ! or @, we assume it is just a nickname, and turn it into an ignore rule for that nick

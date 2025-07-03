@@ -82,7 +82,6 @@ void ClientTransfer::onStatusChanged(Transfer::Status status)
         if (_file)
             _file->remove();
         break;
-    default:
-        ;
+    default:;
     }
 }

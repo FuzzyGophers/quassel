@@ -22,7 +22,8 @@ CoreTransfer::CoreTransfer(Direction direction,
     , _socket(nullptr)
     , _pos(0)
     , _reading(false)
-{}
+{
+}
 
 quint64 CoreTransfer::transferred() const
 {

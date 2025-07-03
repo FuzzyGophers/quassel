@@ -9,9 +9,9 @@
 
 #include <QCoreApplication>
 #include <QDateTime>
-#include <QTimeZone>
 #include <QDebug>
 #include <QRegularExpression>
+#include <QTimeZone>
 #include <QVector>
 
 QString nickFromMask(const QString& mask)
@@ -79,8 +79,8 @@ QString decodeString(const QByteArray& input, const QStringDecoder* decoder)
     // Skip UTF-8 detection if the decoder is valid and blacklisted
     if (decoder && utf8DetectionBlacklist.contains(QStringConverter::encodingForName(decoder->name()).value_or(QStringConverter::Utf8))) {
         QStringDecoder decoderInstance(QStringConverter::encodingForName(decoder->name()).value_or(QStringConverter::Utf8));
-		QString result = decoderInstance(input);
-		if (decoderInstance.hasError()) {
+        QString result = decoderInstance(input);
+        if (decoderInstance.hasError()) {
             qWarning() << "Decoding error with" << decoder->name() << "for input:" << input;
         }
         return result;
@@ -100,21 +100,21 @@ QString decodeString(const QByteArray& input, const QStringDecoder* decoder)
             continue;
         }
         if ((c & 0x80) == 0x00)
-            continue; // 7-bit ASCII
+            continue;  // 7-bit ASCII
         if ((c & 0xf8) == 0xf0) {
-            cnt = 3; // 4-byte char
+            cnt = 3;  // 4-byte char
             continue;
         }
         if ((c & 0xf0) == 0xe0) {
-            cnt = 2; // 3-byte char
+            cnt = 2;  // 3-byte char
             continue;
         }
         if ((c & 0xe0) == 0xc0) {
-            cnt = 1; // 2-byte char
+            cnt = 1;  // 2-byte char
             continue;
         }
         isUtf8 = false;
-        break; // Invalid UTF-8
+        break;  // Invalid UTF-8
     }
 
     if (isUtf8 && cnt == 0) {
@@ -123,7 +123,8 @@ QString decodeString(const QByteArray& input, const QStringDecoder* decoder)
     }
 
     // Use provided decoder or fall back to Latin1
-    QStringDecoder defaultDecoder(decoder ? QStringConverter::encodingForName(decoder->name()).value_or(QStringConverter::Latin1) : QStringConverter::Latin1);
+    QStringDecoder defaultDecoder(decoder ? QStringConverter::encodingForName(decoder->name()).value_or(QStringConverter::Latin1)
+                                          : QStringConverter::Latin1);
     QString result = defaultDecoder(input);
     if (defaultDecoder.hasError()) {
         qWarning() << "Decoding error with" << (decoder ? decoder->name() : "Latin1") << "for input:" << input;

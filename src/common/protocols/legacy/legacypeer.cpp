@@ -21,7 +21,8 @@ using namespace QuasselProtocol;
 LegacyPeer::LegacyPeer(::AuthHandler* authHandler, QTcpSocket* socket, Compressor::CompressionLevel level, QObject* parent)
     : RemotePeer(authHandler, socket, level, parent)
     , _useCompression(false)
-{}
+{
+}
 
 void LegacyPeer::setSignalProxy(::SignalProxy* proxy)
 {

@@ -7,7 +7,8 @@
 
 DebugMessageModelFilter::DebugMessageModelFilter(QObject* parent)
     : QSortFilterProxyModel(parent)
-{}
+{
+}
 
 QVariant DebugMessageModelFilter::headerData(int section, Qt::Orientation orientation, int role) const
 {

@@ -289,7 +289,8 @@ void IrcUser::partChannelInternal(IrcChannel* channel, bool skip_sync)
         disconnect(channel, nullptr, this, nullptr);
         channel->part(this);
         QString channelName = channel->name();
-        if (!skip_sync) SYNC_OTHER(partChannel, ARG(channelName))
+        if (!skip_sync)
+            SYNC_OTHER(partChannel, ARG(channelName))
         if (_channels.isEmpty() && !network()->isMe(this))
             quitInternal(skip_sync);
     }
@@ -309,7 +310,8 @@ void IrcUser::quitInternal(bool skip_sync)
         channel->part(this);
     }
     network()->removeIrcUser(this);
-    if (!skip_sync) SYNC_OTHER(quit, NO_ARG)
+    if (!skip_sync)
+        SYNC_OTHER(quit, NO_ARG)
     emit quited();
 }
 

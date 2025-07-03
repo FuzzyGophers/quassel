@@ -68,12 +68,9 @@ protected:
     inline void debugInfo(QDebug& dbg) const override
     {
         NetworkEvent::debugInfo(dbg);
-        dbg << ", prefix = " << qPrintable(prefix())
-            << ", target = " << qPrintable(target())
-            << ", ctcptype = " << (ctcpType() == Query ? "query" : "reply")
-            << ", cmd = " << qPrintable(ctcpCmd())
-            << ", param = " << qPrintable(param())
-            << ", reply = " << qPrintable(reply());
+        dbg << ", prefix = " << qPrintable(prefix()) << ", target = " << qPrintable(target())
+            << ", ctcptype = " << (ctcpType() == Query ? "query" : "reply") << ", cmd = " << qPrintable(ctcpCmd())
+            << ", param = " << qPrintable(param()) << ", reply = " << qPrintable(reply());
     }
 
 private:

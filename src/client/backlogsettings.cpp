@@ -5,7 +5,8 @@
 
 BacklogSettings::BacklogSettings()
     : ClientSettings("Backlog")
-{}
+{
+}
 
 int BacklogSettings::requesterType() const
 {

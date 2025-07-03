@@ -50,7 +50,8 @@ struct RegisterClient : public HandshakeMessage
         , clientVersion(std::move(clientVersion))
         , buildDate(std::move(buildDate))
         , sslSupported(sslSupported)
-    {}
+    {
+    }
 
     Quassel::Features features;
     QString clientVersion;
@@ -64,7 +65,8 @@ struct ClientDenied : public HandshakeMessage
 {
     inline ClientDenied(QString errorString)
         : errorString(std::move(errorString))
-    {}
+    {
+    }
 
     QString errorString;
 };
@@ -78,7 +80,8 @@ struct ClientRegistered : public HandshakeMessage
         , backendInfo(std::move(backendInfo))
         , authenticatorInfo(std::move(authenticatorInfo))
         , sslSupported(sslSupported)
-    {}
+    {
+    }
 
     Quassel::Features features;
     bool coreConfigured;
@@ -105,7 +108,8 @@ struct SetupData : public HandshakeMessage
         , setupData(std::move(setupData))
         , authenticator(std::move(authenticator))
         , authSetupData(std::move(authSetupData))
-    {}
+    {
+    }
 
     QString adminUser;
     QString adminPassword;
@@ -119,7 +123,8 @@ struct SetupFailed : public HandshakeMessage
 {
     inline SetupFailed(QString errorString)
         : errorString(std::move(errorString))
-    {}
+    {
+    }
 
     QString errorString;
 };
@@ -132,7 +137,8 @@ struct Login : public HandshakeMessage
     inline Login(QString user, QString password)
         : user(std::move(user))
         , password(std::move(password))
-    {}
+    {
+    }
 
     QString user;
     QString password;
@@ -142,7 +148,8 @@ struct LoginFailed : public HandshakeMessage
 {
     inline LoginFailed(QString errorString)
         : errorString(std::move(errorString))
-    {}
+    {
+    }
 
     QString errorString;
 };
@@ -158,7 +165,8 @@ struct SessionState : public HandshakeMessage
         : identities(std::move(identities))
         , bufferInfos(std::move(bufferInfos))
         , networkIds(std::move(networkIds))
-    {}
+    {
+    }
 
     QVariantList identities;
     QVariantList bufferInfos;
@@ -180,7 +188,8 @@ struct SyncMessage : public SignalProxyMessage
         , objectName(std::move(objectName))
         , slotName(std::move(slotName))
         , params(std::move(params))
-    {}
+    {
+    }
 
     QByteArray className;
     QString objectName;
@@ -194,7 +203,8 @@ struct RpcCall : public SignalProxyMessage
     RpcCall(QByteArray signalName, QVariantList params)
         : signalName(std::move(signalName))
         , params(std::move(params))
-    {}
+    {
+    }
 
     QByteArray signalName;
     QVariantList params;
@@ -206,7 +216,8 @@ struct InitRequest : public SignalProxyMessage
     InitRequest(QByteArray className, QString objectName)
         : className(std::move(className))
         , objectName(std::move(objectName))
-    {}
+    {
+    }
 
     QByteArray className;
     QString objectName;
@@ -219,7 +230,8 @@ struct InitData : public SignalProxyMessage
         : className(std::move(className))
         , objectName(std::move(objectName))
         , initData(std::move(initData))
-    {}
+    {
+    }
 
     QByteArray className;
     QString objectName;
@@ -232,7 +244,8 @@ struct HeartBeat
 {
     inline HeartBeat(QDateTime timestamp)
         : timestamp(std::move(timestamp))
-    {}
+    {
+    }
 
     QDateTime timestamp;
 };
@@ -241,12 +254,13 @@ struct HeartBeatReply
 {
     inline HeartBeatReply(QDateTime timestamp)
         : timestamp(std::move(timestamp))
-    {}
+    {
+    }
 
     QDateTime timestamp;
 };
 
-}  // namespace Protocol
+}  // namespace QuasselProtocol
 
 // Required for InternalPeer
 Q_DECLARE_METATYPE(QuasselProtocol::SyncMessage)

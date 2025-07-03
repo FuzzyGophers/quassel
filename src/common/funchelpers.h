@@ -9,11 +9,11 @@
 #include <type_traits>
 #include <utility>
 
-#include <boost/optional.hpp>
-
 #include <QDebug>
 #include <QVariant>
 #include <QVariantList>
+
+#include <boost/optional.hpp>
 
 // ---- Function traits --------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ struct FuncHelper : public FuncHelper<decltype(&Func::operator())>
 
 // Overload for free function
 template<typename R, typename... Args>
-struct FuncHelper<R(*)(Args...)>
+struct FuncHelper<R (*)(Args...)>
 {
     using FunctionType = std::function<R(Args...)>;
     using ReturnType = R;
@@ -37,14 +37,14 @@ struct FuncHelper<R(*)(Args...)>
 
 // Overload for member function with non-const call operator
 template<typename C, typename R, typename... Args>
-struct FuncHelper<R(C::*)(Args...)> : public FuncHelper<R(*)(Args...)>
+struct FuncHelper<R (C::*)(Args...)> : public FuncHelper<R (*)(Args...)>
 {
     using ClassType = C;
 };
 
 // Overload for member function with const call operator
 template<typename C, typename R, typename... Args>
-struct FuncHelper<R(C::*)(Args...) const> : public FuncHelper<R(C::*)(Args...)>
+struct FuncHelper<R (C::*)(Args...) const> : public FuncHelper<R (C::*)(Args...)>
 {};
 
 /// @endcond
@@ -63,7 +63,7 @@ namespace detail {
 
 // Helper for invoking the callable, wrapping its return value in a QVariant (default-constructed if callable returns void).
 // The correct overload is selected via SFINAE.
-template<typename Callable, typename ...Args>
+template<typename Callable, typename... Args>
 auto invokeWithArgs(const Callable& c, Args&&... args)
     -> std::enable_if_t<std::is_void<typename FunctionTraits<Callable>::ReturnType>::value, QVariant>
 {
@@ -71,7 +71,7 @@ auto invokeWithArgs(const Callable& c, Args&&... args)
     return QVariant{};
 }
 
-template<typename Callable, typename ...Args>
+template<typename Callable, typename... Args>
 auto invokeWithArgs(const Callable& c, Args&&... args)
     -> std::enable_if_t<!std::is_void<typename FunctionTraits<Callable>::ReturnType>::value, QVariant>
 {
@@ -79,14 +79,16 @@ auto invokeWithArgs(const Callable& c, Args&&... args)
 }
 
 // Helper for unpacking the argument list via an index sequence
-template<typename Callable, std::size_t ...Is, typename ArgsTuple = typename FunctionTraits<Callable>::ArgsTuple>
+template<typename Callable, std::size_t... Is, typename ArgsTuple = typename FunctionTraits<Callable>::ArgsTuple>
 boost::optional<QVariant> invokeWithArgsList(const Callable& c, const QVariantList& args, std::index_sequence<Is...>)
 {
     // Sanity check that all types can be converted
-    std::array<bool, std::tuple_size<ArgsTuple>::value> convertible{{args[Is].canConvert<std::decay_t<std::tuple_element_t<Is, ArgsTuple>>>()...}};
+    std::array<bool, std::tuple_size<ArgsTuple>::value> convertible{
+        {args[Is].canConvert<std::decay_t<std::tuple_element_t<Is, ArgsTuple>>>()...}};
     for (size_t i = 0; i < convertible.size(); ++i) {
         if (!convertible[i]) {
-            qWarning() << "Cannot convert parameter" << i << "from type" << args[static_cast<int>(i)].typeName() << "to expected argument type";
+            qWarning() << "Cannot convert parameter" << i << "from type" << args[static_cast<int>(i)].typeName()
+                       << "to expected argument type";
             return boost::none;
         }
     }
@@ -95,7 +97,7 @@ boost::optional<QVariant> invokeWithArgsList(const Callable& c, const QVariantLi
     return invokeWithArgs(c, args[Is].value<std::decay_t<std::tuple_element_t<Is, ArgsTuple>>>()...);
 }
 
-}  // detail
+}  // namespace detail
 
 /**
  * Invokes the given callable with the arguments contained in the given variant list.
@@ -138,14 +140,14 @@ boost::optional<QVariant> invokeWithArgsList(const Callable& c, const QVariantLi
  * @returns An optional containing a QVariant with the return value if the member function could be invoked with
  *          the given list of arguments; otherwise boost::none
  */
-template<typename R, typename C, typename ...Args>
-boost::optional<QVariant> invokeWithArgsList(C* object, R(C::*func)(Args...), const QVariantList& args)
+template<typename R, typename C, typename... Args>
+boost::optional<QVariant> invokeWithArgsList(C* object, R (C::*func)(Args...), const QVariantList& args)
 {
     if (sizeof...(Args) != args.size()) {
         qWarning().nospace() << "Argument count mismatch! Expected: " << sizeof...(Args) << ", actual: " << args.size();
         return boost::none;
     }
-    return detail::invokeWithArgsList([object, func](Args&&... args) {
-        return (object->*func)(std::forward<decltype(args)>(args)...);
-    }, args, std::make_index_sequence<sizeof...(Args)>{});
+    return detail::invokeWithArgsList([object, func](Args&&... args) { return (object->*func)(std::forward<decltype(args)>(args)...); },
+                                      args,
+                                      std::make_index_sequence<sizeof...(Args)>{});
 }

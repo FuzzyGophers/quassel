@@ -25,7 +25,8 @@ QHash<QString, std::shared_ptr<SettingsChangeNotifier>> Settings::_settingsChang
 Settings::Settings(QString group, QString appName)
     : _group(std::move(group))
     , _appName(std::move(appName))
-{}
+{
+}
 
 void Settings::setGroup(QString group)
 {

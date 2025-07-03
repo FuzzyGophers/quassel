@@ -9,7 +9,8 @@
 CoreAccountModel::CoreAccountModel(QObject* parent)
     : QAbstractListModel(parent)
     , _internalAccount(0)
-{}
+{
+}
 
 CoreAccountModel::CoreAccountModel(const CoreAccountModel* other, QObject* parent)
     : QAbstractListModel(parent)

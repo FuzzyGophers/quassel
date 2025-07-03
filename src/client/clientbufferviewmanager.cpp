@@ -9,7 +9,8 @@
 
 ClientBufferViewManager::ClientBufferViewManager(SignalProxy* proxy, QObject* parent)
     : BufferViewManager(proxy, parent)
-{}
+{
+}
 
 BufferViewConfig* ClientBufferViewManager::bufferViewConfigFactory(int bufferViewConfigId)
 {

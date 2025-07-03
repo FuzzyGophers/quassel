@@ -24,6 +24,7 @@ public:
                                    const QByteArray& prefix,
                                    const QString& cmd,
                                    const QList<QByteArray>& params);
+
 private:
     /**
      * Encodes a string as IRCv3 message tag value and appends it to the message

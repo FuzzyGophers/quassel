@@ -5,7 +5,8 @@
 
 NetworkConfig::NetworkConfig(const QString& objectName, QObject* parent)
     : SyncableObject(objectName, parent)
-{}
+{
+}
 
 void NetworkConfig::setPingTimeoutEnabled(bool enabled)
 {

@@ -1,19 +1,18 @@
 // SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "testglobal.h"
+#include "funchelpers.h"
 
 #include <QVariantList>
 
-#include "funchelpers.h"
+#include "testglobal.h"
 
 TEST(FuncHelpersTest, invokeLambdaWithArgsList)
 {
     int intVal{};
     QString stringVal{};
 
-    auto callable = [&intVal, &stringVal](int i, const QString& s)
-    {
+    auto callable = [&intVal, &stringVal](int i, const QString& s) {
         intVal = i;
         stringVal = s;
     };
@@ -62,8 +61,7 @@ TEST(FuncHelpersTest, invokeLambdaWithArgsListAndReturnValue)
     int intVal{};
     QString stringVal{};
 
-    auto callable = [&intVal, &stringVal](int i, const QString& s)
-    {
+    auto callable = [&intVal, &stringVal](int i, const QString& s) {
         intVal = i;
         stringVal = s;
         return -i;
@@ -94,10 +92,7 @@ public:
         stringVal = s;
     }
 
-    int intFunc(int i)
-    {
-        return -i;
-    }
+    int intFunc(int i) { return -i; }
 
     int intVal{};
     QString stringVal{};

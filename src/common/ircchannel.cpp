@@ -384,7 +384,7 @@ void IrcChannel::initSetChanModes(const QVariantMap& channelModes)
     }
 
     QString D_modes = channelModes["D"].toString();
-	for (int i = 0; i < D_modes.size(); i++) {
+    for (int i = 0; i < D_modes.size(); i++) {
         _D_channelModes << D_modes[i];
     }
 }
@@ -554,8 +554,7 @@ QStringList IrcChannel::modeValueList(const QChar& mode) const
         if (_A_channelModes.contains(mode))
             return _A_channelModes[mode];
         break;
-    default:
-        ;
+    default:;
     }
     return {};
 }

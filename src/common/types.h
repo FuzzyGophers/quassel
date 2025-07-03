@@ -122,7 +122,8 @@ struct UserId : public SignedId
 {
     inline UserId(int _id = 0)
         : SignedId(_id)
-    {}
+    {
+    }
     // inline operator QVariant() const { return QVariant::fromValue(*this); }  // no automatic conversion!
 };
 
@@ -130,7 +131,8 @@ struct MsgId : public SignedId64
 {
     inline MsgId(qint64 _id = 0)
         : SignedId64(_id)
-    {}
+    {
+    }
     // inline operator QVariant() const { return QVariant::fromValue(*this); }
 };
 
@@ -138,7 +140,8 @@ struct BufferId : public SignedId
 {
     inline BufferId(int _id = 0)
         : SignedId(_id)
-    {}
+    {
+    }
     // inline operator QVariant() const { return QVariant::fromValue(*this); }
 };
 
@@ -146,7 +149,8 @@ struct NetworkId : public SignedId
 {
     inline NetworkId(int _id = 0)
         : SignedId(_id)
-    {}
+    {
+    }
     // inline operator QVariant() const { return QVariant::fromValue(*this); }
 };
 
@@ -154,7 +158,8 @@ struct IdentityId : public SignedId
 {
     inline IdentityId(int _id = 0)
         : SignedId(_id)
-    {}
+    {
+    }
     // inline operator QVariant() const { return QVariant::fromValue(*this); }
 };
 
@@ -162,7 +167,8 @@ struct AccountId : public SignedId
 {
     inline AccountId(int _id = 0)
         : SignedId(_id)
-    {}
+    {
+    }
 };
 
 Q_DECLARE_METATYPE(UserId)
@@ -214,10 +220,7 @@ QDataStream& operator>>(QDataStream& in, T& value)
 template<typename T>
 struct Hash
 {
-    uint operator()(const T& t) const
-    {
-        return qHash(t);
-    }
+    uint operator()(const T& t) const { return qHash(t); }
 };
 
 // Exceptions
@@ -233,5 +236,6 @@ struct ExitException
     ExitException(int code = EXIT_FAILURE, QString error = {})
         : exitCode(code)
         , errorString(std::move(error))
-    {}
+    {
+    }
 };

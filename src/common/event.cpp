@@ -10,7 +10,8 @@
 
 Event::Event(EventManager::EventType type)
     : _type(type)
-{}
+{
+}
 
 Event::Event(EventManager::EventType type, QVariantMap& map)
     : _type(type)

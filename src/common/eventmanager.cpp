@@ -19,7 +19,8 @@ public:
     QueuedQuasselEvent(Event* event)
         : QEvent(QEvent::User)
         , event(event)
-    {}
+    {
+    }
     Event* event;
 };
 
@@ -28,7 +29,8 @@ public:
 // ============================================================
 EventManager::EventManager(QObject* parent)
     : QObject(parent)
-{}
+{
+}
 
 QMetaEnum EventManager::eventEnum()
 {

@@ -21,7 +21,10 @@
  */
 #define SYNCABLE_OBJECT                                                                                                                    \
 public:                                                                                                                                    \
-    const QMetaObject* syncMetaObject() const final override { return &staticMetaObject; }                                                 \
+    const QMetaObject* syncMetaObject() const final override                                                                               \
+    {                                                                                                                                      \
+        return &staticMetaObject;                                                                                                          \
+    }                                                                                                                                      \
                                                                                                                                            \
 private:
 

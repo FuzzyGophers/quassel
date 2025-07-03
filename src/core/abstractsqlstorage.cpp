@@ -18,7 +18,8 @@
 int AbstractSqlStorage::_nextConnectionId = 0;
 AbstractSqlStorage::AbstractSqlStorage(QObject* parent)
     : Storage(parent)
-{}
+{
+}
 
 AbstractSqlStorage::~AbstractSqlStorage()
 {
@@ -99,7 +100,7 @@ void AbstractSqlStorage::dbConnect(QSqlDatabase& db)
 Storage::State AbstractSqlStorage::init(const QVariantMap& settings, const QProcessEnvironment& environment, bool loadFromEnvironment)
 {
     setConnectionProperties(settings, environment, loadFromEnvironment);
-	_debug = true;
+    _debug = true;
     // _debug = Quassel::isOptionSet("debug");
 
     QSqlDatabase db = logDb();
@@ -118,9 +119,9 @@ Storage::State AbstractSqlStorage::init(const QVariantMap& settings, const QProc
 
     if (installedSchemaVersion() < schemaVersion()) {
         qInfo() << qPrintable(tr("Installed database schema (version %1) is not up to date. Upgrading to "
-                                  "version %2...  This may take a while for major upgrades.")
-                                   .arg(installedSchemaVersion())
-                                   .arg(schemaVersion()));
+                                 "version %2...  This may take a while for major upgrades.")
+                                  .arg(installedSchemaVersion())
+                                  .arg(schemaVersion()));
         emit dbUpgradeInProgress(true);
         auto upgradeResult = upgradeDb();
         emit dbUpgradeInProgress(false);
@@ -190,10 +191,10 @@ bool AbstractSqlStorage::setup(const QVariantMap& settings, const QProcessEnviro
     db.transaction();
     for (const auto& queryResource : setupQueries()) {
         QSqlQuery query(db);
-		query.exec(queryResource.queryString);
+        query.exec(queryResource.queryString);
         if (!watchQuery(query)) {
-            qCritical() << qPrintable(QString("Unable to setup Logging Backend!  Setup query failed (step: %1).")
-                                      .arg(queryResource.queryFilename));
+            qCritical() << qPrintable(
+                QString("Unable to setup Logging Backend!  Setup query failed (step: %1).").arg(queryResource.queryFilename));
             db.rollback();
             return false;
         }
@@ -239,7 +240,7 @@ bool AbstractSqlStorage::upgradeDb()
                 if (previousLaunchUpgradeStep == queryResource.queryFilename) {
                     // Found the matching query!
                     qInfo() << qPrintable(QString("Resuming interrupted upgrade for schema version %1 (last step: %2)")
-                                          .arg(QString::number(ver), previousLaunchUpgradeStep));
+                                              .arg(QString::number(ver), previousLaunchUpgradeStep));
 
                     // Stop searching for queries
                     resumingUpgrade = false;
@@ -254,11 +255,13 @@ bool AbstractSqlStorage::upgradeDb()
 
             // Run the upgrade query
             QSqlQuery query(db);
-			query.exec(queryResource.queryString);
+            query.exec(queryResource.queryString);
             if (!watchQuery(query)) {
                 // Individual upgrade query failed, bail out
-                qCritical() << qPrintable(QString("Unable to upgrade Logging Backend!  Upgrade query in schema version %1 failed (step: %2).")
-                                          .arg(ver).arg(queryResource.queryFilename));
+                qCritical() << qPrintable(
+                    QString("Unable to upgrade Logging Backend!  Upgrade query in schema version %1 failed (step: %2).")
+                        .arg(ver)
+                        .arg(queryResource.queryFilename));
                 return false;
             }
             else {
@@ -279,7 +282,7 @@ bool AbstractSqlStorage::upgradeDb()
             qCritical() << qPrintable(QString("Unable to resume interrupted upgrade in Logging "
                                               "Backend!  Missing upgrade step in schema version %1 "
                                               "(expected step: %2)")
-                                      .arg(QString::number(ver), previousLaunchUpgradeStep));
+                                          .arg(QString::number(ver), previousLaunchUpgradeStep));
             return false;
         }
 
@@ -421,7 +424,8 @@ void AbstractSqlStorage::connectionDestroyed()
 AbstractSqlStorage::Connection::Connection(const QString& name, QObject* parent)
     : QObject(parent)
     , _name(name.toLatin1())
-{}
+{
+}
 
 AbstractSqlStorage::Connection::~Connection()
 {
@@ -516,7 +520,8 @@ void AbstractSqlMigrator::dumpStatus()
 // ========================================
 AbstractSqlMigrationReader::AbstractSqlMigrationReader()
     : AbstractSqlMigrator()
-{}
+{
+}
 
 bool AbstractSqlMigrationReader::migrateTo(AbstractSqlMigrationWriter* writer)
 {

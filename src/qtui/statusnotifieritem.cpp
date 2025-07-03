@@ -38,7 +38,8 @@ class QuasselDBusMenuExporter : public DBusMenuExporter
 public:
     QuasselDBusMenuExporter(const QString& dbusObjectPath, QMenu* menu, const QDBusConnection& dbusConnection)
         : DBusMenuExporter(dbusObjectPath, menu, dbusConnection)
-    {}
+    {
+    }
 
 protected:
     QString iconNameForAction(QAction* action) override  // TODO Qt 4.7: fixme when we have converted our iconloader

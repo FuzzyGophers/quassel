@@ -8,7 +8,8 @@
 
 FlatProxyModel::FlatProxyModel(QObject* parent)
     : QAbstractProxyModel(parent)
-{}
+{
+}
 
 QModelIndex FlatProxyModel::mapFromSource(const QModelIndex& sourceIndex) const
 {

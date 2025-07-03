@@ -776,12 +776,8 @@ void ChatScene::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
     // If we have text selected, insert the Copy Selection as first item
     if (isPosOverSelection(pos)) {
         QAction* sep = menu.insertSeparator(menu.actions().first());
-        QAction* act = new Action(icon::get("edit-copy"),
-                                  tr("Copy Selection"),
-                                  &menu,
-                                  this,
-                                  [this]() { selectionToClipboard(); },
-                                  QKeySequence::Copy);
+        QAction* act
+            = new Action(icon::get("edit-copy"), tr("Copy Selection"), &menu, this, [this]() { selectionToClipboard(); }, QKeySequence::Copy);
         menu.insertAction(sep, act);
 
         QString searchSelectionText = selection();
@@ -1323,7 +1319,7 @@ void ChatScene::updateTimestampHasBrackets()
         // Note that '\' must be escaped as '\\'
         // Helpful interactive website for debugging and explaining:  https://regex101.com/
         static const QRegularExpression regExpMatchBrackets(R"(^\s*[({[<].+[)}\]>]\s*$)");
-		QRegularExpressionMatch match = regExpMatchBrackets.match(_timestampFormatString);
-		_timestampHasBrackets = match.hasMatch();
+        QRegularExpressionMatch match = regExpMatchBrackets.match(_timestampFormatString);
+        _timestampHasBrackets = match.hasMatch();
     }
 }

@@ -13,7 +13,8 @@ class PreviewBufferView : public BufferView
 public:
     PreviewBufferView(QWidget* parent = nullptr)
         : BufferView(parent)
-    {}
+    {
+    }
 
 protected:
     void keyPressEvent(QKeyEvent* event) override { QTreeView::keyPressEvent(event); }

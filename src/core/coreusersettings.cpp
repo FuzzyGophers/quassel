@@ -6,7 +6,8 @@
 CoreUserSettings::CoreUserSettings(UserId uid)
     : CoreSettings(QString("CoreUser/%1").arg(uid.toInt()))
     , user(uid)
-{}
+{
+}
 
 Identity CoreUserSettings::identity(IdentityId id) const
 {

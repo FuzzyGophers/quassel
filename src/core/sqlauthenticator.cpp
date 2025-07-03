@@ -9,7 +9,8 @@
 
 SqlAuthenticator::SqlAuthenticator(QObject* parent)
     : Authenticator(parent)
-{}
+{
+}
 
 bool SqlAuthenticator::isAvailable() const
 {

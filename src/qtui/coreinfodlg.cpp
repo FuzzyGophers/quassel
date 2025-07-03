@@ -7,8 +7,8 @@
 
 #include "bufferwidget.h"
 #include "client.h"
-#include "qlocale.h"
 #include "icon.h"
+#include "qlocale.h"
 #include "util.h"
 
 CoreInfoDlg::CoreInfoDlg(QWidget* parent)
@@ -85,8 +85,8 @@ void CoreInfoDlg::coreInfoChanged(const QVariantMap& coreInfo)
             ui.labelCoreVersionDate->setText(QString("<i>%1</i>").arg(tr("Unknown date")));
         }
         else {
-            ui.labelCoreVersionDate->setText(QLocale().toString(
-                QDateTime::fromString(coreInfo["quasselBuildDate"].toString(), Qt::ISODate), QLocale::ShortFormat));
+            ui.labelCoreVersionDate->setText(
+                QLocale().toString(QDateTime::fromString(coreInfo["quasselBuildDate"].toString(), Qt::ISODate), QLocale::ShortFormat));
         }
         ui.labelClientCount->setNum(coreInfo["sessionConnectedClients"].toInt());
     }
