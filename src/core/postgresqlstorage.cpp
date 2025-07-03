@@ -12,6 +12,8 @@
 #include "network.h"
 #include "quassel.h"
 
+#include <vector>
+
 PostgreSqlStorage::PostgreSqlStorage(QObject* parent)
     : AbstractSqlStorage(parent)
 {}
@@ -1802,7 +1804,7 @@ std::vector<Message> PostgreSqlStorage::requestMsgs(UserId user, BufferId buffer
     if (limit != -1)
         params << limit;
     else
-        params << QVariant(QVariant::Int);
+        params << QVariant(QMetaType(QMetaType::Int)); // Replaced QVariant(QVariant::Int)
 
     QSqlQuery query = executePreparedQuery(queryName, params, db);
 
@@ -1939,14 +1941,14 @@ std::vector<Message> PostgreSqlStorage::requestMsgsForward(
     params << bufferId.toInt();
 
     int typeRaw = type;
-    int flagsRaw = flags;
     params << typeRaw;
+    int flagsRaw = flags;
     params << flagsRaw;
 
     if (limit != -1)
         params << limit;
     else
-        params << QVariant(QVariant::Int);
+        params << QVariant(QMetaType(QMetaType::Int)); // Replaced QVariant(QVariant::Int)
 
     QSqlQuery query = executePreparedQuery("select_messagesForward", params, db);
 
