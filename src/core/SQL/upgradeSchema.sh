@@ -1,8 +1,8 @@
 #!/bin/bash
-# Copyright (C) 2005-2022 by the Quassel Project - devel@quassel-irc.org
-# Licensed under GNU General Public License version 2, or (at your option)
-# version 3.
-#
+
+# SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # Call this script whenever you need to add a new database schema version.
 # You can also simply create a new folder in '[SQLite/PostgreSQL]/version/##',
 # where '##' represents your new version number, incremented by one from

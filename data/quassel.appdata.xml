@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2016 Quassel Project <devel@quassel-irc.org> -->
+<!-- SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org> -->
+<!-- SPDX-License-Identifier: GPL-2.0-or-later -->
 <component type="desktop">
 	<id>quassel.desktop</id>
 	<metadata_license>CC0-1.0</metadata_license>
