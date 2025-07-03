@@ -1,3 +1,4 @@
+// SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
 /*
   This file has been derived from Konversation, the KDE IRC client.
   You can redistribute it and/or modify it under the terms of the
