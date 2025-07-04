@@ -1,3 +1,6 @@
+/* SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org> */
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+
 SELECT COALESCE(t.sum,0)
 FROM
   (SELECT COUNT(*) AS sum FROM backlog

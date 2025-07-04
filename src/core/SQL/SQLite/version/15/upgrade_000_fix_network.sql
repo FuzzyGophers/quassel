@@ -1,3 +1,9 @@
+/* SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org> */
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+
+/* SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org> */
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+
 UPDATE network
 SET userandomserver = length(replace(replace(replace(userandomserver,'true','1'), 'false', '0'), '0', '')),
     useautoidentify = length(replace(replace(replace(useautoidentify,'true','1'), 'false', '0'), '0', '')),

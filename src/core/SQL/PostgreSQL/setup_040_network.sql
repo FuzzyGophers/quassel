@@ -1,3 +1,6 @@
+/* SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org> */
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+
 CREATE TABLE network (
        networkid serial NOT NULL PRIMARY KEY,
        userid integer NOT NULL REFERENCES quasseluser (userid) ON DELETE CASCADE,
