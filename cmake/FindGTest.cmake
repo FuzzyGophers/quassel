@@ -20,9 +20,9 @@
 
 include(FindPackageHandleStandardArgs)
 
-set(GTEST_VERSION "1.8.1")
+set(GTEST_VERSION "1.17.0")
 
-set(GTEST_BASE_DIR "${CMAKE_SOURCE_DIR}/3rdparty/googletest-${GTEST_VERSION}")
+set(GTEST_BASE_DIR "${CMAKE_SOURCE_DIR}/3rdparty/googletest")
 set(GTEST_SRC_DIR "${GTEST_BASE_DIR}/googletest")
 set(GTEST_INC_DIR "${GTEST_BASE_DIR}/googletest/include")
 set(GMOCK_SRC_DIR "${GTEST_BASE_DIR}/googlemock")
