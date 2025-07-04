@@ -1,18 +1,13 @@
 #!/usr/bin/env perl
-## infobash: Copyright (C) 2005-2007  Michiel de Boer aka locsmif
-## inxi: Copyright (C) 2008-2018 Harald Hope
-##       Additional features (C) Scott Rogers - kde, cpu info
-## Further fixes (listed as known): Horst Tritremmel <hjt at sidux.com>
-## Steven Barrett (aka: damentz) - usb audio patch; swap percent used patch
-## Jarett.Stevens - dmidecode -M patch for older systems with the /sys
-##
-## License: GNU GPL v3 or greater
-##
-## You should have received a copy of the GNU General Public License
-## along with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-## If you don't understand what Free Software is, please read (or reread)
-## this page: http://www.gnu.org/philosophy/free-sw.html
+
+## SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
+## SPDX-FileCopyrightText: 2005-2007 Michiel de Boer
+## SPDX-FileCopyrightText: 2008-2018 Harald Hope
+## SPDX-FileCopyrightText: 2008-2018 Scott Rogers
+## SPDX-FileCopyrightText: 2008-2018 Horst Tritremmel <hjt@sidux.com>
+## SPDX-FileCopyrightText: 2008-2018 Steven Barrett
+## SPDX-FileCopyrightText: 2008-2018 Jarett.Stevens
+## SPDX-License-Identifier: GPL-3.0-or-later
 
 use strict;
 use warnings;
