@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # Workflow that builds Quassel on various Linux distros, and creates packages for both Windows and macOS.
 # For tagged pushes, a draft release is automatically created, using the tag message as release description
 # and attaching Windows and macOS builds, as well as the source archive.

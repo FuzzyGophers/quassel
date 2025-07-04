@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # pics/ contains non-themed icons and other graphical resources
 
 if (WANT_MONO OR WANT_QTCLIENT)

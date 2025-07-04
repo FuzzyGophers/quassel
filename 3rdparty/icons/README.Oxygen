@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2005-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 The icons found in the oxygen directory are a stripped version of the Oxygen
 icon theme, part of KDE4, as found in KDE's svn. We have removed the parts of
 the theme we don't use in order to conserve space in our own repository and to
