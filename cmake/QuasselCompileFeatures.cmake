@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2018-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # The compile(r) features required to build the Quassel source.
 # This list is used by CMake to determine if the compiler can build the code.
 set(QUASSEL_COMPILE_FEATURES

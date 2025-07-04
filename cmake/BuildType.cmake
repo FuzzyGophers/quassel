@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2018-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # Derived from Marcus D. Hanwell's suggestion
 # https://blog.kitware.com/cmake-and-the-default-build-type/
 

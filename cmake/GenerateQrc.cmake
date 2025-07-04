@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2018-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # Generates a .qrc file named ${QRC_FILE} with path prefix ${PREFIX}, containing
 # all files matching the glob ${PATTERNS} in the current working directory.
 # This script is intended to be executed using the cmake -P syntax, so the

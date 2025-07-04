@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2018-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # It is recommended that projects build GTest/GMock themselves, rather
 # than relying on system-provided libraries. This is to ensure that the
 # same build configuration is used for both test cases and the

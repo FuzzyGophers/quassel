@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2018-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: BSD-3-Clause
+
 # Set up version-related information
 ###############################################################################
 

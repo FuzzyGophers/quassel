@@ -1,10 +1,5 @@
-# This file sets up install locations for Quassel
-#
-# (C) 2015 by the Quassel Project <devel@quassel-irc.org>
-#
-# Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
-
+# SPDX-FileCopyrightText: 2015-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: BSD-3-Clause
 
 # Setup install locations
 #####################################################################

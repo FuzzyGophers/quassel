@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2018-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 include(BundleUtilities)
 
 # After the relevant targets, support files, as well as plugins have already been installed into the bundle structure,

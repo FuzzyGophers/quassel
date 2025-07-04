@@ -1,10 +1,5 @@
-# This file contains various functions and macros useful for building Quassel.
-#
-# (C) 2014-2022 by the Quassel Project <devel@quassel-irc.org>
-#
-# Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
-###################################################################################################
+# SPDX-FileCopyrightText: 2014-2025 Quassel Project <devel@quassel-irc.org>
+# SPDX-License-Identifier: BSD-3-Clause
 
 include(CMakeParseArguments)
 include(GenerateExportHeader)
