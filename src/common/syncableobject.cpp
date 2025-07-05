@@ -5,7 +5,7 @@
 
 #include <QDebug>
 #include <QMetaProperty>
-#include <QMetaType>
+#include <QMetaType>  // Added for Qt 6 compatibility
 
 #include "signalproxy.h"
 #include "util.h"
@@ -56,7 +56,7 @@ QVariantMap SyncableObject::toVariantMap()
 
     const QMetaObject* meta = metaObject();
 
-    // we collect data from properties
+    // Collect data from properties
     QMetaProperty prop;
     QString propName;
     for (int i = 0; i < meta->propertyCount(); i++) {
@@ -67,20 +67,22 @@ QVariantMap SyncableObject::toVariantMap()
         properties[propName] = prop.read(this);
     }
 
-    // ...as well as methods, which have names starting with "init"
+    // Collect data from methods starting with "init"
     for (int i = 0; i < meta->methodCount(); i++) {
         QMetaMethod method = meta->method(i);
         QString methodname(SignalProxy::ExtendedMetaObject::methodName(method));
         if (!methodname.startsWith("init") || methodname.startsWith("initSet") || methodname.startsWith("initDone"))
             continue;
 
+        // Use QMetaType instead of QVariant::Type for Qt 6 compatibility
         QMetaType metaType = QMetaType::fromName(method.typeName());
-        if (!metaType.isValid() && !QByteArray(method.typeName()).isEmpty()) {
+        if (metaType.id() == QMetaType::UnknownType && !QByteArray(method.typeName()).isEmpty()) {
             qWarning() << "SyncableObject::toVariantMap(): cannot fetch init data for:" << this << method.methodSignature()
                        << "- Returntype is unknown to Qt's MetaSystem:" << QByteArray(method.typeName());
             continue;
         }
 
+        // Create QVariant with QMetaType
         QVariant value(metaType, nullptr);
         QGenericReturnArgument genericvalue = QGenericReturnArgument(method.typeName(), value.data());
         QMetaObject::invokeMethod(this, methodname.toLatin1(), genericvalue);

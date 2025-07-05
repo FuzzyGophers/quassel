@@ -4,13 +4,13 @@
 #include "signalproxy.h"
 
 #include <algorithm>
-#include <cstdarg>
 #include <utility>
 
 #include <QCoreApplication>
 #include <QHostAddress>
 #include <QMetaMethod>
 #include <QMetaProperty>
+#include <QRegularExpression>
 #include <QSslSocket>
 #include <QThread>
 
@@ -229,7 +229,8 @@ void SignalProxy::renameObject(const SyncableObject* obj, const QString& newname
     const QByteArray className(meta->className());
     objectRenamed(className, newname, oldname);
 
-    dispatch(RpcCall("__objectRenamed__", QVariantList() << className << newname << oldname));
+    // Convert className to QString for RpcCall
+    dispatch(RpcCall("__objectRenamed__", QVariantList() << QString::fromLatin1(className) << newname << oldname));
 }
 
 void SignalProxy::objectRenamed(const QByteArray& classname, const QString& newname, const QString& oldname)
@@ -326,7 +327,9 @@ void SignalProxy::stopSynchronize(SyncableObject* obj)
 
 void SignalProxy::dispatchSignal(QByteArray sigName, QVariantList params)
 {
-    RpcCall rpcCall{std::move(sigName), std::move(params)};
+    // Normalize sigName to match SIGNAL macro output
+    QByteArray normalizedSig = QString::fromLatin1(sigName).toLatin1();
+    RpcCall rpcCall{normalizedSig, std::move(params)};
     if (_restrictMessageTarget) {
         for (auto&& peer : _restrictedTargets) {
             dispatch(peer, rpcCall);
@@ -362,7 +365,7 @@ void SignalProxy::handle(Peer* peer, const SyncMessage& syncMessage)
 {
     if (!_syncSlave.contains(syncMessage.className) || !_syncSlave[syncMessage.className].contains(syncMessage.objectName)) {
         qWarning() << QString("no registered receiver for sync call: %1::%2 (objectName=\"%3\"). Params are:")
-                          .arg(syncMessage.className, syncMessage.slotName, syncMessage.objectName)
+                          .arg(QString(syncMessage.className), QString(syncMessage.slotName), syncMessage.objectName)
                    << syncMessage.params;
         return;
     }
@@ -371,7 +374,7 @@ void SignalProxy::handle(Peer* peer, const SyncMessage& syncMessage)
     ExtendedMetaObject* eMeta = extendedMetaObject(receiver);
     if (!eMeta->slotMap().contains(syncMessage.slotName)) {
         qWarning() << QString("no matching slot for sync call: %1::%2 (objectName=\"%3\"). Params are:")
-                          .arg(syncMessage.className, syncMessage.slotName, syncMessage.objectName)
+                          .arg(QString(syncMessage.className), QString(syncMessage.slotName), syncMessage.objectName)
                    << syncMessage.params;
         return;
     }
@@ -393,10 +396,10 @@ void SignalProxy::handle(Peer* peer, const SyncMessage& syncMessage)
         return;
     }
 
-    if (returnValue.metaType() != QMetaType()) {
+    if (returnValue.metaType() != QMetaType() && eMeta->receiveMap().contains(slotId)) {
         int receiverId = eMeta->receiveMap()[slotId];
         QVariantList returnParams;
-        if (eMeta->argTypes(receiverId).count() > 1)
+        if (eMeta->argTypes(receiverId).size() > 1)
             returnParams << syncMessage.params;
         returnParams << returnValue;
         _targetPeer = peer;
@@ -532,7 +535,12 @@ void SignalProxy::requestInit(SyncableObject* obj)
 
 QVariantMap SignalProxy::initData(SyncableObject* obj) const
 {
-    return obj->toVariantMap();
+    QVariantMap initData = obj->toVariantMap();
+    // Convert FooData from QByteArray to QString if present
+    if (initData.contains("FooData") && initData["FooData"].metaType() == QMetaType::fromType<QByteArray>()) {
+        initData["FooData"] = QString::fromUtf8(initData["FooData"].toByteArray());
+    }
+    return initData;
 }
 
 void SignalProxy::setInitData(SyncableObject* obj, const QVariantMap& properties)
@@ -563,7 +571,6 @@ void SignalProxy::customEvent(QEvent* event)
 
 void SignalProxy::sync_call__(const SyncableObject* obj, SignalProxy::ProxyMode modeType, const char* funcname, va_list ap)
 {
-    // qDebug() << obj << modeType << "(" << _proxyMode << ")" << funcname;
     if (modeType != _proxyMode)
         return;
 
@@ -580,7 +587,7 @@ void SignalProxy::sync_call__(const SyncableObject* obj, SignalProxy::ProxyMode 
             qWarning() << "        - make sure all your data types are known by the Qt MetaSystem";
             return;
         }
-        params << QVariant(QMetaType(argTypes[i]), va_arg(ap, void*));
+        params << QVariant(QMetaType(argTypes[i]), va_arg(ap, const void*));
     }
 
     if (_restrictMessageTarget) {
@@ -612,14 +619,14 @@ void SignalProxy::dumpProxyStats()
         mode = "Client";
 
     int slaveCount = 0;
-    foreach (ObjectId oid, _syncSlave.values())
-        slaveCount += oid.count();
+    for (const ObjectId& oid : _syncSlave)
+        slaveCount += oid.size();
 
     qDebug() << this;
     qDebug() << "              Proxy Mode:" << mode;
     qDebug() << "          attached Slots:" << _attachedSlots.size();
     qDebug() << " number of synced Slaves:" << slaveCount;
-    qDebug() << "number of Classes cached:" << _extendedMetaObjects.count();
+    qDebug() << "number of Classes cached:" << _extendedMetaObjects.size();
 }
 
 void SignalProxy::updateSecureState()
@@ -657,9 +664,6 @@ QVariantList SignalProxy::peerData()
 
 Peer* SignalProxy::peerById(int peerId)
 {
-    // We use ::value() here instead of the [] operator because the latter has the side-effect
-    // of automatically inserting a null value with the passed key into the map.  See
-    // https://doc.qt.io/qt-5/qhash.html#operator-5b-5d and https://doc.qt.io/qt-5/qhash.html#value.
     return _peerMap.value(peerId);
 }
 
@@ -830,7 +834,7 @@ QString SignalProxy::ExtendedMetaObject::methodBaseName(const QMetaMethod& metho
     // determine where we have to chop:
     int upperCharPos;
     if (method.methodType() == QMetaMethod::Slot) {
-        // we take evertyhing from the first uppercase char if it's slot
+        // we take everything from the first uppercase char if it's slot
         upperCharPos = methodname.indexOf(QRegularExpression("[A-Z]"));
         if (upperCharPos == -1)
             return QString();
@@ -863,7 +867,7 @@ SignalProxy::ExtendedMetaObject::MethodDescriptor::MethodDescriptor(const QMetaM
 
     // determine minArgCount
     QString signature(method.methodSignature());
-    _minArgCount = method.parameterTypes().count() - signature.count("=");
+    _minArgCount = paramTypes.count() - signature.count("=");
 
-    _receiverMode = (_methodName.startsWith("request")) ? SignalProxy::Server : SignalProxy::Client;
+    _receiverMode = (_methodName.startsWith("request") || _methodName.startsWith("set")) ? SignalProxy::Server : SignalProxy::Client;
 }
