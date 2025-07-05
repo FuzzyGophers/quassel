@@ -41,10 +41,6 @@ Quassel::Quassel()
     , _logger{new Logger{this}}
 {
 #ifdef EMBED_DATA
-    // Ensure QCoreApplication is initialized before accessing QTime
-    if (!QCoreApplication::instance()) {
-        qWarning() << "QCoreApplication not initialized during Quassel construction.";
-    }
     Q_INIT_RESOURCE(i18n);
 #endif
 }
