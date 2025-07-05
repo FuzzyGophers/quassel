@@ -328,7 +328,7 @@ void SignalProxy::stopSynchronize(SyncableObject* obj)
 void SignalProxy::dispatchSignal(QByteArray sigName, QVariantList params)
 {
     // Normalize sigName to match SIGNAL macro output
-    QByteArray normalizedSig = QString::fromLatin1(sigName).toLatin1();
+    QByteArray normalizedSig = QMetaObject::normalizedSignature(sigName.constData());
     RpcCall rpcCall{normalizedSig, std::move(params)};
     if (_restrictMessageTarget) {
         for (auto&& peer : _restrictedTargets) {
